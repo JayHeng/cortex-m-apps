@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <components>
+    <component name="platform.devices.evkbimxrt1050_flash" type="debugger" requires="devices.boards.evkbimxrt1050" provides="platform.devices.device platform.devices.MIMXRT1052xxxxx">
+      <source path="./" requires="mcuxpresso">
+        <files mask="board_memory.meta"/>
+      </source>
+      <source path="./mcuxpresso" requires="mcuxpresso">
+        <files mask="MIMXRT1050-EVK_S26KS512S.cfx"/>
+        <files mask="MIMXRT1050-EVK_IS25WP064A.cfx"/>
+      </source>
+    </component>
+  </components>
+  <manifest_metadata_set>
+    <manifest_metadata key="memory" bindings="devices.boards.evkbimxrt1050">
+      <specific>
+        <content>
+          <memory ram_size_kb="32768" flash_size_kb="65536">
+            <memoryBlock id="BOARD_FLASH_evkbimxrt1050" name="BOARD_FLASH" addr="60000000" size="04000000" type="ExtFlash" access="RO"/>
+            <memoryBlock id="BOARD_SDRAM_evkbimxrt1050" name="BOARD_SDRAM" addr="80000000" size="02000000" type="RAM" access="RW"/>
+          </memory>
+        </content>
+      </specific>
+    </manifest_metadata>
+  </manifest_metadata_set>
+  <debug_configurations>
+    <debug_configuration id_refs="com.crt.advproject.config.exe.debug com.crt.advproject.config.exe.release" bindings="mcuxpresso devices.boards.evkbimxrt1050">
+      <drivers>
+        <driver memory_block="BOARD_FLASH_evkbimxrt1050">
+          <driver_binary path="devices/MIMXRT1052/mcuxpresso">
+            <files mask="MIMXRT1050-EVK_S26KS512S.cfx"/>
+          </driver_binary>
+        </driver>
+        <driver memory_block="BOARD_FLASH_evkbimxrt1050">
+          <driver_binary path="devices/MIMXRT1052/mcuxpresso">
+            <files mask="MIMXRT1050-EVK_IS25WP064A.cfx"/>
+          </driver_binary>
+        </driver>
+      </drivers>
+    </debug_configuration>
+  </debug_configurations>
+</metadata>

@@ -53,6 +53,11 @@ const clock_usb_pll_config_t usb1PllConfig = {.loopDivider = 0U};
 extern uint32_t SystemCoreClock;
 
 /*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+extern void hapi_clock_init(void);
+
+/*******************************************************************************
  * Code
  ******************************************************************************/
 static void BOARD_BootClockGate(void)
@@ -69,6 +74,9 @@ static void BOARD_BootClockGate(void)
 
 void BOARD_BootClockRUN(void)
 {
+    /* Do clock configuration as Boot ROM did*/
+    hapi_clock_init();
+
     /* Boot ROM did initialize the XTAL, here we only sets external XTAL OSC freq */
     CLOCK_SetXtalFreq(24000000U);
     CLOCK_SetRtcXtalFreq(32768U);

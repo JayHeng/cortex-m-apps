@@ -1054,7 +1054,7 @@
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long, no flags, without multibyte support.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -1096,7 +1096,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>MIMXRT1052xxx5A	NXP MIMXRT1052xxx5A</state>
+                    <state>MIMXRT1052xxx6A	NXP MIMXRT1052xxx6A</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -1156,7 +1156,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>MIMXRT1052xxx5A	NXP MIMXRT1052xxx5A</state>
+                    <state>MIMXRT1052xxx6A	NXP MIMXRT1052xxx6A</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -1191,7 +1191,7 @@
                 <option>
                     <name>OGPrintfVariant</name>
                     <version>0</version>
-                    <state>4</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>OGPrintfMultibyteSupport</name>
@@ -1235,6 +1235,10 @@
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
                     <state>CPU_MIMXRT1052DVL6B</state>
+                    <state>PRINTF_FLOAT_ENABLE=0</state>
+                    <state>SCANF_FLOAT_ENABLE=0</state>
+                    <state>PRINTF_ADVANCED_ENABLE=0</state>
+                    <state>SCANF_ADVANCED_ENABLE=0</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1274,7 +1278,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state></state>
+                    <state>Pa082,Pa050,Pe167</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -2071,10 +2075,10 @@
                 <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\hardware_init.c</name>
+                <name>$PROJ_DIR$\..\..\src\hapi_irom_clock.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\hello_world.c</name>
+                <name>$PROJ_DIR$\..\..\src\hardware_init.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\src\pin_mux.c</name>
@@ -2083,18 +2087,6 @@
                 <name>$PROJ_DIR$\..\..\src\pin_mux.h</name>
             </file>
         </group>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\drivers\fsl_clock.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\iar\startup_MIMXRT1052.s</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.h</name>
-        </file>
     </group>
     <group>
         <name>src</name>
@@ -2102,6 +2094,12 @@
             <name>platform</name>
             <group>
                 <name>drivers</name>
+                <group>
+                    <name>clock</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\drivers\fsl_clock.c</name>
+                    </file>
+                </group>
                 <group>
                     <name>igpio</name>
                     <file>
@@ -2137,5 +2135,20 @@
                 </file>
             </group>
         </group>
+        <group>
+            <name>startup</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\iar\startup_MIMXRT1052.s</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.h</name>
+            </file>
+        </group>
+        <file>
+            <name>$PROJ_DIR$\..\..\src\hello_world.c</name>
+        </file>
     </group>
 </project>

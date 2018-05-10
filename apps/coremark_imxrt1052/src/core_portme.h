@@ -53,11 +53,11 @@
  #ifdef __GNUC__
  #define COMPILER_VERSION "GCC"__VERSION__
  #else
- #define COMPILER_VERSION "Please put compiler version here (e.g. gcc 4.1)"
+ #define COMPILER_VERSION "IAR EWARM v8.20.2"
  #endif
 #endif
 #ifndef COMPILER_FLAGS 
- #define COMPILER_FLAGS FLAGS_STR /* "Please put compiler flags here (e.g. -o3)" */
+ #define COMPILER_FLAGS "High - Speed" /* "Please put compiler flags here (e.g. -o3)" */
 #endif
 #ifndef MEM_LOCATION 
  #define MEM_LOCATION "STACK"
@@ -76,7 +76,7 @@ typedef double ee_f32;
 typedef unsigned char ee_u8;
 typedef unsigned int ee_u32;
 typedef ee_u32 ee_ptr_int;
-typedef size_t ee_size_t;
+typedef unsigned int ee_size_t;
 #define NULL ((void *)0)
 /* align_mem :
 	This macro is used to align an offset to point to a 32b value. It is used in the Matrix algorithm to initialize the input memory blocks.
@@ -86,7 +86,7 @@ typedef size_t ee_size_t;
 /* Configuration : CORE_TICKS
 	Define type of return from the timing functions.
  */
-#define CORETIMETYPE ee_u32 
+#define CORETIMETYPE uint64_t
 typedef ee_u32 CORE_TICKS;
 
 /* Configuration : SEED_METHOD

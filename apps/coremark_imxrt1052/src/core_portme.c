@@ -7,6 +7,9 @@
 */ 
 #include "coremark.h"
 #include "core_portme.h"
+#include "app.h"
+#include "clock_config.h"
+#include "fsl_pit.h"
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -25,13 +28,49 @@
 #endif
 	volatile ee_s32 seed4_volatile=ITERATIONS;
 	volatile ee_s32 seed5_volatile=0;
+
+volatile uint32_t s_timerHighCounter = 0;
+void PIT_IRQ_HANDLER(void)
+{
+    /* Clear interrupt flag.*/
+    PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+    s_timerHighCounter++;
+}
+
+void timer_pit_init(void)
+{
+    /* Structure of initialize PIT */
+    pit_config_t pitConfig;
+    PIT_GetDefaultConfig(&pitConfig);
+    /* Init pit module */
+    PIT_Init(PIT, &pitConfig);
+    /* Set max timer period for channel 0 */
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t)~0);
+    /* Enable timer interrupts for channel 0 */
+    PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+    /* Enable at the NVIC */
+    EnableIRQ(PIT_IRQ_ID);
+    /* Start channel 0 */
+    PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
 /* Porting : Timing functions
 	How to capture time and convert to seconds must be ported to whatever is supported by the platform.
 	e.g. Read value from on board RTC, read value from cpu clock cycles performance counter etc. 
 	Sample implementation for standard time.h and windows.h definitions included.
 */
 CORETIMETYPE barebones_clock() {
-	#error "You must implement a method to measure time in barebones_clock()! This function should return current time.\n"
+    uint64_t retVal;
+    uint32_t high;
+    uint32_t low;
+    do
+    {
+        high = s_timerHighCounter;
+        low = ~PIT_GetCurrentTimerCount(PIT, kPIT_Chnl_0);
+    } while (high != s_timerHighCounter);
+    retVal = ((uint64_t)high << 32U) + low;
+
+    return retVal;
 }
 /* Define : TIMER_RES_DIVIDER
 	Divider to trade off timer resolution and total time that can be measured.
@@ -39,6 +78,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
+#define CLOCKS_PER_SEC (24000000)
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
@@ -98,7 +138,11 @@ ee_u32 default_num_contexts=1;
 */
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-	#error "Call board initialization routines in portable init (if needed), in particular initialize UART!\n"
+    /* Init board hardware. */
+    BOARD_InitHardware();
+    /* Init timer for microsecond function. */
+    timer_pit_init();
+    
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
 		ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");
 	}

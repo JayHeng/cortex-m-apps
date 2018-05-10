@@ -33,6 +33,9 @@ This code is based on a file that contains the following:
 
 #include <coremark.h>
 #include <stdarg.h>
+#include "fsl_common.h"
+#include "board.h"
+#include "fsl_lpuart.h"
 
 #define ZEROPAD  	(1<<0)	/* Pad with zero */
 #define SIGN    	(1<<1)	/* Unsigned/signed long */
@@ -578,7 +581,12 @@ repeat:
 }
 
 void uart_send_char(char c) {
-#error "You must implement the method uart_send_char to use this file!\n";
+    if (c == '\n')
+    {
+        char tmp = '\r';
+        LPUART_WriteBlocking((LPUART_Type *)BOARD_DEBUG_UART_BASEADDR, (const uint8_t *)&tmp, 1);
+    }
+    LPUART_WriteBlocking((LPUART_Type *)BOARD_DEBUG_UART_BASEADDR, (const uint8_t *)&c, 1);
 /*	Output of a char to a UART usually follows the following model:
 	Wait until UART is ready
 	Write char to UART

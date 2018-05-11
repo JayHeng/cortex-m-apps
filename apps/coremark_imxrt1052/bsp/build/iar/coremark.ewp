@@ -1239,7 +1239,7 @@
                     <state>SCANF_FLOAT_ENABLE=0</state>
                     <state>PRINTF_ADVANCED_ENABLE=0</state>
                     <state>SCANF_ADVANCED_ENABLE=0</state>
-                    <state>ITERATIONS=1</state>
+                    <state>ITERATIONS=40000</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1457,7 +1457,7 @@
                 </option>
                 <option>
                     <name>CCOptimizationNoSizeConstraints</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCNoLiteralPool</name>

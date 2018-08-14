@@ -11,10 +11,14 @@
 #
 *.dep
 *.ewt
-/apps/*/bsp/build/iar/settings
-/apps/*/bsp/build/settings
-/apps/*/bsp/build/iar/Release
-/apps/*/bsp/build/iar/Debug
+/apps/*/bsp/build8202/iar/settings
+/apps/*/bsp/build8202/settings
+/apps/*/bsp/build8202/iar/Release
+/apps/*/bsp/build8202/iar/Debug
 
+/apps/*/bsp/build7804/iar/settings
+/apps/*/bsp/build7804/settings
+/apps/*/bsp/build7804/iar/Release
+/apps/*/bsp/build7804/iar/Debug
 
 

@@ -53,7 +53,7 @@
  #ifdef __GNUC__
  #define COMPILER_VERSION "GCC"__VERSION__
  #else
- #define COMPILER_VERSION "IAR EWARM v8.20.2"
+ #define COMPILER_VERSION "IAR EWARM v7.80.4"
  #endif
 #endif
 #ifndef COMPILER_FLAGS 

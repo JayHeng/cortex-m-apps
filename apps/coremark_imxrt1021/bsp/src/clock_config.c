@@ -282,6 +282,10 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetDiv(kCLOCK_UartDiv, 0x0);
     /* Set Uart clock source. */
     CLOCK_SetMux(kCLOCK_UartMux, 0x0);
+
+    /* Configure PIT divider */   
+    CLOCK_SetMux(kCLOCK_PerclkMux, 1U); /* Set PERCLK_CLK source to OSC_CLK*/
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 0U); /* Set PERCLK_CLK divider to 1 */
     
     SystemCoreClockUpdate();
 }

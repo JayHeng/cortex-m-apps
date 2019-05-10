@@ -9,6 +9,9 @@
 */
 #ifndef CORE_PORTME_H
 #define CORE_PORTME_H
+
+#include <stdint.h>
+
 /************************/
 /* Data types and settings */
 /************************/
@@ -87,7 +90,7 @@ typedef unsigned int ee_size_t;
 	Define type of return from the timing functions.
  */
 #define CORETIMETYPE uint64_t
-typedef ee_u32 CORE_TICKS;
+#define CORE_TICKS uint64_t
 
 /* Configuration : SEED_METHOD
 	Defines method to get seed values that cannot be computed at compile time.

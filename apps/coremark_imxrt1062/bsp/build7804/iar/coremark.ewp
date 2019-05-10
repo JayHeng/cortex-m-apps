@@ -1283,17 +1283,13 @@
           <state>$PROJ_DIR$/../../../src</state>
           <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062</state>
           <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/drivers</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/utilities/str</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/utilities/debug_console</state>
+          <state>$PROJ_DIR$/../../../../../components/uart</state>
+          <state>$PROJ_DIR$/../../../../../components/serial_manager</state>
+          <state>$PROJ_DIR$/../../../../../components/lists</state>
           <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
           <state>$PROJ_DIR$/../../../../../middleware/coremark</state>
-          <state>$PROJ_DIR$/../../../../../platform/drivers/common</state>
-          <state>$PROJ_DIR$/../../../../../platform/drivers/igpio</state>
-          <state>$PROJ_DIR$/../../../../../platform/drivers/iomuxc</state>
-          <state>$PROJ_DIR$/../../../../../platform/drivers/lpuart</state>
-          <state>$PROJ_DIR$/../../../../../platform/drivers/pit</state>
-          <state>$PROJ_DIR$/../../../../../platform/utilities/debug_console</state>
-          <state>$PROJ_DIR$/../../../../../platform/utilities/debug_console/io</state>
-          <state>$PROJ_DIR$/../../../../../platform/utilities/debug_console/log</state>
-          <state>$PROJ_DIR$/../../../../../platform/utilities/debug_console/str</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1993,6 +1989,42 @@
   <group>
     <name>src</name>
     <group>
+      <name>component</name>
+      <group>
+        <name>lists</name>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\lists\generic_list.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\lists\generic_list.h</name>
+        </file>
+      </group>
+      <group>
+        <name>serial_manager</name>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\serial_manager\serial_manager.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\serial_manager\serial_manager.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\serial_manager\serial_port_uart.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\serial_manager\serial_port_uart.h</name>
+        </file>
+      </group>
+      <group>
+        <name>uart</name>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\uart\lpuart_adapter.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\components\uart\uart.h</name>
+        </file>
+      </group>
+    </group>
+    <group>
       <name>middleware</name>
       <group>
         <name>coremark</name>
@@ -2016,54 +2048,60 @@
     <group>
       <name>platform</name>
       <group>
-        <name>driver</name>
-        <group>
-          <name>clock</name>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\drivers\fsl_clock.c</name>
-          </file>
-        </group>
-        <group>
-          <name>igpio</name>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\igpio\fsl_gpio.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\igpio\fsl_gpio.h</name>
-          </file>
-        </group>
-        <group>
-          <name>lpuart</name>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\lpuart\fsl_lpuart.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\lpuart\fsl_lpuart.h</name>
-          </file>
-        </group>
-        <group>
-          <name>pit</name>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\pit\fsl_pit.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\platform\drivers\pit\fsl_pit.h</name>
-          </file>
-        </group>
+        <name>drivers</name>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_iomuxc.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.h</name>
+        </file>
       </group>
       <group>
         <name>utilities</name>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\platform\utilities\debug_console\fsl_debug_console.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\fsl_assert.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\platform\utilities\debug_console\io\fsl_io.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\platform\utilities\debug_console\log\fsl_log.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\platform\utilities\debug_console\str\fsl_str.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console_conf.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\str\fsl_str.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\str\fsl_str.h</name>
         </file>
       </group>
     </group>

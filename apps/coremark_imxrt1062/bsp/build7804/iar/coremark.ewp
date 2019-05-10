@@ -1585,11 +1585,11 @@
         </option>
         <option>
           <name>OCOutputOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state></state>
+          <state>coremark.srec</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1597,7 +1597,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -1966,9 +1966,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\src\hapi_irom_clock.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\src\hardware_init.c</name>

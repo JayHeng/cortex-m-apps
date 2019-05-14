@@ -15,20 +15,7 @@
  ****************************************************************************
  */
 
-#include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "dhry.h"
-#include "cpuidh.h"
-
-#ifdef CNNT
-#define options "Non-optimised"
-#define opt "0"
-#else
-//#define options   "Optimised"
-#define options "Opt 3 64 Bit"
-#define opt ""
-#endif
 
 /* Global Variables: */
 
@@ -39,46 +26,28 @@ char Ch_1_Glob, Ch_2_Glob;
 int Arr_1_Glob[50];
 int Arr_2_Glob[50][50];
 
-char Reg_Define[40] = "Register option      Selected.";
-
-
-Enumeration Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 /* forward declaration necessary since Enumeration may not simply be int */
 
- #ifndef ROPT
- #define REG
+#ifndef REG
+Boolean Reg = false;
+#define REG
 /* REG becomes defined as empty */
 /* i.e. no register variables   */
- #else
- #define REG register
- #endif
+#else
+Boolean Reg = true;
+#endif
 
-void Proc_1 (REG Rec_Pointer Ptr_Val_Par);
-void Proc_2 (One_Fifty *Int_Par_Ref);
-void Proc_3 (Rec_Pointer *Ptr_Ref_Par);
-void Proc_4 ();
-void Proc_5 ();
-void Proc_6 (Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par);
-void Proc_7 (One_Fifty Int_1_Par_Val, One_Fifty Int_2_Par_Val,
-                                            One_Fifty *Int_Par_Ref);
-void Proc_8 (Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref,
-                             int Int_1_Par_Val, int Int_2_Par_Val);
+/* variables for time measurement: */
 
-Boolean Func_2 (Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref);
-
-
-
-
- #define Too_Small_Time 2
+#define Too_Small_Time 2
 /* Measurements should last at least 2 seconds */
 
 double User_Time;
-double Microseconds, Dhrystones_Per_Second, Vax_Mips;
+double Microseconds, Dhrystones_Per_Second;
 
 /* end of variables for time measurement */
 
-
-void main (int argc, char *argv[])
+void main(void)
 /*****/
 /* main program, corresponds to procedures        */
 /* Main and Proc_0 in the Ada version             */
@@ -93,32 +62,7 @@ void main (int argc, char *argv[])
     REG int Run_Index;
     REG int Number_Of_Runs;
 
-
-   /* Initializations */
-    if (argc > 1)
-     {
-        switch (argv[1][0])
-         {
-             case 'N':
-                nopause = 0;
-                break;
-             case 'n':
-               nopause = 0;
-               break;
-         }
-      }
-
-   if ((Ap = fopen("Dhry.txt","a+")) == NULL)
-     {
-        printf(" Can not open Dhry.txt\n\n");
-        printf(" Press Enter\n\n");
-        int g = getchar();
-        exit(1);
-     }
-
-/***********************************************************************
- *         Change for compiler and optimisation used                   *
- ***********************************************************************/
+    /* Initializations */
 
     Next_Ptr_Glob = (Rec_Pointer)malloc(sizeof(Rec_Type));
     Ptr_Glob = (Rec_Pointer)malloc(sizeof(Rec_Type));
@@ -136,430 +80,150 @@ void main (int argc, char *argv[])
     /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
     /* overflow may occur for this array element.                   */
 
-    getDetails();
-    for (i=1; i<10; i++)
+    printf("\r\n");
+    printf("Dhrystone Benchmark, Version 2.1 (Language: C)\r\n");
+    printf("\r\n");
+    if (Reg)
     {
-        printf("%s\n", configdata[i]);
+        printf("Program compiled with 'register' attribute\r\n");
+        printf("\r\n");
     }
-    printf("\n");
-
-    fprintf (Ap, " #####################################################\n\n");
-    for (i=1; i<10; i++)
+    else
     {
-        fprintf(Ap, "%s \n", configdata[i]);
+        printf("Program compiled without 'register' attribute\r\n");
+        printf("\r\n");
     }
-    fprintf (Ap, "\n");
 
-    printf("##########################################\n");
+    Number_Of_Runs = 4000;
+    printf("Execution starts, %d runs through Dhrystone\r\n", Number_Of_Runs);
 
-   printf ("\n");
-   printf ("Dhrystone Benchmark, Version 2.1 (Language: C or C++)\n");
-   printf ("\n");
-
-   printf ("Optimisation    %s\n", options);
-   #ifdef ROPT
-       printf ("Register option selected\n\n");
-   #else
-       printf ("Register option not selected\n\n");
-       strcpy(Reg_Define, "Register option  Not selected.");
-   #endif                 "Register option      Selected."
-
- /*
-   if (Reg)
-   {
-     printf ("Program compiled with 'register' attribute\n");
-     printf ("\n");
-   }
-   else
-   {
-     printf ("Program compiled without 'register' attribute\n");
-     printf ("\n");
-   }
-
-   printf ("Please give the number of runs through the benchmark: ");
-   {
-     int n;
-     scanf ("%d", &n);
-     Number_Of_Runs = n;
-   }
-   printf ("\n");
-   printf ("Execution starts, %d runs through Dhrystone\n",
-                                                 Number_Of_Runs);
- */
-
-   Number_Of_Runs = 5000;
-
-   do
-   {
-
-       Number_Of_Runs = Number_Of_Runs * 2;
-       count = count - 1;
-       Arr_2_Glob [8][7] = 10;
-
-       /***************/
-       /* Start timer */
-       /***************/
-
-       start_time();
-
-       for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
-       {
-
-         Proc_5();
-         Proc_4();
-           /* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */
-         Int_1_Loc = 2;
-         Int_2_Loc = 3;
-         strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
-         Enum_Loc = Ident_2;
-         Bool_Glob = ! Func_2 (Str_1_Loc, Str_2_Loc);
-           /* Bool_Glob == 1 */
-         while (Int_1_Loc < Int_2_Loc)  /* loop body executed once */
-         {
-           Int_3_Loc = 5 * Int_1_Loc - Int_2_Loc;
-             /* Int_3_Loc == 7 */
-           Proc_7 (Int_1_Loc, Int_2_Loc, &Int_3_Loc);
-             /* Int_3_Loc == 7 */
-           Int_1_Loc += 1;
-         }   /* while */
-            /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
-         Proc_8 (Arr_1_Glob, Arr_2_Glob, Int_1_Loc, Int_3_Loc);
-           /* Int_Glob == 5 */
-         Proc_1 (Ptr_Glob);
-         for (Ch_Index = 'A'; Ch_Index <= Ch_2_Glob; ++Ch_Index)
-                              /* loop body executed twice */
-         {
-           if (Enum_Loc == Func_1 (Ch_Index, 'C'))
-               /* then, not executed */
-             {
-               Proc_6 (Ident_1, &Enum_Loc);
-               strcpy (Str_2_Loc, "DHRYSTONE PROGRAM, 3'RD STRING");
-               Int_2_Loc = Run_Index;
-               Int_Glob = Run_Index;
-             }
-         }
-           /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
-         Int_2_Loc = Int_2_Loc * Int_1_Loc;
-         Int_1_Loc = Int_2_Loc / Int_3_Loc;
-         Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc;
-           /* Int_1_Loc == 1, Int_2_Loc == 13, Int_3_Loc == 7 */
-         Proc_2 (&Int_1_Loc);
-           /* Int_1_Loc == 5 */
-
-       }   /* loop "for Run_Index" */
-
-       /**************/
-       /* Stop timer */
-       /**************/
-
-       end_time();
-       User_Time = secs;
-
-       printf ("%12.0f runs %6.2f seconds \n",(double) Number_Of_Runs, User_Time);
-       if (User_Time > 2)
-       {
-             count = 0;
-       }
-       else
-       {
-             if (User_Time < 0.05)
-             {
-                  Number_Of_Runs = Number_Of_Runs * 5;
-             }
-       }
-   }   /* calibrate/run do while */
-   while (count >0);
-
-   printf ("\n");
-   printf ("Final values (* implementation-dependent):\n");
-   printf ("\n");
-   printf ("Int_Glob:      ");
-   if (Int_Glob == 5)  printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d  ", Int_Glob);
-
-   printf ("Bool_Glob:     ");
-   if (Bool_Glob == 1) printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d\n", Bool_Glob);
-
-   printf ("Ch_1_Glob:     ");
-   if (Ch_1_Glob == 'A')  printf ("O.K.  ");
-   else                   printf ("WRONG ");
-   printf ("%c  ", Ch_1_Glob);
-
-   printf ("Ch_2_Glob:     ");
-   if (Ch_2_Glob == 'B')  printf ("O.K.  ");
-   else                   printf ("WRONG ");
-   printf ("%c\n",  Ch_2_Glob);
-
-   printf ("Arr_1_Glob[8]: ");
-   if (Arr_1_Glob[8] == 7)  printf ("O.K.  ");
-   else                     printf ("WRONG ");
-   printf ("%d  ", Arr_1_Glob[8]);
-
-   printf ("Arr_2_Glob8/7: ");
-   if (Arr_2_Glob[8][7] == Number_Of_Runs + 10)
-                          printf ("O.K.  ");
-   else                   printf ("WRONG ");
-   printf ("%10d\n", Arr_2_Glob[8][7]);
-
-   printf ("Ptr_Glob->            ");
-   printf ("  Ptr_Comp:       *    %d\n", (int) Ptr_Glob->Ptr_Comp);
-
-   printf ("  Discr:       ");
-   if (Ptr_Glob->Discr == 0)  printf ("O.K.  ");
-   else                       printf ("WRONG ");
-   printf ("%d  ", Ptr_Glob->Discr);
-
-   printf ("Enum_Comp:     ");
-   if (Ptr_Glob->variant.var_1.Enum_Comp == 2)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d\n", Ptr_Glob->variant.var_1.Enum_Comp);
-
-   printf ("  Int_Comp:    ");
-   if (Ptr_Glob->variant.var_1.Int_Comp == 17)  printf ("O.K.  ");
-   else                                         printf ("WRONG ");
-   printf ("%d ", Ptr_Glob->variant.var_1.Int_Comp);
-
-   printf ("Str_Comp:      ");
-   if (strcmp(Ptr_Glob->variant.var_1.Str_Comp,
-                        "DHRYSTONE PROGRAM, SOME STRING") == 0)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%s\n", Ptr_Glob->variant.var_1.Str_Comp);
-
-   printf ("Next_Ptr_Glob->       ");
-   printf ("  Ptr_Comp:       *    %d", (int) Next_Ptr_Glob->Ptr_Comp);
-   printf (" same as above\n");
-
-   printf ("  Discr:       ");
-   if (Next_Ptr_Glob->Discr == 0)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d  ", Next_Ptr_Glob->Discr);
-
-   printf ("Enum_Comp:     ");
-   if (Next_Ptr_Glob->variant.var_1.Enum_Comp == 1)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
-
-   printf ("  Int_Comp:    ");
-   if (Next_Ptr_Glob->variant.var_1.Int_Comp == 18)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d ", Next_Ptr_Glob->variant.var_1.Int_Comp);
-
-   printf ("Str_Comp:      ");
-   if (strcmp(Next_Ptr_Glob->variant.var_1.Str_Comp,
-                        "DHRYSTONE PROGRAM, SOME STRING") == 0)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%s\n", Next_Ptr_Glob->variant.var_1.Str_Comp);
-
-   printf ("Int_1_Loc:     ");
-   if (Int_1_Loc == 5)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d  ", Int_1_Loc);
-
-   printf ("Int_2_Loc:     ");
-   if (Int_2_Loc == 13)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d\n", Int_2_Loc);
-
-   printf ("Int_3_Loc:     ");
-   if (Int_3_Loc == 7)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d  ", Int_3_Loc);
-
-   printf ("Enum_Loc:      ");
-   if (Enum_Loc == 1)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%d  \n", Enum_Loc);
-
-
-   printf ("Str_1_Loc:                             ");
-   if (strcmp(Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING") == 0)
-                        printf ("O.K.  ");
-
-   else                printf ("WRONG ");
-   printf ("%s\n", Str_1_Loc);
-
-   printf ("Str_2_Loc:                             ");
-   if (strcmp(Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING") == 0)
-                        printf ("O.K.  ");
-   else                printf ("WRONG ");
-   printf ("%s\n", Str_2_Loc);
-
-
-   printf ("\n");
-
-
-   if (User_Time < Too_Small_Time)
-   {
-     printf ("Measured time too small to obtain meaningful results\n");
-     printf ("Please increase number of runs\n");
-     printf ("\n");
-   }
-   else
-   {
-     Microseconds = User_Time * Mic_secs_Per_Second
-                         / (double) Number_Of_Runs;
-     Dhrystones_Per_Second = (double) Number_Of_Runs / User_Time;
-     Vax_Mips = Dhrystones_Per_Second / 1757.0;
-
-     printf ("Microseconds for one run through Dhrystone: ");
-     printf ("%12.2lf \n", Microseconds);
-     printf ("Dhrystones per Second:                      ");
-     printf ("%10.0lf \n", Dhrystones_Per_Second);
-     printf ("VAX  MIPS rating =                          ");
-     printf ("%12.2lf \n",Vax_Mips);
-     printf ("\n");
-
-
-/************************************************************************
- *                Add results to output file Dhry.txt                   *
- ************************************************************************/
-   local_time();
-   fprintf (Ap, " #####################################################\n\n");
-   fprintf (Ap, " Dhrystone Benchmark 2.1 %s via C/C++ %s\n", options, timeday);
-   fprintf (Ap, " VAX MIPS rating:      %12.2lf\n\n",Vax_Mips);
-
-//   fprintf(Ap, " Classic Benchmark Ratings for CPUSpeed.txt where 100 MHz Pentium = 100\n");
-/*
-   if (strtol(opt, NULL, 10) == 1)
-   {
-       fprintf(Ap, " Integer Dhry2 Opt %d\n\n", (int)(Vax_Mips / 130 * 100));
-   }
-   else
-   {
-       fprintf(Ap, " Integer Dhry2 NoOpt %d\n\n", (int)(Vax_Mips / 32 * 100));
-   }
-*/
-
-   if (Int_Glob != 5)
-   {
-       fprintf (Ap, " Wrong result Int_Glob Was %d Should be 5\n", Int_Glob);
-       errors = errors + 1;
-   }
-   if (Bool_Glob != 1)
-   {
-       fprintf (Ap, " Wrong result Bool_Glob Was %d Should be 1\n", Bool_Glob);
-       errors = errors + 1;
-   }
-   if (Ch_1_Glob != 'A')
-   {
-       fprintf (Ap, " Wrong result Ch_1_Glob Was %c Should be A\n", Ch_1_Glob);
-       errors = errors + 1;
-   }
-   if (Ch_2_Glob != 'B')
-   {
-       fprintf (Ap, " Wrong result Ch_2_Glob Was %c Should be B\n", Ch_2_Glob);
-       errors = errors + 1;
-   }
-   if (Arr_1_Glob[8] != 7)
-   {
-       fprintf (Ap, " Wrong result Arr_1_Glob[8] Was %d Should be 7\n", Arr_1_Glob[8]);
-       errors = errors + 1;
-   }
-   if (Arr_2_Glob[8][7] != Number_Of_Runs + 10)
-   {
-       fprintf (Ap, " Wrong result Arr_2_Glob[8][7] Was %d Should be %d\n", Arr_2_Glob[8][7], Number_Of_Runs + 10);
-       errors = errors + 1;
-   }
-   if (Ptr_Glob->Discr != 0)
-   {
-       fprintf (Ap, " Wrong result Ptr_Glob->Discr Was %d Should be 0\n", Ptr_Glob->Discr);
-       errors = errors + 1;
-   }
-   if (Ptr_Glob->variant.var_1.Enum_Comp != 2)
-   {
-       fprintf (Ap, " Wrong result Ptr_Glob->variant.var_1.Enum_Comp Was %d Should be 2\n", Ptr_Glob->variant.var_1.Enum_Comp);
-       errors = errors + 1;
-   }
-   if (Ptr_Glob->variant.var_1.Int_Comp != 17)
-   {
-       fprintf (Ap, " Wrong result Ptr_Glob->variant.var_1.Int_Comp Was %d Should be 17\n", Ptr_Glob->variant.var_1.Int_Comp);
-       errors = errors + 1;
-   }
-   if (strcmp(Ptr_Glob->variant.var_1.Str_Comp,  "DHRYSTONE PROGRAM, SOME STRING") != 0)
-   {
-       fprintf (Ap, " Wrong result Ptr_Glob->variant.var_1.Str_Comp Was %s Should be DHRYSTONE PROGRAM, SOME STRING\n", Ptr_Glob->variant.var_1.Str_Comp);
-       errors = errors + 1;
-   }
-   if (Next_Ptr_Glob->Discr != 0)
-   {
-       fprintf (Ap, " Wrong result Next_Ptr_Glob->Discr Was %d Should be 0\n", Next_Ptr_Glob->Discr);
-       errors = errors + 1;
-   }
-   if (Next_Ptr_Glob->variant.var_1.Enum_Comp != 1)
-   {
-       fprintf (Ap, " Wrong result Next_Ptr_Glob->variant.var_1.Enum_Comp Was %d Should be 1\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
-       errors = errors + 1;
-   }
-   if (Next_Ptr_Glob->variant.var_1.Int_Comp != 18)
-   {
-       fprintf (Ap, " Wrong result Next_Ptr_Glob->variant.var_1.Int_Comp Was %d Should be 18\n", Next_Ptr_Glob->variant.var_1.Int_Comp);
-       errors = errors + 1;
-   }
-   if (strcmp(Next_Ptr_Glob->variant.var_1.Str_Comp,  "DHRYSTONE PROGRAM, SOME STRING") != 0)
-   {
-       fprintf (Ap, " Wrong result Next_Ptr_Glob->variant.var_1.Str_Comp Was %s Should be DHRYSTONE PROGRAM, SOME STRING\n", Next_Ptr_Glob->variant.var_1.Str_Comp);
-       errors = errors + 1;
-   }
-   if (Int_1_Loc != 5)
-   {
-       fprintf (Ap, " Wrong result Int_1_Loc Was %d Should be 5\n", Int_1_Loc);
-       errors = errors + 1;
-   }
-   if (Int_2_Loc != 13)
-   {
-       fprintf (Ap, " Wrong result Int_2_Loc Was %d Should be 13\n", Int_2_Loc);
-       errors = errors + 1;
-   }
-   if (Int_3_Loc != 7)
-   {
-       fprintf (Ap, " Wrong result Int_3_Loc Was %d Should be 7\n", Int_3_Loc);
-       errors = errors + 1;
-   }
-   if (Enum_Loc != 1)
-   {
-       fprintf (Ap, " Wrong result Enum_Loc Was %d Should be 1\n", Enum_Loc);
-       errors = errors + 1;
-   }
-   if (strcmp(Str_1_Loc, "DHRYSTONE PROGRAM, 1'ST STRING") != 0)
-   {
-       fprintf (Ap, " Wrong result Str_1_Loc Was %s Should be DHRYSTONE PROGRAM, 1'ST STRING\n", Str_1_Loc);
-       errors = errors + 1;
-   }
-   if (strcmp(Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING") != 0)
-   {
-       fprintf (Ap, " Wrong result Str_2_Loc Was %s Should be DHRYSTONE PROGRAM, 2'ND STRING\n", Str_2_Loc);
-       errors = errors + 1;
-   }
-   if (errors == 0)
-   {
-       fprintf (Ap, " Numeric results were correct\n\n");
-   }
-   else
-   {
-       fprintf (Ap, "\n");
-   }
-
-   fclose(Ap);
-   }
-    if (nopause)
+    /***************/
+    /* Start timer */
+    /***************/
+    start_time();
+    for (Run_Index = 1; Run_Index <= Number_Of_Runs; ++Run_Index)
     {
-       printf(" Press Enter\n\n");
-       int g = getchar();
+        Proc_5();
+        Proc_4();
+        /* Ch_1_Glob == 'A', Ch_2_Glob == 'B', Bool_Glob == true */
+        Int_1_Loc = 2;
+        Int_2_Loc = 3;
+        strcpy(Str_2_Loc, "DHRYSTONE PROGRAM, 2'ND STRING");
+        Enum_Loc = Ident_2;
+        Bool_Glob = !Func_2(Str_1_Loc, Str_2_Loc);
+        /* Bool_Glob == 1 */
+        while (Int_1_Loc < Int_2_Loc) /* loop body executed once */
+        {
+            Int_3_Loc = 5 * Int_1_Loc - Int_2_Loc;
+            /* Int_3_Loc == 7 */
+            Proc_7(Int_1_Loc, Int_2_Loc, &Int_3_Loc);
+            /* Int_3_Loc == 7 */
+            Int_1_Loc += 1;
+        } /* while */
+          /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
+        Proc_8(Arr_1_Glob, Arr_2_Glob, Int_1_Loc, Int_3_Loc);
+        /* Int_Glob == 5 */
+        Proc_1(Ptr_Glob);
+        for (Ch_Index = 'A'; Ch_Index <= Ch_2_Glob; ++Ch_Index)
+        /* loop body executed twice */
+        {
+            if (Enum_Loc == Func_1(Ch_Index, 'C'))
+            /* then, not executed */
+            {
+                Proc_6(Ident_1, &Enum_Loc);
+                strcpy(Str_2_Loc, "DHRYSTONE PROGRAM, 3'RD STRING");
+                Int_2_Loc = Run_Index;
+                Int_Glob = Run_Index;
+            }
+        }
+        /* Int_1_Loc == 3, Int_2_Loc == 3, Int_3_Loc == 7 */
+        Int_2_Loc = Int_2_Loc * Int_1_Loc;
+        Int_1_Loc = Int_2_Loc / Int_3_Loc;
+        Int_2_Loc = 7 * (Int_2_Loc - Int_3_Loc) - Int_1_Loc;
+        /* Int_1_Loc == 1, Int_2_Loc == 13, Int_3_Loc == 7 */
+        Proc_2(&Int_1_Loc);
+        /* Int_1_Loc == 5 */
+
+    } /* loop "for Run_Index" */
+    /**************/
+    /* Stop timer */
+    /**************/
+    end_time();
+    User_Time = secs;
+
+    printf("Execution ends\r\n");
+    printf("\r\n");
+    printf("Final values of the variables used in the benchmark:\r\n");
+    printf("\r\n");
+    printf("Int_Glob:            %d\r\n", Int_Glob);
+    printf("        should be:   %d\r\n", 5);
+    printf("Bool_Glob:           %d\r\n", Bool_Glob);
+    printf("        should be:   %d\r\n", 1);
+    printf("Ch_1_Glob:           %c\r\n", Ch_1_Glob);
+    printf("        should be:   %c\r\n", 'A');
+    printf("Ch_2_Glob:           %c\r\n", Ch_2_Glob);
+    printf("        should be:   %c\r\n", 'B');
+    printf("Arr_1_Glob[8]:       %d\r\n", Arr_1_Glob[8]);
+    printf("        should be:   %d\r\n", 7);
+    printf("Arr_2_Glob[8][7]:    %d\r\n", Arr_2_Glob[8][7]);
+    printf("        should be:   Number_Of_Runs + 10\r\n");
+    printf("Ptr_Glob->\r\n");
+    printf("  Ptr_Comp:          %d\r\n", (int)Ptr_Glob->Ptr_Comp);
+    printf("        should be:   (implementation-dependent)\r\n");
+    printf("  Discr:             %d\r\n", Ptr_Glob->Discr);
+    printf("        should be:   %d\r\n", 0);
+    printf("  Enum_Comp:         %d\r\n", Ptr_Glob->variant.var_1.Enum_Comp);
+    printf("        should be:   %d\r\n", 2);
+    printf("  Int_Comp:          %d\r\n", Ptr_Glob->variant.var_1.Int_Comp);
+    printf("        should be:   %d\r\n", 17);
+    printf("  Str_Comp:          %s\r\n", Ptr_Glob->variant.var_1.Str_Comp);
+    printf("        should be:   DHRYSTONE PROGRAM, SOME STRING\r\n");
+    printf("Next_Ptr_Glob->\r\n");
+    printf("  Ptr_Comp:          %d\r\n", (int)Next_Ptr_Glob->Ptr_Comp);
+    printf("        should be:   (implementation-dependent), same as above\r\n");
+    printf("  Discr:             %d\r\n", Next_Ptr_Glob->Discr);
+    printf("        should be:   %d\r\n", 0);
+    printf("  Enum_Comp:         %d\r\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
+    printf("        should be:   %d\r\n", 1);
+    printf("  Int_Comp:          %d\r\n", Next_Ptr_Glob->variant.var_1.Int_Comp);
+    printf("        should be:   %d\r\n", 18);
+    printf("  Str_Comp:          %s\r\n", Next_Ptr_Glob->variant.var_1.Str_Comp);
+    printf("        should be:   DHRYSTONE PROGRAM, SOME STRING\r\n");
+    printf("Int_1_Loc:           %d\r\n", Int_1_Loc);
+    printf("        should be:   %d\r\n", 5);
+    printf("Int_2_Loc:           %d\r\n", Int_2_Loc);
+    printf("        should be:   %d\r\n", 13);
+    printf("Int_3_Loc:           %d\r\n", Int_3_Loc);
+    printf("        should be:   %d\r\n", 7);
+    printf("Enum_Loc:            %d\r\n", Enum_Loc);
+    printf("        should be:   %d\r\n", 1);
+    printf("Str_1_Loc:           %s\r\n", Str_1_Loc);
+    printf("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\r\n");
+    printf("Str_2_Loc:           %s\r\n", Str_2_Loc);
+    printf("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\r\n");
+    printf("\r\n");
+
+    printf("User Time %d\r\n", User_Time);
+
+
+    if (User_Time < Too_Small_Time)
+    {
+        printf("Measured time too small to obtain meaningful results\n");
+        printf("Please increase number of runs\n");
+        printf("\n");
     }
- }
+    else
+    {
+        Microseconds = User_Time * Mic_secs_Per_Second / (double) Number_Of_Runs;
+        Dhrystones_Per_Second = (double) Number_Of_Runs / User_Time;
+
+        printf("Microseconds for one run through Dhrystone: ");
+        printf("%6.1f \r\n", Microseconds);
+        printf("Dhrystones per Second:                      ");
+        printf("%6.1f \r\n", Dhrystones_Per_Second);
+        printf("\r\n");
+    }
+}
 
 void Proc_1(REG Rec_Pointer Ptr_Val_Par)
 /******************/
@@ -620,7 +284,7 @@ void Proc_3(Rec_Pointer *Ptr_Ref_Par)
     Proc_7(10, Int_Glob, &Ptr_Glob->variant.var_1.Int_Comp);
 } /* Proc_3 */
 
-void Proc_4() /* without parameters */
+void Proc_4(void) /* without parameters */
 /*******/
 /* executed once */
 {
@@ -631,7 +295,7 @@ void Proc_4() /* without parameters */
     Ch_2_Glob = 'B';
 } /* Proc_4 */
 
-void Proc_5() /* without parameters */
+void Proc_5(void) /* without parameters */
 /*******/
 /* executed once */
 {

@@ -232,17 +232,8 @@
 
 /* Compiler and system dependent definitions: */
 
-#ifndef TIME
-#define TIMES
-#endif
-/* Use times(2) time function unless    */
-/* explicitly defined otherwise         */
-
-#ifdef TIMES
-#include <sys/types.h>
-#include <sys/times.h>
-/* for "times" */
-#endif
+#include <string.h> // to refer strcpy()
+#include <stdlib.h> // to refer malloc()
 
 #define Mic_secs_Per_Second 1000000.0
 /* Berkeley UNIX C returns process times in seconds/HZ */
@@ -273,10 +264,6 @@ typedef enum
 /* for boolean and enumeration types in Ada, Pascal */
 
 /* General definitions: */
-
-#include <stdio.h>
-#include <string.h>
-/* for strcpy, strcmp */
 
 #define Null 0
 /* Value of a Null pointer */
@@ -316,5 +303,14 @@ typedef struct record
     } variant;
 } Rec_Type, *Rec_Pointer;
 
-
-
+void Proc_1(REG Rec_Pointer Ptr_Val_Par);
+void Proc_2(One_Fifty *Int_Par_Ref);
+void Proc_3(Rec_Pointer *Ptr_Ref_Par);
+void Proc_4(void);
+void Proc_5(void);
+void Proc_6(Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par);
+void Proc_7(One_Fifty Int_1_Par_Val, One_Fifty Int_2_Par_Val, One_Fifty *Int_Par_Ref);
+void Proc_8(Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref, int Int_1_Par_Val, int Int_2_Par_Val);
+Enumeration Func_1(Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
+Boolean Func_2(Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref);
+Boolean Func_3(Enumeration Enum_Par_Val);

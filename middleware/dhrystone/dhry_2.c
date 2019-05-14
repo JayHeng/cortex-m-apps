@@ -21,14 +21,10 @@
 #define REG
 /* REG becomes defined as empty */
 /* i.e. no register variables   */
-#else
-#define REG register
 #endif
 
 extern int Int_Glob;
 extern char Ch_1_Glob;
-
-Boolean Func_3 (Enumeration Enum_Par_Val);
 
 void Proc_6(Enumeration Enum_Val_Par, Enumeration *Enum_Ref_Par)
 /*********************************/

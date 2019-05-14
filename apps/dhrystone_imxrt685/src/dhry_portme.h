@@ -10,6 +10,7 @@
 #define DHRY_PORTME_H
 
 #include <stdint.h>
+#include "fsl_debug_console.h"
 
 /*******************************************************************************
  * Externs

@@ -44,7 +44,7 @@ Boolean Reg = true;
 /* Measurements should last at least 2 seconds */
 
 double User_Time;
-double Microseconds, Dhrystones_Per_Second;
+double Microseconds, Dhrystones_Per_Second, DMips_Per_MHz;
 
 /* end of variables for time measurement */
 
@@ -81,18 +81,14 @@ void dhrystone(void)
     /* Warning: With 16-Bit processors and Number_Of_Runs > 32000,  */
     /* overflow may occur for this array element.                   */
 
-    PRINTF("\r\n");
     PRINTF("Dhrystone Benchmark, Version 2.1 (Language: C)\r\n");
-    PRINTF("\r\n");
     if (Reg)
     {
         PRINTF("Program compiled with 'register' attribute\r\n");
-        PRINTF("\r\n");
     }
     else
     {
         PRINTF("Program compiled without 'register' attribute\r\n");
-        PRINTF("\r\n");
     }
 
     Number_Of_Runs = NUMBER_OF_RUNS;
@@ -155,57 +151,33 @@ void dhrystone(void)
     PRINTF("Execution ends\r\n");
     PRINTF("\r\n");
     PRINTF("Final values of the variables used in the benchmark:\r\n");
-    PRINTF("\r\n");
-    PRINTF("Int_Glob:            %d\r\n", Int_Glob);
-    PRINTF("        should be:   %d\r\n", 5);
-    PRINTF("Bool_Glob:           %d\r\n", Bool_Glob);
-    PRINTF("        should be:   %d\r\n", 1);
-    PRINTF("Ch_1_Glob:           %c\r\n", Ch_1_Glob);
-    PRINTF("        should be:   %c\r\n", 'A');
-    PRINTF("Ch_2_Glob:           %c\r\n", Ch_2_Glob);
-    PRINTF("        should be:   %c\r\n", 'B');
-    PRINTF("Arr_1_Glob[8]:       %d\r\n", Arr_1_Glob[8]);
-    PRINTF("        should be:   %d\r\n", 7);
-    PRINTF("Arr_2_Glob[8][7]:    %d\r\n", Arr_2_Glob[8][7]);
-    PRINTF("        should be:   Number_Of_Runs + 10\r\n");
+    PRINTF("Int_Glob: %d, it should be %d\r\n", Int_Glob, 5);
+    PRINTF("Bool_Glob: %d, it should be %d\r\n", Bool_Glob, 1);
+    PRINTF("Ch_1_Glob: %c, it should be %c\r\n", Ch_1_Glob, 'A');
+    PRINTF("Ch_2_Glob: %c, it should be %c\r\n", Ch_2_Glob, 'B');
+    PRINTF("Arr_1_Glob[8]: %d, it should be %d\r\n", Arr_1_Glob[8], 7);
+    PRINTF("Arr_2_Glob[8][7]: %d, it should be Number_Of_Runs + 10\r\n", Arr_2_Glob[8][7]);
     PRINTF("Ptr_Glob->\r\n");
-    PRINTF("  Ptr_Comp:          %d\r\n", (int)Ptr_Glob->Ptr_Comp);
-    PRINTF("        should be:   (implementation-dependent)\r\n");
-    PRINTF("  Discr:             %d\r\n", Ptr_Glob->Discr);
-    PRINTF("        should be:   %d\r\n", 0);
-    PRINTF("  Enum_Comp:         %d\r\n", Ptr_Glob->variant.var_1.Enum_Comp);
-    PRINTF("        should be:   %d\r\n", 2);
-    PRINTF("  Int_Comp:          %d\r\n", Ptr_Glob->variant.var_1.Int_Comp);
-    PRINTF("        should be:   %d\r\n", 17);
-    PRINTF("  Str_Comp:          %s\r\n", Ptr_Glob->variant.var_1.Str_Comp);
-    PRINTF("        should be:   DHRYSTONE PROGRAM, SOME STRING\r\n");
+    PRINTF("  Ptr_Comp: %d, it should be implementation-dependent\r\n", (int)Ptr_Glob->Ptr_Comp);
+    PRINTF("  Discr: %d, it should be %d\r\n", Ptr_Glob->Discr, 0);
+    PRINTF("  Enum_Comp: %d, it should be %d\r\n", Ptr_Glob->variant.var_1.Enum_Comp, 2);
+    PRINTF("  Int_Comp: %d, it should be %d\r\n", Ptr_Glob->variant.var_1.Int_Comp, 17);
+    PRINTF("  Str_Comp: %s, it should be DHRYSTONE PROGRAM, SOME STRING\r\n", Ptr_Glob->variant.var_1.Str_Comp);
     PRINTF("Next_Ptr_Glob->\r\n");
-    PRINTF("  Ptr_Comp:          %d\r\n", (int)Next_Ptr_Glob->Ptr_Comp);
-    PRINTF("        should be:   (implementation-dependent), same as above\r\n");
-    PRINTF("  Discr:             %d\r\n", Next_Ptr_Glob->Discr);
-    PRINTF("        should be:   %d\r\n", 0);
-    PRINTF("  Enum_Comp:         %d\r\n", Next_Ptr_Glob->variant.var_1.Enum_Comp);
-    PRINTF("        should be:   %d\r\n", 1);
-    PRINTF("  Int_Comp:          %d\r\n", Next_Ptr_Glob->variant.var_1.Int_Comp);
-    PRINTF("        should be:   %d\r\n", 18);
-    PRINTF("  Str_Comp:          %s\r\n", Next_Ptr_Glob->variant.var_1.Str_Comp);
-    PRINTF("        should be:   DHRYSTONE PROGRAM, SOME STRING\r\n");
-    PRINTF("Int_1_Loc:           %d\r\n", Int_1_Loc);
-    PRINTF("        should be:   %d\r\n", 5);
-    PRINTF("Int_2_Loc:           %d\r\n", Int_2_Loc);
-    PRINTF("        should be:   %d\r\n", 13);
-    PRINTF("Int_3_Loc:           %d\r\n", Int_3_Loc);
-    PRINTF("        should be:   %d\r\n", 7);
-    PRINTF("Enum_Loc:            %d\r\n", Enum_Loc);
-    PRINTF("        should be:   %d\r\n", 1);
-    PRINTF("Str_1_Loc:           %s\r\n", Str_1_Loc);
-    PRINTF("        should be:   DHRYSTONE PROGRAM, 1'ST STRING\r\n");
-    PRINTF("Str_2_Loc:           %s\r\n", Str_2_Loc);
-    PRINTF("        should be:   DHRYSTONE PROGRAM, 2'ND STRING\r\n");
+    PRINTF("  Ptr_Comp: %d, it should be implementation-dependentr\r\n", (int)Next_Ptr_Glob->Ptr_Comp);
+    PRINTF("  Discr: %d, it should be %d\r\n", Next_Ptr_Glob->Discr, 0);
+    PRINTF("  Enum_Comp: %d, it should be %d\r\n", Next_Ptr_Glob->variant.var_1.Enum_Comp, 1);
+    PRINTF("  Int_Comp: %d, it should be %d\r\n", Next_Ptr_Glob->variant.var_1.Int_Comp, 18);
+    PRINTF("  Str_Comp: %s, it should be DHRYSTONE PROGRAM, SOME STRING\r\n", Next_Ptr_Glob->variant.var_1.Str_Comp);
+    PRINTF("Int_1_Loc: %d, it should be %d\r\n", Int_1_Loc, 5);
+    PRINTF("Int_2_Loc: %d, it should be %d\r\n", Int_2_Loc, 13);
+    PRINTF("Int_3_Loc: %d, it should be %d\r\n", Int_3_Loc, 7);
+    PRINTF("Enum_Loc: %d, it should be %d\r\n", Enum_Loc, 1);
+    PRINTF("Str_1_Loc: %s, it should be DHRYSTONE PROGRAM, 1'ST STRING\r\n", Str_1_Loc);
+    PRINTF("Str_2_Loc: %s, it should be DHRYSTONE PROGRAM, 2'ND STRING\r\n", Str_2_Loc);
     PRINTF("\r\n");
 
-    PRINTF("User Time %d\r\n", User_Time);
-
+    PRINTF("User Time is %6.2fs\r\n", User_Time);
 
     if (User_Time < Too_Small_Time)
     {
@@ -217,11 +189,12 @@ void dhrystone(void)
     {
         Microseconds = User_Time * Mic_secs_Per_Second / (double) Number_Of_Runs;
         Dhrystones_Per_Second = (double) Number_Of_Runs / User_Time;
+        DMips_Per_MHz = Dhrystones_Per_Second / CORE_FREQ_MHz / 1757.0;
 
-        PRINTF("Microseconds for one run through Dhrystone: ");
-        PRINTF("%6.1f \r\n", Microseconds);
-        PRINTF("Dhrystones per Second:                      ");
-        PRINTF("%6.1f \r\n", Dhrystones_Per_Second);
+        PRINTF("Microseconds for one run through Dhrystone: %6.2f \r\n", Microseconds);
+        PRINTF("Dhrystones per Second: %6.2f \r\n", Dhrystones_Per_Second);
+        PRINTF("DMIPS: %2.4f \r\n", DMips_Per_MHz * CORE_FREQ_MHz);
+        PRINTF("DMIPS/MHz: %2.4f \r\n", DMips_Per_MHz);
         PRINTF("\r\n");
     }
 }

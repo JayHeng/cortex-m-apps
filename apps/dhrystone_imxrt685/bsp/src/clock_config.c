@@ -111,7 +111,7 @@ void BOARD_BootClockRUN(void)
 
     CLOCK_InitSysPll(&g_configSysPll); /* Configure system PLL to 528Mhz. */
     /* Valid PFD values are decimal 12-35. */
-    CLOCK_InitSysPfd(kCLOCK_Pfd0, 19); /* Enable main PLL clock 500MHz. */
+    CLOCK_InitSysPfd(kCLOCK_Pfd0, 16); /* Enable main PLL clock 594MHz. */
     CLOCK_InitSysPfd(kCLOCK_Pfd1, 17); /* Enable dsp PLL clock 559MHz. */
     CLOCK_InitSysPfd(kCLOCK_Pfd2, 24); /* Enable aux0 PLL clock 396MHz for SDIO */
 
@@ -120,22 +120,22 @@ void BOARD_BootClockRUN(void)
     CLOCK_InitAudioPfd(kCLOCK_Pfd0, 26);        /* Enable audio PLL PFD0 368.64MHz */
     CLOCK_SetClkDiv(kCLOCK_DivAudioPllClk, 15); /* Configure audio_pll_clk to 24.576Mhz */
 
-    /* Let CPU run on SYS PLL PFD0 with divider 2 (250Mhz). */
+    /* Let CPU run on SYS PLL PFD0 with divider 2 (300Mhz). */
     CLOCK_SetClkDiv(kCLOCK_DivSysCpuAhbClk, 2);
     CLOCK_AttachClk(kMAIN_PLL_to_MAIN_CLK);
 
-    /* for loop of 65000 is about 1ms (@250 MHz CPU) */
-    for (uint32_t i = 2600000U; i > 0; i--)
+    /* for loop of 65000 is about 1ms (@300 MHz CPU) */
+    for (uint32_t i = 3120000U; i > 0; i--)
     {
         __asm("NOP");
     }
 
-    /* Let ARM Systick run same frequency with CPU (250Mhz). */
+    /* Let ARM Systick run same frequency with CPU (300Mhz). */
     CLOCK_AttachClk(kMAIN_CLK_DIV_to_SYSTICK_CLK);
     CLOCK_SetClkDiv(kCLOCK_DivSystickClk, 2);
 
-    /* Let QSPI run on main clock (500/2 = 250MHz) for MX25UM51345G flash. This
-     * results in octal DDR read at 62.5MHz I/O speed.
+    /* Let QSPI run on main clock (600/2 = 300MHz) for MX25UM51345G flash. This
+     * results in octal DDR read at 75MHz I/O speed.
      * NOTE: The frequency limit is up to the flash memory.
      *       Need to adjust QSPI clock frequency if you want to use other flash memory.
      */

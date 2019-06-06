@@ -11,21 +11,11 @@
 #if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
 #include "fsl_lpi2c.h"
 #endif /* SDK_I2C_BASED_COMPONENT_USED */
-#if defined BOARD_USE_CODEC
-#include "fsl_wm8960.h"
-#endif
 #include "fsl_iomuxc.h"
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-#if defined BOARD_USE_CODEC
-codec_config_t boardCodecConfig = {.I2C_SendFunc = BOARD_Codec_I2C_Send,
-                                   .I2C_ReceiveFunc = BOARD_Codec_I2C_Receive,
-                                   .op.Init = WM8960_Init,
-                                   .op.Deinit = WM8960_Deinit,
-                                   .op.SetFormat = WM8960_ConfigDataFormat};
-#endif
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -33,27 +23,13 @@ codec_config_t boardCodecConfig = {.I2C_SendFunc = BOARD_Codec_I2C_Send,
 /* Get debug console frequency. */
 uint32_t BOARD_DebugConsoleSrcFreq(void)
 {
-    uint32_t freq;
-
-    /* To make it simple, we assume default PLL and divider settings, and the only variable
-       from application is use PLL3 source or OSC source */
-    if (CLOCK_GetMux(kCLOCK_UartMux) == 0) /* PLL3 div6 80M */
-    {
-        freq = (CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6U) / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-    }
-    else
-    {
-        freq = CLOCK_GetOscFreq() / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-    }
-
-    return freq;
+    return CLOCK_GetRootClockFreq(kCLOCK_Root_Lpuart1);
 }
 
 /* Initialize debug console. */
 void BOARD_InitDebugConsole(void)
 {
     uint32_t uartClkSrcFreq = BOARD_DebugConsoleSrcFreq();
-
     DbgConsole_Init(BOARD_DEBUG_UART_INSTANCE, BOARD_DEBUG_UART_BAUDRATE, BOARD_DEBUG_UART_TYPE, uartClkSrcFreq);
 }
 
@@ -296,15 +272,19 @@ status_t BOARD_Camera_I2C_ReceiveSCCB(
 /* MPU configuration. */
 void BOARD_ConfigMPU(void)
 {
+#if defined(__ICACHE_PRESENT) && __ICACHE_PRESENT
     /* Disable I cache and D cache */
     if (SCB_CCR_IC_Msk == (SCB_CCR_IC_Msk & SCB->CCR))
     {
         SCB_DisableICache();
     }
+#endif
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
     if (SCB_CCR_DC_Msk == (SCB_CCR_DC_Msk & SCB->CCR))
     {
         SCB_DisableDCache();
     }
+#endif
 
     /* Disable MPU */
     ARM_MPU_Disable();
@@ -312,12 +292,12 @@ void BOARD_ConfigMPU(void)
     /* MPU configure:
      * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable,
      * SubRegionDisable, Size)
-     * API in core_cm7.h.
+     * API in mpu_armv7.h.
      * param DisableExec       Instruction access (XN) disable bit,0=instruction fetches enabled, 1=instruction fetches
      * disabled.
      * param AccessPermission  Data access permissions, allows you to configure read/write access for User and
      * Privileged mode.
-     *      Use MACROS defined in core_cm7.h:
+     *      Use MACROS defined in mpu_armv7.h:
      * ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
      * Combine TypeExtField/IsShareable/IsCacheable/IsBufferable to configure MPU memory access attributes.
      *  TypeExtField  IsShareable  IsCacheable  IsBufferable   Memory Attribtue    Shareability        Cache
@@ -345,7 +325,7 @@ void BOARD_ConfigMPU(void)
      *  please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide <dui0646b_cortex_m7_dgug.pdf>
      * param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled.
      * param Size              Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in
-     * core_cm7.h.
+     * mpu_armv7.h.
      */
 
     /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -391,7 +371,7 @@ void BOARD_ConfigMPU(void)
  * this suggestion is referred from chapter 2.2.1 Memory regions,
  * types and attributes in Cortex-M7 Devices, Generic User Guide */
 #if defined(SDRAM_IS_SHAREABLE)
-    /* Region 8 setting: Memory with Normal type, not shareable, outer/inner write back */
+    /* Region 8 setting: Memory with Normal type, shareable, outer/inner write back */
     MPU->RBAR = ARM_MPU_RBAR(8, 0x80000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_32MB);
 #else
@@ -410,41 +390,34 @@ void BOARD_ConfigMPU(void)
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
     /* Enable I cache and D cache */
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
     SCB_EnableDCache();
+#endif
+#if defined(__ICACHE_PRESENT) && __ICACHE_PRESENT
     SCB_EnableICache();
+#endif
 }
 
 void BOARD_SD_Pin_Config(uint32_t speed, uint32_t strength)
 {
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_00_USDHC1_CMD,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_00_USDHC1_CMD,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+                            IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_01_USDHC1_CLK,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(0) |
                             IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_01_USDHC1_CLK,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(0) |
-                            IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_02_USDHC1_DATA0,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                            IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_03_USDHC1_DATA1,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                            IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_04_USDHC1_DATA2,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                            IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B0_05_USDHC1_DATA3,
-                        IOMUXC_SW_PAD_CTL_PAD_SPEED(speed) | IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                            IOMUXC_SW_PAD_CTL_PAD_HYS_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(1) |
-                            IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_02_USDHC1_DATA0,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+                            IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_03_USDHC1_DATA1,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+                            IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_04_USDHC1_DATA2,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+                            IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_SD_B1_05_USDHC1_DATA3,
+                        IOMUXC_SW_PAD_CTL_PAD_SRE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
+                            IOMUXC_SW_PAD_CTL_PAD_PUS(1) | IOMUXC_SW_PAD_CTL_PAD_DSE(strength));
 }
 
 void BOARD_MMC_Pin_Config(uint32_t speed, uint32_t strength)

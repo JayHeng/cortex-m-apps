@@ -1,49 +1,43 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
  *
- * 
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 /*${header:start}*/
 #include "pin_mux.h"
 #include "board.h"
 #include "clock_config.h"
 /*${header:end}*/
-
+  
 /*${function:start}*/
 void BOARD_InitHardware(void)
 {
+    uint32_t freq;
     BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
+    freq =  CLOCK_GetFreqFromObs(CCM_OBS_PLL_ARM_OUT) / 1000000;
+    DbgConsole_Printf("\r\nARM PLL %d MHz", freq * 4);
+    freq =  CLOCK_GetFreqFromObs(CCM_OBS_M7_CLK_ROOT) / 1000000;
+    DbgConsole_Printf("\r\nCM7 %d MHz", freq * 4);
+
+    DbgConsole_Printf("\r\nOD is ");
+#if OD
+    DbgConsole_Printf("Enabled\r\n");
+#else
+    DbgConsole_Printf("Disabled\r\n");
+#endif
+    DbgConsole_Printf("M7_ROOT_CTRL 0x%x\r\n", CCM->CLOCK_ROOT[0].CONTROL);
 }
+
+#ifdef COREMARK_USING_SYSTICK && COREMARK_USING_SYSTICK
+uint32_t COREMARK_GetTimerClockFreq(void)
+{
+    return CLOCK_GetRootClockFreq(kCLOCK_Root_M7_Systick);
+}
+#endif
 /*${function:end}*/

@@ -21,17 +21,17 @@ void BOARD_InitHardware(void)
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
     freq =  CLOCK_GetFreqFromObs(CCM_OBS_PLL_ARM_OUT) / 1000000;
-    DbgConsole_Printf("\r\nARM PLL %d MHz", freq * 4);
+    //DbgConsole_Printf("\r\nARM PLL %d MHz", freq * 4);
     freq =  CLOCK_GetFreqFromObs(CCM_OBS_M7_CLK_ROOT) / 1000000;
-    DbgConsole_Printf("\r\nCM7 %d MHz", freq * 4);
+    //DbgConsole_Printf("\r\nCM7 %d MHz", freq * 4);
 
-    DbgConsole_Printf("\r\nOD is ");
+    //DbgConsole_Printf("\r\nOD is ");
 #if OD
-    DbgConsole_Printf("Enabled\r\n");
+    //DbgConsole_Printf("Enabled\r\n");
 #else
-    DbgConsole_Printf("Disabled\r\n");
+    //DbgConsole_Printf("Disabled\r\n");
 #endif
-    DbgConsole_Printf("M7_ROOT_CTRL 0x%x\r\n", CCM->CLOCK_ROOT[0].CONTROL);
+    //DbgConsole_Printf("M7_ROOT_CTRL 0x%x\r\n", CCM->CLOCK_ROOT[0].CONTROL);
 }
 
 #ifdef COREMARK_USING_SYSTICK && COREMARK_USING_SYSTICK

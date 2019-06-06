@@ -9,7 +9,6 @@
 #include "core_portme.h"
 #include "app.h"
 #include "clock_config.h"
-#include "fsl_pit.h"
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -30,28 +29,21 @@
 	volatile ee_s32 seed5_volatile=0;
 
 volatile uint32_t s_timerHighCounter = 0;
-void PIT_IRQ_HANDLER(void)
+void SysTick_Handler(void)
 {
-    /* Clear interrupt flag.*/
-    PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+    if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
+    {
+        SysTick->VAL = 0;
+    }
     s_timerHighCounter++;
 }
 
 void timer_pit_init(void)
 {
-    /* Structure of initialize PIT */
-    pit_config_t pitConfig;
-    PIT_GetDefaultConfig(&pitConfig);
-    /* Init pit module */
-    PIT_Init(PIT, &pitConfig);
-    /* Set max timer period for channel 0 */
-    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t)~0);
-    /* Enable timer interrupts for channel 0 */
-    PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
-    /* Enable at the NVIC */
-    EnableIRQ(PIT_IRQ_ID);
-    /* Start channel 0 */
-    PIT_StartTimer(PIT, kPIT_Chnl_0);
+    SysTick->LOAD      = (uint32_t)(0xFFFFFF);                       /* set reload register */
+    NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
+    SysTick->VAL  = 0UL;                                             /* Load the SysTick Counter Value */
+    SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 }
 
 /* Porting : Timing functions
@@ -66,9 +58,9 @@ CORETIMETYPE barebones_clock() {
     do
     {
         high = s_timerHighCounter;
-        low = ~PIT_GetCurrentTimerCount(PIT, kPIT_Chnl_0);
+        low = (~(SysTick->VAL)) & 0xFFFFFF;
     } while (high != s_timerHighCounter);
-    retVal = ((uint64_t)high << 32U) + low;
+    retVal = ((uint64_t)high << 24U) + low;
 
     return retVal;
 }
@@ -78,7 +70,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#define CLOCKS_PER_SEC (24000000)
+#define CLOCKS_PER_SEC (100000)
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1

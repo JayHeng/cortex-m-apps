@@ -1145,12 +1145,12 @@
         <option>
           <name>CCDefines</name>
           <state>NDEBUG</state>
-          <state>CPU_MIMXRT1062DVL6A</state>
+          <state>CPU_MIMXRT1176DVMAA_cm7</state>
           <state>PRINTF_FLOAT_ENABLE=0</state>
           <state>SCANF_FLOAT_ENABLE=0</state>
           <state>PRINTF_ADVANCED_ENABLE=0</state>
           <state>SCANF_ADVANCED_ENABLE=0</state>
-          <state>ITERATIONS=40000</state>
+          <state>ITERATIONS=80000</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1281,10 +1281,10 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$/../../src</state>
           <state>$PROJ_DIR$/../../../src</state>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062</state>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/drivers</state>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/utilities/str</state>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/utilities/debug_console</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/drivers</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/utilities/str</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/utilities/debug_console</state>
           <state>$PROJ_DIR$/../../../../../components/uart</state>
           <state>$PROJ_DIR$/../../../../../components/serial_manager</state>
           <state>$PROJ_DIR$/../../../../../components/lists</state>
@@ -1704,7 +1704,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1062/iar/MIMXRT1062xxxxx_ram.icf</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/iar/MIMXRT1176xxxxx_cm7_ram.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1945,7 +1945,7 @@
     </settings>
   </configuration>
   <group>
-    <name>IMXRT1062</name>
+    <name>IMXRT1176</name>
     <group>
       <name>bsp</name>
       <file>
@@ -2050,71 +2050,65 @@
       <group>
         <name>drivers</name>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_clock.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_clock.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_common.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_common.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_gpio.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_gpio.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_iomuxc.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_iomuxc.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_lpuart.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.h</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_lpuart.h</name>
         </file>
       </group>
       <group>
         <name>utilities</name>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\fsl_assert.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\fsl_assert.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\debug_console\fsl_debug_console.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\debug_console\fsl_debug_console.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\debug_console\fsl_debug_console_conf.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\debug_console\fsl_debug_console_conf.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\str\fsl_str.c</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\str\fsl_str.c</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\utilities\str\fsl_str.h</name>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\utilities\str\fsl_str.h</name>
         </file>
       </group>
     </group>
     <group>
       <name>startup</name>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\iar\startup_MIMXRT1062.s</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\iar\startup_MIMXRT1176_cm7.s</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\system_MIMXRT1062.c</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm7.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\system_MIMXRT1062.h</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm7.h</name>
       </file>
     </group>
   </group>

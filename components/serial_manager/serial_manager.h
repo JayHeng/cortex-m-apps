@@ -109,9 +109,10 @@ typedef void *serial_read_handle_t;
 
 typedef enum _serial_port_type
 {
-    kSerialPort_Uart = 1U, /*!< Serial port UART */
-    kSerialPort_UsbCdc,    /*!< Serial port USB CDC */
-    kSerialPort_Swo,       /*!< Serial port SWO */
+    kSerialPort_Uart = 1U,     /*!< Serial port UART */
+    kSerialPort_UsbCdc,        /*!< Serial port USB CDC */
+    kSerialPort_Swo,           /*!< Serial port SWO */
+    kSerialPort_UsbCdcVirtual, /*!< Serial port USB CDC Virtual */
 } serial_port_type_t;
 
 typedef struct _serial_manager_config

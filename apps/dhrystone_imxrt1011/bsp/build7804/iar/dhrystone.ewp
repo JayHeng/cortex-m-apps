@@ -1117,12 +1117,12 @@
         <option>
           <name>FPU2</name>
           <version>0</version>
-          <state>7</state>
+          <state>0</state>
         </option>
         <option>
           <name>NrRegs</name>
           <version>0</version>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>NEON</name>
@@ -2064,6 +2064,12 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1011\drivers\fsl_lpuart.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1011\drivers\fsl_pit.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1011\drivers\fsl_pit.h</name>
         </file>
       </group>
       <group>

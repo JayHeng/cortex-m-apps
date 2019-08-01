@@ -7,7 +7,7 @@
 **     Compiler:            IAR ANSI C/C++ Compiler for ARM
 **     Reference manual:    IMXRT1170RM_initial_draft, 02/2018
 **     Version:             rev. 0.1, 2018-03-05
-**     Build:               b190604
+**     Build:               b190722
 **
 **     Abstract:
 **         Linker file for the IAR ANSI C/C++ Compiler for ARM
@@ -37,10 +37,10 @@ define symbol m_data2_start            = 0x20240000;
 define symbol m_data2_end              = 0x202BFFFF;
 
 define symbol m_data3_start            = 0x80200000;
-define symbol m_data3_end              = 0x81DFFFFF;
+define symbol m_data3_end              = 0x82FFFFFF;
 
-define symbol m_ncache_start           = 0x81E00000;
-define symbol m_ncache_end             = 0x81FFFFFF;
+define symbol m_ncache_start           = 0x83000000;
+define symbol m_ncache_end             = 0x83FFFFFF;
 
 /* Sizes */
 if (isdefinedsymbol(__stack_size__)) {
@@ -72,7 +72,7 @@ define block CSTACK    with alignment = 8, size = __size_cstack__   { };
 define block HEAP      with alignment = 8, size = __size_heap__     { };
 define block RW        { first readwrite, section m_usb_dma_init_data };
 define block ZI         with alignment = 32  { first zi, section m_usb_dma_noninit_data };
-define block NCACHE_VAR with size = 0x200000 , alignment = 0x100000  { section NonCacheable , section NonCacheable.init };
+define block NCACHE_VAR with size = 0x01000000 , alignment = 0x100000  { section NonCacheable , section NonCacheable.init };
 
 initialize by copy { readwrite, section .textrw };
 do not initialize  { section .noinit };

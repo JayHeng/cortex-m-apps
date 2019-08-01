@@ -7,7 +7,7 @@
 **     Compiler:            IAR ANSI C/C++ Compiler for ARM
 **     Reference manual:    IMXRT1170RM_initial_draft, 02/2018
 **     Version:             rev. 0.1, 2018-03-05
-**     Build:               b190604
+**     Build:               b190722
 **
 **     Abstract:
 **         Linker file for the IAR ANSI C/C++ Compiler for ARM

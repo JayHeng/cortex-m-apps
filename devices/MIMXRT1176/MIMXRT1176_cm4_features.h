@@ -1,7 +1,7 @@
 /*
 ** ###################################################################
 **     Version:             rev. 0.1, 2018-03-05
-**     Build:               b190530
+**     Build:               b190719
 **
 **     Abstract:
 **         Chip specific module features.
@@ -83,6 +83,8 @@
 #define FSL_FEATURE_SOC_LPSPI_COUNT (6)
 /* @brief LPUART availability on the SoC. */
 #define FSL_FEATURE_SOC_LPUART_COUNT (12)
+/* @brief MU availability on the SoC. */
+#define FSL_FEATURE_SOC_MU_COUNT (2)
 /* @brief OCOTP availability on the SoC. */
 #define FSL_FEATURE_SOC_OCOTP_COUNT (1)
 /* @brief OTFAD availability on the SoC. */
@@ -93,6 +95,8 @@
 #define FSL_FEATURE_SOC_PWM_COUNT (4)
 /* @brief PXP availability on the SoC. */
 #define FSL_FEATURE_SOC_PXP_COUNT (1)
+/* @brief RDC availability on the SoC. */
+#define FSL_FEATURE_SOC_RDC_COUNT (1)
 /* @brief ROMC availability on the SoC. */
 #define FSL_FEATURE_SOC_ROMC_COUNT (1)
 /* @brief SEMC availability on the SoC. */
@@ -115,6 +119,8 @@
 #define FSL_FEATURE_SOC_USBNC_COUNT (2)
 /* @brief USBPHY availability on the SoC. */
 #define FSL_FEATURE_SOC_USBPHY_COUNT (2)
+/* @brief USB_ANALOG availability on the SoC. */
+#define FSL_FEATURE_SOC_USB_ANALOG_COUNT (1)
 /* @brief USDHC availability on the SoC. */
 #define FSL_FEATURE_SOC_USDHC_COUNT (2)
 /* @brief WDOG availability on the SoC. */
@@ -167,6 +173,8 @@
 #define FSL_FEATURE_FLEXCAN_INSTANCE_HAS_FLEXIBLE_DATA_RATEn(x) (1)
 /* @brief Has extra MB interrupt or common one. */
 #define FSL_FEATURE_FLEXCAN_HAS_EXTRA_MB_INT (0)
+/* @brief Has memory error control (register MECR). */
+#define FSL_FEATURE_FLEXCAN_HAS_MEMORY_ERROR_CONTROL (1)
 
 /* ACMP module features */
 
@@ -274,6 +282,8 @@
 #define FSL_FEATURE_FLEXRAM_INTERNAL_RAM_BANK_SIZE (32 * 1024)
 /* @brief Total Bank numbers */
 #define FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS (16)
+/* @brief Has FLEXRAM_MAGIC_ADDR. */
+#define FSL_FEATURE_FLEXRAM_HAS_MAGIC_ADDR (1)
 
 /* FLEXSPI module features */
 
@@ -281,6 +291,8 @@
 #define FSL_FEATURE_FLEXSPI_AHB_BUFFER_COUNTn(x) (4)
 /* @brief FlexSPI has no data learn. */
 #define FSL_FEATURE_FLEXSPI_HAS_NO_DATA_LEARN (1)
+/* @brief There is AHBBUSERROREN bit in INTEN register. */
+#define FSL_FEATURE_FLEXSPI_HAS_INTEN_AHBBUSERROREN (1)
 
 /* GPC_CPU_MODE_CTRL module features */
 
@@ -532,11 +544,46 @@
 #define FSL_FEATURE_USDHC_HAS_SDR104_MODE (1)
 /* @brief USDHC has reset control */
 #define FSL_FEATURE_USDHC_HAS_RESET (0)
+/* @brief USDHC has no bitfield WTMK_LVL[WR_BRST_LEN] and WTMK_LVL[RD_BRST_LEN] */
+#define FSL_FEATURE_USDHC_HAS_NO_RW_BURST_LEN (1)
 
 /* XBARA module features */
 
 /* @brief Number of interrupt requests. */
 #define FSL_FEATURE_XBARA_INTERRUPT_COUNT (4)
+
+/* MU module features */
+
+/* @brief MU side for current core */
+#define FSL_FEATURE_MU_SIDE_A (1)
+/* @brief MU Has register CCR */
+#define FSL_FEATURE_MU_HAS_CCR (0)
+/* @brief MU Has register SR[RS], BSR[ARS] */
+#define FSL_FEATURE_MU_HAS_SR_RS (1)
+/* @brief MU Has register CR[RDIE], SR[RDIP], or CR[RAIE], SR[RAIP] */
+#define FSL_FEATURE_MU_HAS_RESET_INT (1)
+/* @brief MU Has register SR[MURIP] */
+#define FSL_FEATURE_MU_HAS_SR_MURIP (0)
+/* @brief MU Has register SR[HRIP] */
+#define FSL_FEATURE_MU_HAS_SR_HRIP (0)
+/* @brief MU does not support enable clock of the other core, CR[CLKE] or CCR[CLKE]. */
+#define FSL_FEATURE_MU_NO_CLKE (1)
+/* @brief MU does not support NMI, CR[NMI]. */
+#define FSL_FEATURE_MU_NO_NMI (1)
+/* @brief MU does not support hold the other core reset. CR[RSTH] or CCR[RSTH]. */
+#define FSL_FEATURE_MU_NO_RSTH (1)
+/* @brief MU does not supports MU reset, CR[MUR]. */
+#define FSL_FEATURE_MU_NO_MUR (0)
+/* @brief MU does not supports hardware reset, CR[HR] or CCR[HR]. */
+#define FSL_FEATURE_MU_NO_HR (1)
+/* @brief MU supports mask the hardware reset. CR[HRM] or CCR[HRM]. */
+#define FSL_FEATURE_MU_HAS_HRM (0)
+/* @brief MU does not support check the other core power mode. SR[PM]. */
+#define FSL_FEATURE_MU_NO_PM (1)
+/* @brief MU supports reset assert interrupt. CR[RAIE], SR[RAIP] */
+#define FSL_FEATURE_MU_HAS_RESET_ASSERT_INT (0)
+/* @brief MU supports reset assert interrupt. CR[RDIE], SR[RDIP] */
+#define FSL_FEATURE_MU_HAS_RESET_DEASSERT_INT (1)
 
 #endif /* _MIMXRT1176_cm4_FEATURES_H_ */
 

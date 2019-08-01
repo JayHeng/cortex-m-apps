@@ -4,7 +4,7 @@
 ;            MIMXRT1176_cm7
 ;  @version: 0.1
 ;  @date:    2018-3-5
-;  @build:   b190530
+;  @build:   b190718
 ; -------------------------------------------------------------------------
 ;
 ; Copyright 1997-2016 Freescale Semiconductor, Inc.
@@ -158,7 +158,7 @@ __vector_table_0x1c
         DCD     Reserved105_IRQHandler                        ;Reserved interrupt
         DCD     USBPHY1_IRQHandler                            ;USBPHY1 interrupt
         DCD     USBPHY2_IRQHandler                            ;USBPHY2 interrupt
-        DCD     Reserved108_IRQHandler                        ;Reserved interrupt
+        DCD     RDC_IRQHandler                                ;RDC interrupt
         DCD     GPIO13_Combined_0_31_IRQHandler               ;Combined interrupt indication for GPIO13 signal 0 throughout 31
         DCD     SFA_IRQHandler                                ;SFA interrupt
         DCD     DCIC1_IRQHandler                              ;DCIC1 interrupt
@@ -181,10 +181,10 @@ __vector_table_0x1c
         DCD     WDOG1_IRQHandler                              ;WDOG1 interrupt
         DCD     RTWDOG3_IRQHandler                            ;RTWDOG3 interrupt
         DCD     EWM_IRQHandler                                ;EWM interrupt
-        DCD     OCOTP_READ_FUSE_ERROR_IRQHandler              ;PCPTP read fuse error interrupt
-        DCD     OCOTP_READ_DONE_ERROR_IRQHandler              ;PCPTP read fuse done interrupt
+        DCD     OCOTP_READ_FUSE_ERROR_IRQHandler              ;OCOTP read fuse error interrupt
+        DCD     OCOTP_READ_DONE_ERROR_IRQHandler              ;OCOTP read fuse done interrupt
         DCD     Reserved133_IRQHandler                        ;Reserved interrupt
-        DCD     Reserved134_IRQHandler                        ;Reserved interrupt
+        DCD     MUA_IRQHandler                                ;MUA interrupt
         DCD     GPT1_IRQHandler                               ;GPT1 interrupt
         DCD     GPT2_IRQHandler                               ;GPT2 interrupt
         DCD     GPT3_IRQHandler                               ;GPT3 interrupt
@@ -689,7 +689,7 @@ SPDIF_IRQHandler
         PUBWEAK Reserved105_IRQHandler
         PUBWEAK USBPHY1_IRQHandler
         PUBWEAK USBPHY2_IRQHandler
-        PUBWEAK Reserved108_IRQHandler
+        PUBWEAK RDC_IRQHandler
         PUBWEAK GPIO13_Combined_0_31_IRQHandler
         PUBWEAK SFA_IRQHandler
         PUBWEAK DCIC1_IRQHandler
@@ -727,7 +727,7 @@ FLEXIO2_IRQHandler
         PUBWEAK OCOTP_READ_FUSE_ERROR_IRQHandler
         PUBWEAK OCOTP_READ_DONE_ERROR_IRQHandler
         PUBWEAK Reserved133_IRQHandler
-        PUBWEAK Reserved134_IRQHandler
+        PUBWEAK MUA_IRQHandler
         PUBWEAK GPT1_IRQHandler
         PUBWEAK GPT2_IRQHandler
         PUBWEAK GPT3_IRQHandler
@@ -978,7 +978,7 @@ Reserved104_IRQHandler
 Reserved105_IRQHandler
 USBPHY1_IRQHandler
 USBPHY2_IRQHandler
-Reserved108_IRQHandler
+RDC_IRQHandler
 GPIO13_Combined_0_31_IRQHandler
 SFA_IRQHandler
 DCIC1_IRQHandler
@@ -1004,7 +1004,7 @@ EWM_IRQHandler
 OCOTP_READ_FUSE_ERROR_IRQHandler
 OCOTP_READ_DONE_ERROR_IRQHandler
 Reserved133_IRQHandler
-Reserved134_IRQHandler
+MUA_IRQHandler
 GPT1_IRQHandler
 GPT2_IRQHandler
 GPT3_IRQHandler

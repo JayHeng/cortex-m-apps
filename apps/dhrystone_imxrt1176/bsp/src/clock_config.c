@@ -147,7 +147,10 @@ sources:
  ******************************************************************************/
 void BOARD_BootClockRUN(void)
 {
-    const clock_source_t source[][8] = ROOT_CLOCK_SOURCES;
+    uint32_t bus_root;
+    uint32_t bus_root_lpsr;
+    
+    const clock_name_t source[][8] = ROOT_CLOCK_SOURCES;
     clock_root_config_t rootCfg = {0};
 #if OD
     DCDC->DCDC_CTRL1 &= ~DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG_MASK;
@@ -184,9 +187,27 @@ void BOARD_BootClockRUN(void)
         rootCfg.div = 0;
         CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
     }
-
+    /* Configure M7 */
+    rootCfg.mux = 0;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
+    rootCfg.mux = 0;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);    
+    rootCfg.mux = 0;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_Semc, &rootCfg);    
+    rootCfg.mux = 0;
+    rootCfg.div = 0;
+    
+    bus_root = CCM->CLOCK_ROOT[kCLOCK_Root_Bus].CONTROL;
+    bus_root_lpsr = CCM->CLOCK_ROOT[kCLOCK_Root_Bus_Lpsr].CONTROL;
+    CLOCK_SetRootClock(kCLOCK_Root_Bus, &rootCfg);   
+    CLOCK_SetRootClock(kCLOCK_Root_Bus_Lpsr, &rootCfg); 
+    for(int i=0; i<1000*1000*10; i++);
+    
     /* PLL LDO shall be enabled first before enable PLLs */
-    CLOCK_EnablePllLdo();
+    //CLOCK_EnablePllLdo();
 
     CLOCK_InitArmPll(&armPllConfig);
     CLOCK_InitSysPll2(&sysPllConfig);
@@ -196,23 +217,37 @@ void BOARD_BootClockRUN(void)
     rootCfg.mux = 4;
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
-
+    
     /* Configure M7 Systick running at 100K */
     rootCfg.mux = 0;
     rootCfg.div = 239;
     CLOCK_SetRootClock(kCLOCK_Root_M7_Systick, &rootCfg);
-
+    
     /* Configure Lpuart1 using Osc48MDiv2 */
     rootCfg.mux = 0;
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_Lpuart1, &rootCfg);
-
-
+    
+#if 1    
+    CLOCK_InitPfd(kCLOCK_Pll_SysPll3, kCLOCK_Pfd3, 26);
+    /* Configure M4 using SysPll3 divided by 1 */
+    rootCfg.mux = 4;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);
+#endif
+    
     CLOCK_EnableOscRc400M();
     /* Configure Semc using OscRc400M divided by 2 */
     rootCfg.mux = 2;
     rootCfg.div = 1;
     CLOCK_SetRootClock(kCLOCK_Root_Semc, &rootCfg);
 
+    CCM->CLOCK_ROOT[kCLOCK_Root_Bus].CONTROL = bus_root;
+    CCM->CLOCK_ROOT[kCLOCK_Root_Bus_Lpsr].CONTROL = bus_root_lpsr;    
+    
+#if __CORTEX_M == 7
     SystemCoreClock = CLOCK_GetRootClockFreq(kCLOCK_Root_M7);
+#else
+    SystemCoreClock = CLOCK_GetRootClockFreq(kCLOCK_Root_M4);
+#endif
 }

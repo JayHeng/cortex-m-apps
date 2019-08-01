@@ -26,4 +26,12 @@
 /apps/*/bsp/build7804/iar/Release
 /apps/*/bsp/build7804/iar/Debug
 
+/apps/*/bsp/build7804_cm7/iar/settings
+/apps/*/bsp/build7804_cm7/settings
+/apps/*/bsp/build7804_cm7/iar/Release
+/apps/*/bsp/build7804_cm7/iar/Debug
 
+/apps/*/bsp/build7804_cm4/iar/settings
+/apps/*/bsp/build7804_cm4/settings
+/apps/*/bsp/build7804_cm4/iar/Release
+/apps/*/bsp/build7804_cm4/iar/Debug

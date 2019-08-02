@@ -1147,8 +1147,8 @@
           <state>NDEBUG</state>
           <state>CPU_MIMXRT1176DVMAA_cm4</state>
           <state>REG=register</state>
-          <state>NUMBER_OF_RUNS=13000000</state>
-          <state>CORE_FREQ_MHz=400</state>
+          <state>NUMBER_OF_RUNS=4500000</state>
+          <state>CORE_FREQ_MHz=480</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2055,6 +2055,12 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_gpio.h</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_gpt.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_gpt.h</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_iomuxc.h</name>

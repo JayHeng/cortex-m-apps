@@ -231,7 +231,7 @@ void BOARD_BootClockRUN(void)
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
 
-    /* Configure M7 Systick running at 10K */
+    /* Configure M7 Systick running at 100K */
     rootCfg.mux = 0;
     rootCfg.div = 239;
     CLOCK_SetRootClock(kCLOCK_Root_M7_Systick, &rootCfg);

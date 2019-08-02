@@ -1700,11 +1700,11 @@
         </option>
         <option>
           <name>CExtraOptionsCheck</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CExtraOptions</name>
-          <state></state>
+          <state>--jlink_script_file=$PROJ_DIR$/evkmimxrt1170_connect_cm4_cm7side.jlinkscript</state>
         </option>
         <option>
           <name>CFpuProcessor</name>

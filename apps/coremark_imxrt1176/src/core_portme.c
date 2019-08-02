@@ -9,6 +9,7 @@
 #include "core_portme.h"
 #include "app.h"
 #include "clock_config.h"
+#include "fsl_gpt.h"
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -38,12 +39,21 @@ void SysTick_Handler(void)
     s_timerHighCounter++;
 }
 
-void timer_pit_init(void)
+void timer_init(void)
 {
+#if __CORTEX_M == 7
     SysTick->LOAD      = (uint32_t)(0xFFFFFF);                       /* set reload register */
     NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
     SysTick->VAL  = 0UL;                                             /* Load the SysTick Counter Value */
     SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+#elif __CORTEX_M == 4
+    gpt_config_t gpt;
+    GPT_GetDefaultConfig(&gpt);
+    GPT_Init(GPT2, &gpt);
+    /* Using 32K osc as timer clock source */
+    GPT_SetClockSource(GPT2, kGPT_ClockSource_LowFreq);
+    GPT_StartTimer(GPT2);
+#endif
 }
 
 /* Porting : Timing functions
@@ -53,6 +63,7 @@ void timer_pit_init(void)
 */
 CORETIMETYPE barebones_clock() {
     uint64_t retVal;
+#if __CORTEX_M == 7
     uint32_t high;
     uint32_t low;
     do
@@ -61,6 +72,9 @@ CORETIMETYPE barebones_clock() {
         low = (~(SysTick->VAL)) & 0xFFFFFF;
     } while (high != s_timerHighCounter);
     retVal = ((uint64_t)high << 24U) + low;
+#elif __CORTEX_M == 4
+    retVal = GPT_GetCurrentTimerCount(GPT2);
+#endif
 
     return retVal;
 }
@@ -70,7 +84,11 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
+#if __CORTEX_M == 7
 #define CLOCKS_PER_SEC (100000)
+#elif __CORTEX_M == 4
+#define CLOCKS_PER_SEC (32000)
+#endif
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
@@ -133,7 +151,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     /* Init board hardware. */
     BOARD_InitHardware();
     /* Init timer for microsecond function. */
-    timer_pit_init();
+    timer_init();
     
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
 		ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");

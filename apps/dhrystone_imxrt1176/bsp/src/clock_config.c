@@ -32,6 +32,7 @@ board: MIMXRT1060-EVK
 
 #include "clock_config.h"
 #include "fsl_iomuxc.h"
+#include "board.h"
 
 /*******************************************************************************
  * Definitions
@@ -139,112 +140,143 @@ sources:
 - {id: XTALOSC24M.OSC.outFreq, value: 24 MHz, enabled: true}
 - {id: XTALOSC24M.RTC_OSC.outFreq, value: 32.768 kHz, enabled: true}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
-#ifndef OD
-#define OD 1
+
+#define DCDC_TARGET_VOLTAGE_1V 1000
+#ifndef DCDC_TARGET_VOLTAGE
+#define DCDC_TARGET_VOLTAGE DCDC_TARGET_VOLTAGE_1V
 #endif
+
+/*
+ * TODO:
+ *   replace the following two dcdc function with SDK DCDC driver when it's
+ * ready
+ */
+/*******************************************************************************
+ * Code for getting current DCDC voltage setting
+ ******************************************************************************/
+uint32_t dcdc_get_target_voltage()
+{
+    uint32_t temp = DCDC->DCDC_CTRL1;
+    temp          = (temp & DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG_MASK) >> DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG_SHIFT;
+    return (temp * 25 + 600);
+}
+
+/*******************************************************************************
+ * Code for setting DCDC to target voltage
+ ******************************************************************************/
+void dcdc_trim_target_1p0(uint32_t target_voltage)
+{
+    uint8_t trim_value;
+    uint32_t temp;
+
+    trim_value = (target_voltage - 600) / 25;
+    temp       = DCDC->DCDC_CTRL1;
+    temp &= ~DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG_MASK;
+    temp |= DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG(trim_value);
+    DCDC->DCDC_CTRL1 = temp;
+}
+
 /*******************************************************************************
  * Code for BOARD_BootClockRUN configuration
  ******************************************************************************/
 void BOARD_BootClockRUN(void)
 {
-    uint32_t bus_root;
-    uint32_t bus_root_lpsr;
-    
-    const clock_name_t source[][8] = ROOT_CLOCK_SOURCES;
     clock_root_config_t rootCfg = {0};
-#if OD
-    DCDC->DCDC_CTRL1 &= ~DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG_MASK;
-    DCDC->DCDC_CTRL1 |= DCDC_DCDC_CTRL1_DCDC_VDD1P0CTRL_TRG(20);
-#endif
-    /* ARM PLL 996 MHz. */
-    const clock_arm_pll_config_t armPllConfig =
-    {
-        .postDivider = kCLOCK_PllPostDiv2,
-        .loopDivider = 166, /* 116: 696M
-                             * 166: 1G, verified with coremark
-                             */
-    };
 
-    /* SYS PLL2 52 8MHz. */
-    const clock_sys_pll_config_t sysPllConfig =
-    {
+#if !defined(SKIP_DCDC_ADJUSTMENT) || (!SKIP_DCDC_ADJUSTMENT)
+    dcdc_trim_target_1p0(DCDC_TARGET_VOLTAGE);
+#endif
+
+#if defined(BYPASS_LDO_LPSR) && BYPASS_LDO_LPSR
+    CLOCK_ANATOP_LdoLpsrAnaBypassOn();
+    CLOCK_ANATOP_LdoLpsrDigBypassOn();
+#endif
+
+#if __CORTEX_M == 7
+    /* ARM PLL 996 MHz. */
+    const clock_arm_pll_config_t armPllConfig = {
+        .postDivider = kCLOCK_PllPostDiv2, .loopDivider = 166, /* 116: 696M
+                                                                * 166: 996M
+                                                                */
+    };
+#endif
+
+    /* SYS PLL2 528MHz. */
+    const clock_sys_pll_config_t sysPllConfig = {
         .loopDivider = 1,
         /* Using 24Mhz OSC */
         .mfn = 0,
         .mfi = 22,
     };
 
-    const clock_sys_pll3_config_t sysPll3Config =
-    {
+#if __CORTEX_M == 4
+    const clock_sys_pll3_config_t sysPll3Config = {
         .divSelect = 3,
     };
-
-
+#endif
+    /* PLL LDO shall be enabled first before enable PLLs */
     CLOCK_EnableOsc24M();
-    if (source[kCLOCK_Root_M7][4] == CLOCK_GetRootClockMux(kCLOCK_Root_M7))
-    {
-        rootCfg.mux = source[kCLOCK_Root_M7][1];
-        rootCfg.div = 0;
-        CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
-    }
-    /* Configure M7 */
+    CLOCK_EnablePllLdo();
+
+#if __CORTEX_M == 7
     rootCfg.mux = 0;
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
-    rootCfg.mux = 0;
-    rootCfg.div = 0;
-    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);    
-    rootCfg.mux = 0;
-    rootCfg.div = 0;
-    CLOCK_SetRootClock(kCLOCK_Root_Semc, &rootCfg);    
-    rootCfg.mux = 0;
-    rootCfg.div = 0;
-    
-    bus_root = CCM->CLOCK_ROOT[kCLOCK_Root_Bus].CONTROL;
-    bus_root_lpsr = CCM->CLOCK_ROOT[kCLOCK_Root_Bus_Lpsr].CONTROL;
-    CLOCK_SetRootClock(kCLOCK_Root_Bus, &rootCfg);   
-    CLOCK_SetRootClock(kCLOCK_Root_Bus_Lpsr, &rootCfg); 
-    for(int i=0; i<1000*1000*10; i++);
-    
-    /* PLL LDO shall be enabled first before enable PLLs */
-    //CLOCK_EnablePllLdo();
+    CLOCK_SetRootClock(kCLOCK_Root_M7_Systick, &rootCfg);
 
+    /* ARMPll: 996M */
     CLOCK_InitArmPll(&armPllConfig);
-    CLOCK_InitSysPll2(&sysPllConfig);
-    CLOCK_InitSysPll3(&sysPll3Config);
-    
     /* Configure M7 */
     rootCfg.mux = 4;
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_M7, &rootCfg);
-    
-    /* Configure M7 Systick running at 100K */
+
+    /* Configure M7 Systick running at 10K */
     rootCfg.mux = 0;
     rootCfg.div = 239;
     CLOCK_SetRootClock(kCLOCK_Root_M7_Systick, &rootCfg);
-    
+#endif
+
+#if __CORTEX_M == 4
+    rootCfg.mux = 0;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);
+    CLOCK_SetRootClock(kCLOCK_Root_Bus_Lpsr, &rootCfg);
+
+    /* SysPll3Pfd3: 480M */
+    CLOCK_InitSysPll3(&sysPll3Config);
+    CLOCK_InitPfd(kCLOCK_Pll_SysPll3, kCLOCK_Pfd3, 18);
+
+    /* Configure M4 using SysPll3Pfd3 divided by 1 */
+    rootCfg.mux = 4;
+    rootCfg.div = 0;
+    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);
+
+    /* SysPll3 */
+    rootCfg.mux = 5;
+    rootCfg.div = 3;
+    CLOCK_SetRootClock(kCLOCK_Root_Bus_Lpsr, &rootCfg);
+#endif
+    CLOCK_InitSysPll2(&sysPllConfig);
+
+#if DEBUG_CONSOLE_UART_INDEX == 1
     /* Configure Lpuart1 using Osc48MDiv2 */
     rootCfg.mux = 0;
     rootCfg.div = 0;
     CLOCK_SetRootClock(kCLOCK_Root_Lpuart1, &rootCfg);
-    
-#if 1    
-    CLOCK_InitPfd(kCLOCK_Pll_SysPll3, kCLOCK_Pfd3, 26);
-    /* Configure M4 using SysPll3 divided by 1 */
-    rootCfg.mux = 4;
+#else
+    /* Configure Lpuart2 using Osc48MDiv2 */
+    rootCfg.mux = 0;
     rootCfg.div = 0;
-    CLOCK_SetRootClock(kCLOCK_Root_M4, &rootCfg);
+    CLOCK_SetRootClock(kCLOCK_Root_Lpuart2, &rootCfg);
 #endif
-    
+
     CLOCK_EnableOscRc400M();
     /* Configure Semc using OscRc400M divided by 2 */
     rootCfg.mux = 2;
     rootCfg.div = 1;
     CLOCK_SetRootClock(kCLOCK_Root_Semc, &rootCfg);
 
-    CCM->CLOCK_ROOT[kCLOCK_Root_Bus].CONTROL = bus_root;
-    CCM->CLOCK_ROOT[kCLOCK_Root_Bus_Lpsr].CONTROL = bus_root_lpsr;    
-    
 #if __CORTEX_M == 7
     SystemCoreClock = CLOCK_GetRootClockFreq(kCLOCK_Root_M7);
 #else

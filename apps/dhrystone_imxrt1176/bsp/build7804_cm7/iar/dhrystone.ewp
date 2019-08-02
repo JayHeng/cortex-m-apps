@@ -1148,7 +1148,7 @@
           <state>CPU_MIMXRT1176DVMAA_cm7</state>
           <state>REG=register</state>
           <state>NUMBER_OF_RUNS=13000000</state>
-          <state>CORE_FREQ_MHz=1000</state>
+          <state>CORE_FREQ_MHz=996</state>
         </option>
         <option>
           <name>CCPreprocFile</name>

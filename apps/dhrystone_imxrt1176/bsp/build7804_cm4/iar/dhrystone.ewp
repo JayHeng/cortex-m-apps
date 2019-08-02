@@ -1091,7 +1091,7 @@
         <option>
           <name>GBECoreSlave</name>
           <version>24</version>
-          <state>41</state>
+          <state>39</state>
         </option>
         <option>
           <name>OGUseCmsis</name>
@@ -1108,7 +1108,7 @@
         <option>
           <name>CoreVariant</name>
           <version>24</version>
-          <state>41</state>
+          <state>39</state>
         </option>
         <option>
           <name>GFPUDeviceSlave</name>
@@ -1117,12 +1117,12 @@
         <option>
           <name>FPU2</name>
           <version>0</version>
-          <state>7</state>
+          <state>0</state>
         </option>
         <option>
           <name>NrRegs</name>
           <version>0</version>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>NEON</name>
@@ -1131,7 +1131,7 @@
         <option>
           <name>GFPUCoreSlave2</name>
           <version>24</version>
-          <state>41</state>
+          <state>39</state>
         </option>
       </data>
     </settings>
@@ -1145,10 +1145,10 @@
         <option>
           <name>CCDefines</name>
           <state>NDEBUG</state>
-          <state>CPU_MIMXRT1176DVMAA_cm7</state>
+          <state>CPU_MIMXRT1176DVMAA_cm4</state>
           <state>REG=register</state>
           <state>NUMBER_OF_RUNS=13000000</state>
-          <state>CORE_FREQ_MHz=1000</state>
+          <state>CORE_FREQ_MHz=400</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1702,7 +1702,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/iar/MIMXRT1176xxxxx_cm7_ram.icf</state>
+          <state>$PROJ_DIR$/../../../../../devices/MIMXRT1176/iar/MIMXRT1176xxxxx_cm4_ram.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -2091,13 +2091,13 @@
     <group>
       <name>startup</name>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\iar\startup_MIMXRT1176_cm7.s</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\iar\startup_MIMXRT1176_cm4.s</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm7.c</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm4.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm7.h</name>
+        <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\system_MIMXRT1176_cm4.h</name>
       </file>
     </group>
     <file>

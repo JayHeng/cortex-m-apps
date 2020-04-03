@@ -27,15 +27,32 @@ static void print_rt_clocks(void)
     }
 }
 
+static void enable_fbb(void)
+{
+    //== FBB lvl config 0->0.5 1->0.6 бнбн8->1.3
+    ANADIG_PMU->PMU_BIAS_CTRL &= ~ANADIG_PMU_PMU_BIAS_CTRL_wb_pw_lvl_1p8_MASK;
+    ANADIG_PMU->PMU_BIAS_CTRL |= ANADIG_PMU_PMU_BIAS_CTRL_wb_pw_lvl_1p8(1);
+    ANADIG_PMU->PMU_BIAS_CTRL &= ~ANADIG_PMU_PMU_BIAS_CTRL_wb_nw_lvl_1p8_MASK;
+    ANADIG_PMU->PMU_BIAS_CTRL |= ANADIG_PMU_PMU_BIAS_CTRL_wb_nw_lvl_1p8(1);     
+    //==anatop_wb_cfg_1p8_cfg(0x01EE);
+    ANADIG_PMU->PMU_BIAS_CTRL &= ~ANADIG_PMU_PMU_BIAS_CTRL_wb_cfg_1p8_MASK;
+    ANADIG_PMU->PMU_BIAS_CTRL |= ANADIG_PMU_PMU_BIAS_CTRL_wb_cfg_1p8(0x01EE);
+    //==anatop_wb_pwr_sw_en_1p8(1);
+    ANADIG_PMU->PMU_BIAS_CTRL2 &= ~ANADIG_PMU_PMU_BIAS_CTRL2_wb_pwr_sw_en_1p8_MASK;
+    ANADIG_PMU->PMU_BIAS_CTRL2 |= ANADIG_PMU_PMU_BIAS_CTRL2_wb_pwr_sw_en_1p8(0x1);
+    //==anatop_enable_wbias();
+    ANADIG_PMU->PMU_BIAS_CTRL2 |= ANADIG_PMU_PMU_BIAS_CTRL2_wb_en_MASK;
+}
+
 void BOARD_InitHardware(void)
 {
-    uint32_t freq;
     BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
 
     print_rt_clocks();
+    //enable_fbb();
 }
 
 #ifdef COREMARK_USING_SYSTICK && COREMARK_USING_SYSTICK

@@ -2,7 +2,7 @@
 
 <workspace>
   <project>
-    <path>$WS_DIR$\iar\coremark.ewp</path>
+    <path>$WS_DIR$\iar\coremark_loader.ewp</path>
   </project>
   <batchBuild/>
 </workspace>

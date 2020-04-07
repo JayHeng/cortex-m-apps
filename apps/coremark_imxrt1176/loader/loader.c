@@ -14,6 +14,11 @@
  ******************************************************************************/
 #define APP_START 0U
 
+#define ITCM_START   0x00000000
+#define ITCM_SIZE    (256*1024U)
+#define DTCM_START   0x20000000
+#define DTCM_SIZE    (256*1024U)
+
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -27,11 +32,49 @@
  * Code
  ******************************************************************************/
 
+static void enable_tcm_ecc(void)
+{
+    // According to ARM Cortex-M7 Process Technical Reference Manual, section 5.7.5
+    // The SW needs to enable the RMW bit on the TCM ECC enabled system
+    SCB->ITCMCR |= SCB_ITCMCR_RMW_Msk;
+    SCB->DTCMCR |= SCB_DTCMCR_RMW_Msk;
+    
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+    
+    *(uint32_t *)(FLEXRAM_BASE + 0x108) |= (1u << 5); /* Enable CM7 TCM ECC */
+    
+    asm("NOP");
+    asm("NOP");
+    asm("NOP");
+}
+
+static void init_itcm_ecc(void)
+{
+    for (uint32_t i = 0; i < ITCM_SIZE; i += sizeof(uint64_t))
+    {
+        *(uint64_t *)(ITCM_START + i) = 0;
+    }
+}
+
+static void init_dtcm_ecc(void)
+{
+    for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint64_t))
+    {
+        *(uint64_t *)(DTCM_START + i) = 0;
+    }
+}
+
 /*!
  * @brief Main function
  */
 int main(void)
 {
+    enable_tcm_ecc();
+    init_itcm_ecc();
+    init_dtcm_ecc();
+
     // Copy image to RAM.
     memcpy((void *)APP_START, app_code, APP_LEN);
     

@@ -32,6 +32,11 @@
  * Code
  ******************************************************************************/
 
+void HardFault_Handler(void)
+{
+    while (1);
+}
+
 static void enable_tcm_ecc(void)
 {
     // According to ARM Cortex-M7 Process Technical Reference Manual, section 5.7.5

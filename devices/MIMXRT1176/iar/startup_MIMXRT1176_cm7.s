@@ -37,6 +37,7 @@
 
         EXTERN  __iar_program_start
         EXTERN  SystemInit
+        EXTERN  hardfault_handler
         PUBLIC  __vector_table
         PUBLIC  __vector_table_0x1c
         PUBLIC  __Vectors
@@ -341,7 +342,12 @@ NMI_Handler
         PUBWEAK HardFault_Handler
         SECTION .text:CODE:REORDER:NOROOT(1)
 HardFault_Handler
-        B .
+        mrs r0, msp
+        PUSH {LR}
+        bl hardfault_handler
+        POP {LR}
+        ORR LR, LR, #0x04
+        BX LR
 
         PUBWEAK MemManage_Handler
         SECTION .text:CODE:REORDER:NOROOT(1)

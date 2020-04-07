@@ -1964,6 +1964,9 @@
         <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\..\src\exception_handler.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\..\src\hardware_init.c</name>
       </file>
       <file>

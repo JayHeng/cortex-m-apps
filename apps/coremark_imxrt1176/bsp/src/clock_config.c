@@ -197,7 +197,7 @@ void BOARD_BootClockRUN(void)
 #if __CORTEX_M == 7
     /* ARM PLL 996 MHz. */
     const clock_arm_pll_config_t armPllConfig = {
-        .postDivider = kCLOCK_PllPostDiv2, .loopDivider = 166, /* 116: 696M
+        .postDivider = kCLOCK_PllPostDiv2, .loopDivider = 133, /* 116: 696M
                                                                 * 133: 798M
                                                                 * 150: 900M
                                                                 * 166: 996M

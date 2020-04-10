@@ -9,7 +9,7 @@ def BinFile2HexFile(bin, hex):
 
     with open(hex, "w") as fHex:
         fHex.write("#define APP_LEN {}\n\n".format(length))
-        fHex.write("const uint8_t app_code[] = {\n")
+        fHex.write("const uint8_t cm7_app_code[] = {\n")
 
         index = 0
         while index < length:

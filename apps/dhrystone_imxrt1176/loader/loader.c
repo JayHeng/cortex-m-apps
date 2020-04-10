@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "fsl_device_registers.h"
-#include "dhrystone.h"
+#include "cm7_dhrystone.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -85,7 +85,7 @@ int main(void)
     init_flexram_dtcm_ecc();
 
     // Copy image to RAM.
-    memcpy((void *)APP_START, app_code, APP_LEN);
+    memcpy((void *)APP_START, cm7_app_code, APP_LEN);
     
     uint32_t appStack = *(uint32_t *)(APP_START);
     uint32_t appEntry = *(uint32_t *)(APP_START + 4);

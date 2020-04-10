@@ -16,8 +16,5 @@
 /apps/*/bsp/*/iar/Release
 /apps/*/bsp/*/iar/Debug
 
-/apps/*/loader/coremark.h
-/apps/*/loader/dhrystone.h
-
-/apps/*/launcher/coremark.h
-/apps/*/launcher/dhrystone.h
+/apps/*/*/cm7_coremark.h
+/apps/*/*/cm7_dhrystone.h

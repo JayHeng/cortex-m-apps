@@ -37,7 +37,7 @@ void HardFault_Handler(void)
     while (1);
 }
 
-static void enable_tcm_ecc(void)
+static void enable_cm7_tcm_ecc(void)
 {
     // According to ARM Cortex-M7 Process Technical Reference Manual, section 5.7.5
     // The SW needs to enable the RMW bit on the TCM ECC enabled system
@@ -47,7 +47,10 @@ static void enable_tcm_ecc(void)
     asm("NOP");
     asm("NOP");
     asm("NOP");
-    
+}
+
+static void enable_flexram_tcm_ecc(void)
+{
     *(uint32_t *)(FLEXRAM_BASE + 0x108) |= (1u << 5); /* Enable CM7 TCM ECC */
     
     asm("NOP");
@@ -55,7 +58,7 @@ static void enable_tcm_ecc(void)
     asm("NOP");
 }
 
-static void init_itcm_ecc(void)
+static void init_flexram_itcm_ecc(void)
 {
     for (uint32_t i = 0; i < ITCM_SIZE; i += sizeof(uint64_t))
     {
@@ -63,11 +66,11 @@ static void init_itcm_ecc(void)
     }
 }
 
-static void init_dtcm_ecc(void)
+static void init_flexram_dtcm_ecc(void)
 {
-    for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint64_t))
+    for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint32_t))
     {
-        *(uint64_t *)(DTCM_START + i) = 0;
+        *(uint32_t *)(DTCM_START + i) = 0;
     }
 }
 
@@ -76,9 +79,10 @@ static void init_dtcm_ecc(void)
  */
 int main(void)
 {
-    enable_tcm_ecc();
-    init_itcm_ecc();
-    init_dtcm_ecc();
+    enable_cm7_tcm_ecc();
+    enable_flexram_tcm_ecc();
+    init_flexram_itcm_ecc();
+    init_flexram_dtcm_ecc();
 
     // Copy image to RAM.
     memcpy((void *)APP_START, app_code, APP_LEN);

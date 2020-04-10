@@ -1,0 +1,137 @@
+/*
+ * Copyright 2019 NXP
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice, this list
+ *   of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * o Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+
+void InitTarget(void) {
+    CPU = CORTEX_M7;
+    JLINK_CORESIGHT_AddAP(0, CORESIGHT_AHB_AP); // First AP is a AHB-AP
+    JLINK_CORESIGHT_AddAP(1, CORESIGHT_AHB_AP);
+    JLINK_CORESIGHT_AddAP(2, CORESIGHT_APB_AP);
+    CORESIGHT_IndexAHBAPToUse = 0;
+}
+
+void ClearIRQ(void) {
+    unsigned int reg;
+    unsigned int i;
+    reg = 0xE000E100; /* NVIC base */
+
+    /* Disable all IRQ: ICERn */
+    i = 0x80;
+    while (i <= 0x9C)
+    {
+        MEM_WriteU32(reg + i, 0xFFFFFFFF);
+        i = i+4;
+    }
+
+    /* Clear pending IRQ: ICPRn */
+    i = 0x180;
+    while (i <= 0x19C)
+    {
+        MEM_WriteU32(reg + i, 0xFFFFFFFF);
+        i = i+4;
+    }
+}
+
+void RestoreClockRoots(void) {
+    unsigned int reg;
+    unsigned int i;
+
+    reg = 0x40CC0000;
+    i = 0;
+    while (i < 80)
+    {
+        MEM_WriteU32(reg + (i * 0x80), 0);
+        i = i + 1;
+    }
+}
+
+void PrepareCM7SpinCode(void) {
+    unsigned int start;
+    start = 0x2001FF00;
+    MEM_WriteU32(start + 4, 0x207e11);
+    /* GPR19 for CM7 init vector */
+    MEM_WriteU32(0x400E404c, start >> 7);
+}
+
+void PrepareCM4SpinCode(void) {
+    unsigned int start;
+    start = 0x2021FF00;
+    MEM_WriteU32(start + 4, 0x207e11);
+    /* LPSR_GPR0 and LPSR_GPR1 for CM4 init vector */
+    MEM_WriteU32(0x40C0C000, start & 0xFFFF);
+    MEM_WriteU32(0x40C0C004, (start >> 16) & 0xFFFF);
+}
+
+void ReleaseCM4(void) {
+    PrepareCM4SpinCode();
+    MEM_WriteU32(0x40C04000, 1);
+    Report("CM4 is released");
+}
+
+void ResetCM7(void) {
+    unsigned int t;
+
+    /* Issue M7 reset */
+    MEM_WriteU32(0x40c042a4, 1);
+
+    /* Check M7 reset status */
+    t = MEM_ReadU32(0x40c042b0);
+    t &= 0x1;
+    while (t)
+    {
+        t = MEM_ReadU32(0x40c042b0);
+        t &= 0x1;
+    }
+    SYS_Sleep(10);
+    Report("CM7 SRC reset");
+}
+
+void ResetTarget(void) {
+    ClearIRQ();
+    RestoreClockRoots();
+    PrepareCM7SpinCode();
+    ResetCM7();
+    if (JLINK_TARGET_IsHalted() != 1)
+        JLINK_TARGET_Halt();
+}
+
+void SetupTarget(void) {
+    ClearIRQ();
+    RestoreClockRoots();
+    PrepareCM7SpinCode();
+    ResetCM7();
+    ReleaseCM4();
+}
+
+void _AfterResetTarget(void) {
+    ClearIRQ();
+    RestoreClockRoots();
+}
+
+

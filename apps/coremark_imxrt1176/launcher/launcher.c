@@ -8,16 +8,14 @@
 #include <stdint.h>
 #include <string.h>
 #include "fsl_device_registers.h"
-#include "coremark.h"
+#include "cm4_coremark.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define APP_START 0U
+#define APP_START 0x20200000U
 
-#define ITCM_START   0x00000000
-#define ITCM_SIZE    (256*1024U)
-#define DTCM_START   0x20000000
-#define DTCM_SIZE    (256*1024U)
+#define CM4_OCRAM_START   0x20200000
+#define CM4_OCRAM_SIZE    (256*1024U)
 
 /*******************************************************************************
  * Prototypes
@@ -37,41 +35,14 @@ void HardFault_Handler(void)
     while (1);
 }
 
-static void enable_cm7_tcm_ecc(void)
+static void enable_cm4_tcm_ecc(void)
 {
-    // According to ARM Cortex-M7 Process Technical Reference Manual, section 5.7.5
-    // The SW needs to enable the RMW bit on the TCM ECC enabled system
-    SCB->ITCMCR |= SCB_ITCMCR_RMW_Msk;
-    SCB->DTCMCR |= SCB_DTCMCR_RMW_Msk;
-    
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
+
 }
 
-static void enable_flexram_tcm_ecc(void)
+static void init_cm4_tcm_ecc(void)
 {
-    *(uint32_t *)(FLEXRAM_BASE + 0x108) |= (1u << 5); /* Enable CM7 TCM ECC */
-    
-    asm("NOP");
-    asm("NOP");
-    asm("NOP");
-}
 
-static void init_flexram_itcm_ecc(void)
-{
-    for (uint32_t i = 0; i < ITCM_SIZE; i += sizeof(uint64_t))
-    {
-        *(uint64_t *)(ITCM_START + i) = 0;
-    }
-}
-
-static void init_flexram_dtcm_ecc(void)
-{
-    for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint32_t))
-    {
-        *(uint32_t *)(DTCM_START + i) = 0;
-    }
 }
 
 /*!
@@ -79,34 +50,16 @@ static void init_flexram_dtcm_ecc(void)
  */
 int main(void)
 {
-    enable_cm7_tcm_ecc();
-    enable_flexram_tcm_ecc();
-    init_flexram_itcm_ecc();
-    init_flexram_dtcm_ecc();
+    enable_cm4_tcm_ecc();
+    init_cm4_tcm_ecc();
 
     // Copy image to RAM.
-    memcpy((void *)APP_START, app_code, APP_LEN);
+    memcpy((void *)APP_START, cm4_app_code, APP_LEN);
     
-    uint32_t appStack = *(uint32_t *)(APP_START);
-    uint32_t appEntry = *(uint32_t *)(APP_START + 4);
+    IOMUXC_LPSR_GPR->GPR0 = 0x0000;
+    IOMUXC_LPSR_GPR->GPR1 = 0x1FFE;
 
-    // Turn off interrupts.
-    __disable_irq();
-
-    // Set the VTOR to default.
-    SCB->VTOR = APP_START;
-
-    // Memory barriers for good measure.
-    __ISB();
-    __DSB();
-
-    // Set main stack pointer and process stack pointer.
-    __set_MSP(appStack);
-    __set_PSP(appStack);
-
-    // Jump to app entry point, does not return.
-    void (*entry)(void) = (void (*)(void))appEntry;
-    entry();
+    SRC->SCR |= SRC_SCR_BT_RELEASE_M4_MASK;
 
     while (1)
     {

@@ -1947,7 +1947,7 @@
       </file>
     </group>
     <file>
-      <name>$PROJ_DIR$\..\..\..\loader\coremark.h</name>
+      <name>$PROJ_DIR$\..\..\..\launcher\cm4_coremark.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\launcher\launcher.c</name>

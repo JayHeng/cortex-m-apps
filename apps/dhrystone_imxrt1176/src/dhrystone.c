@@ -7,6 +7,7 @@
  */
 
 #include "fsl_device_registers.h"
+#include "app.h"
 #include "board.h"
 #include "pin_mux.h"
 #include "clock_config.h"
@@ -30,10 +31,7 @@ extern void dhrystone(void);
 int main(void)
 {
     /* Init board hardware. */
-    BOARD_InitPins();
-    BOARD_BootClockRUN();
-    BOARD_InitDebugConsole();
-
+    BOARD_InitHardware();
     dhrystone();
 
     while (1)

@@ -196,6 +196,8 @@ void BOARD_BootClockRUN(void)
     /* ARM PLL 996 MHz. */
     const clock_arm_pll_config_t armPllConfig = {
         .postDivider = kCLOCK_PllPostDiv2, .loopDivider = 166, /* 116: 696M
+                                                                * 133: 798M
+                                                                * 150: 900M
                                                                 * 166: 996M
                                                                 */
     };

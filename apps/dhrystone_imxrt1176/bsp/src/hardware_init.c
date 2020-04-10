@@ -10,28 +10,31 @@
 #include "pin_mux.h"
 #include "board.h"
 #include "clock_config.h"
+#include "dhry_portme.h"
 /*${header:end}*/
   
 /*${function:start}*/
+static void print_rt_clocks(void)
+{
+    PRINTF("Clock roots frequency (MHz):\n");
+    for(uint32_t i=0; i<4; i++)
+    {
+        float freq = CLOCK_GetRootClockFreq((clock_root_t)i);
+        freq /= 1000000;
+        char name[5] = {0};
+        *(uint32_t *)name = CCM->CLOCK_ROOT[i].NAME;
+        PRINTF("%4s: %6.2f\n", name, freq);
+    }
+}
+
 void BOARD_InitHardware(void)
 {
-    uint32_t freq;
     BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    freq =  CLOCK_GetFreqFromObs(CCM_OBS_PLL_ARM_OUT) / 1000000;
-    //DbgConsole_Printf("\r\nARM PLL %d MHz", freq * 4);
-    freq =  CLOCK_GetFreqFromObs(CCM_OBS_M7_CLK_ROOT) / 1000000;
-    //DbgConsole_Printf("\r\nCM7 %d MHz", freq * 4);
 
-    //DbgConsole_Printf("\r\nOD is ");
-#if OD
-    //DbgConsole_Printf("Enabled\r\n");
-#else
-    //DbgConsole_Printf("Disabled\r\n");
-#endif
-    //DbgConsole_Printf("M7_ROOT_CTRL 0x%x\r\n", CCM->CLOCK_ROOT[0].CONTROL);
+    print_rt_clocks();
 }
 
 #ifdef COREMARK_USING_SYSTICK && COREMARK_USING_SYSTICK

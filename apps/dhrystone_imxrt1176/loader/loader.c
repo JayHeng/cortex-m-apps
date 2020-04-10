@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "fsl_device_registers.h"
-#include "coremark.h"
+#include "dhrystone.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/

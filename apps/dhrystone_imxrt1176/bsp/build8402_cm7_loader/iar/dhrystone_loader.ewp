@@ -2122,7 +2122,7 @@
             </file>
         </group>
         <file>
-            <name>$PROJ_DIR$\..\..\..\loader\coremark.h</name>
+            <name>$PROJ_DIR$\..\..\..\loader\dhrystone.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\loader\loader.c</name>

@@ -1745,7 +1745,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild></postbuild>
+                <postbuild>cmd /c $PROJ_DIR$\..\..\..\loader\create_image.bat $PROJ_DIR$\Release</postbuild>
             </data>
         </settings>
         <settings>

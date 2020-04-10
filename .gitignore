@@ -15,3 +15,6 @@
 /apps/*/bsp/*/settings
 /apps/*/bsp/*/iar/Release
 /apps/*/bsp/*/iar/Debug
+
+/apps/*/loader/coremark.h
+/apps/*/loader/dhrystone.h

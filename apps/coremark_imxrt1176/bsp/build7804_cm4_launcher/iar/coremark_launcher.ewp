@@ -1935,6 +1935,18 @@
   <group>
     <name>src</name>
     <group>
+      <name>platform</name>
+      <group>
+        <name>drivers</name>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_soc_src.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\drivers\fsl_soc_src.h</name>
+        </file>
+      </group>
+    </group>
+    <group>
       <name>startup</name>
       <file>
         <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1176\iar\startup_MIMXRT1176_cm7.s</name>

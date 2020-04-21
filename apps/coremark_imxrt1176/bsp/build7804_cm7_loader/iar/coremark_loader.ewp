@@ -1692,7 +1692,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$/../../../loader/MIMXRT1176xxxxx_cm7_ocram.icf</state>
+          <state>$PROJ_DIR$/../../../cm7_loader/MIMXRT1176xxxxx_cm7_ocram.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1947,10 +1947,10 @@
       </file>
     </group>
     <file>
-      <name>$PROJ_DIR$\..\..\..\loader\cm7_coremark.h</name>
+      <name>$PROJ_DIR$\..\..\..\cm7_loader\cm7_coremark.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\loader\loader.c</name>
+      <name>$PROJ_DIR$\..\..\..\cm7_loader\loader.c</name>
     </file>
   </group>
 </project>

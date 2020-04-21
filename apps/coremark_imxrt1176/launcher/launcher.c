@@ -15,9 +15,6 @@
  ******************************************************************************/
 #define APP_START 0x20200000U
 
-#define CM4_OCRAM_START   0x20200000
-#define CM4_OCRAM_SIZE    (256*1024U)
-
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -34,22 +31,6 @@
 void HardFault_Handler(void)
 {
     while (1);
-}
-
-static void enable_cm4_tcm_ecc(void)
-{
-    // MCM->LMDR0[3] - Enable TCRAML ECC
-    *(uint32_t *)0xE0080400 |= 0x0B;        /* Enable CM4 TCRAM_L ECC */
-    // MCM->LMDR1[3] - Enable TCRAMU ECC
-    *(uint32_t *)0xE0080404 |= 0x0B;        /* Enable CM4 TCRAM_U ECC */
-}
-
-static void init_cm4_tcm_ecc(void)
-{
-    for (uint32_t i = 0; i < CM4_OCRAM_SIZE; i += sizeof(uint32_t))
-    {
-        *(uint32_t *)(CM4_OCRAM_START + i) = 0;
-    }
 }
 
 static void boot_cm4_app(void)
@@ -77,9 +58,6 @@ static void boot_cm4_app(void)
  */
 int main(void)
 {
-    enable_cm4_tcm_ecc();
-    init_cm4_tcm_ecc();
-
 #if defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     SCB_CleanInvalidateDCache_by_Addr((void *)APP_START, APP_LEN);
 #endif

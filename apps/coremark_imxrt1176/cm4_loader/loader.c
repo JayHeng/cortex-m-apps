@@ -14,6 +14,11 @@
  ******************************************************************************/
 #define APP_START 0x1FFE0000U
 
+#define ITCM_START   0x1FFE0000
+#define ITCM_SIZE    (128*1024U)
+#define DTCM_START   0x20000000
+#define DTCM_SIZE    (128*1024U)
+
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -32,11 +37,35 @@ void HardFault_Handler(void)
     while (1);
 }
 
+static void enable_cm4_tcm_ecc(void)
+{
+    // MCM->LMDR0[3] - Enable TCRAML ECC
+    *(uint32_t *)0xE0080400 |= 0x0B;        /* Enable CM4 TCRAM_L ECC */
+    // MCM->LMDR1[3] - Enable TCRAMU ECC
+    *(uint32_t *)0xE0080404 |= 0x0B;        /* Enable CM4 TCRAM_U ECC */
+}
+
+static void init_cm4_tcm_ecc(void)
+{
+    for (uint32_t i = 0; i < ITCM_SIZE; i += sizeof(uint32_t))
+    {
+        *(uint32_t *)(ITCM_START + i) = 0;
+    }
+
+    for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint32_t))
+    {
+        *(uint32_t *)(DTCM_START + i) = 0;
+    }
+}
+
 /*!
  * @brief Main function
  */
 int main(void)
 {
+    enable_cm4_tcm_ecc();
+    init_cm4_tcm_ecc();
+
     // Copy image to RAM.
     memcpy((void *)APP_START, cm4_app_code, APP_LEN);
     

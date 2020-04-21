@@ -249,7 +249,10 @@ void BOARD_BootClockRUN(void)
 
     /* SysPll3Pfd3: 480M */
     CLOCK_InitSysPll3(&sysPll3Config);
-    CLOCK_InitPfd(kCLOCK_Pll_SysPll3, kCLOCK_Pfd3, 18);
+    CLOCK_InitPfd(kCLOCK_Pll_SysPll3, kCLOCK_Pfd3, 24);  /* 29: 297M
+                                                          * 24: 360M
+                                                          * 18: 480M
+                                                          */
 
     /* Configure M4 using SysPll3Pfd3 divided by 1 */
     rootCfg.mux = 4;

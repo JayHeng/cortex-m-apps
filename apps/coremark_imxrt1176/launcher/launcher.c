@@ -38,12 +38,18 @@ void HardFault_Handler(void)
 
 static void enable_cm4_tcm_ecc(void)
 {
-
+    // MCM->LMDR0[3] - Enable TCRAML ECC
+    *(uint32_t *)0xE0080400 |= 0x0B;        /* Enable CM4 TCRAM_L ECC */
+    // MCM->LMDR1[3] - Enable TCRAMU ECC
+    *(uint32_t *)0xE0080404 |= 0x0B;        /* Enable CM4 TCRAM_U ECC */
 }
 
 static void init_cm4_tcm_ecc(void)
 {
-
+    for (uint32_t i = 0; i < CM4_OCRAM_SIZE; i += sizeof(uint32_t))
+    {
+        *(uint32_t *)(CM4_OCRAM_START + i) = 0;
+    }
 }
 
 static void boot_cm4_app(void)

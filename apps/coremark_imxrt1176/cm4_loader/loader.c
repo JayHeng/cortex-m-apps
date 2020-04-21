@@ -12,7 +12,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define APP_START 0x1FFE0000U
+#define CM4_COREMARK_START 0x1FFE0000U
 
 #define ITCM_START   0x1FFE0000
 #define ITCM_SIZE    (128*1024U)
@@ -67,16 +67,16 @@ int main(void)
     init_cm4_tcm_ecc();
 
     // Copy image to RAM.
-    memcpy((void *)APP_START, cm4_app_code, APP_LEN);
+    memcpy((void *)CM4_COREMARK_START, cm4_app_code, APP_LEN);
     
-    uint32_t appStack = *(uint32_t *)(APP_START);
-    uint32_t appEntry = *(uint32_t *)(APP_START + 4);
+    uint32_t appStack = *(uint32_t *)(CM4_COREMARK_START);
+    uint32_t appEntry = *(uint32_t *)(CM4_COREMARK_START + 4);
 
     // Turn off interrupts.
     __disable_irq();
 
     // Set the VTOR to default.
-    SCB->VTOR = APP_START;
+    SCB->VTOR = CM4_COREMARK_START;
 
     // Memory barriers for good measure.
     __ISB();

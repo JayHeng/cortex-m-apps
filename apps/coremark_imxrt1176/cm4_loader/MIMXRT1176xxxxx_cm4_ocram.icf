@@ -24,11 +24,11 @@
 ** ###################################################################
 */
 
-define symbol m_interrupts_start       = 0x202C0000;
-define symbol m_interrupts_end         = 0x202C03FF;
+define symbol m_interrupts_start       = 0x20240000;
+define symbol m_interrupts_end         = 0x202403FF;
 
-define symbol m_text_start             = 0x202C0400;
-define symbol m_text_end               = 0x2033FFFF;
+define symbol m_text_start             = 0x20240400;
+define symbol m_text_end               = 0x202BFFFF;
 
 /* Sizes */
 if (isdefinedsymbol(__stack_size__)) {

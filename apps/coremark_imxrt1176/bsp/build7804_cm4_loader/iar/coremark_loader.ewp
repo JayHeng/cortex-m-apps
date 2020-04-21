@@ -1565,15 +1565,15 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>3</version>
-          <state>0</state>
+          <state>3</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>coremark_launcher.srec</state>
+          <state>coremark_loader.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -1581,7 +1581,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -1604,7 +1604,7 @@
       <archiveVersion>1</archiveVersion>
       <data>
         <prebuild></prebuild>
-        <postbuild></postbuild>
+        <postbuild>cmd /c $PROJ_DIR$\..\..\..\launcher\create_image.bat $PROJ_DIR$\Release</postbuild>
       </data>
     </settings>
     <settings>
@@ -1628,7 +1628,7 @@
         </option>
         <option>
           <name>IlinkOutputFile</name>
-          <state>coremark_launcher.out</state>
+          <state>coremark_loader.out</state>
         </option>
         <option>
           <name>IlinkDebugInfoEnable</name>

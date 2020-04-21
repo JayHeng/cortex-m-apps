@@ -12,7 +12,7 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define APP_START 0U
+#define CM7_COREMARK_START 0U
 
 #define ITCM_START   0x00000000
 #define ITCM_SIZE    (256*1024U)
@@ -85,16 +85,16 @@ int main(void)
     init_flexram_dtcm_ecc();
 
     // Copy image to RAM.
-    memcpy((void *)APP_START, cm7_app_code, APP_LEN);
+    memcpy((void *)CM7_COREMARK_START, cm7_app_code, APP_LEN);
     
-    uint32_t appStack = *(uint32_t *)(APP_START);
-    uint32_t appEntry = *(uint32_t *)(APP_START + 4);
+    uint32_t appStack = *(uint32_t *)(CM7_COREMARK_START);
+    uint32_t appEntry = *(uint32_t *)(CM7_COREMARK_START + 4);
 
     // Turn off interrupts.
     __disable_irq();
 
     // Set the VTOR to default.
-    SCB->VTOR = APP_START;
+    SCB->VTOR = CM7_COREMARK_START;
 
     // Memory barriers for good measure.
     __ISB();

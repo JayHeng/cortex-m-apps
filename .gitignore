@@ -20,4 +20,5 @@
 /apps/*/*/cm7_dhrystone.h
 
 /apps/*/*/cm4_coremark.h
+/apps/*/*/cm4_loader.h
 /apps/*/*/cm4_dhrystone.h

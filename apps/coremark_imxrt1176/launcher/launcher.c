@@ -8,12 +8,12 @@
 #include <stdint.h>
 #include <string.h>
 #include "fsl_device_registers.h"
-#include "cm4_coremark.h"
+#include "cm4_loader.h"
 #include "fsl_soc_src.h"
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define APP_START 0x20200000U
+#define CM4_LOADER_START 0x20240000U
 
 /*******************************************************************************
  * Prototypes
@@ -35,8 +35,8 @@ void HardFault_Handler(void)
 
 static void boot_cm4_app(void)
 {
-    IOMUXC_LPSR_GPR->GPR0 = IOMUXC_LPSR_GPR_GPR0_CM4_INIT_VTOR_LOW(APP_START);
-    IOMUXC_LPSR_GPR->GPR1 = IOMUXC_LPSR_GPR_GPR1_CM4_INIT_VTOR_HIGH(APP_START >> 16);
+    IOMUXC_LPSR_GPR->GPR0 = IOMUXC_LPSR_GPR_GPR0_CM4_INIT_VTOR_LOW(CM4_LOADER_START);
+    IOMUXC_LPSR_GPR->GPR1 = IOMUXC_LPSR_GPR_GPR1_CM4_INIT_VTOR_HIGH(CM4_LOADER_START >> 16);
 
     /* If CM4 is already running (released by debugger), then reset the CM4.
        If CM4 is not running, release it. */
@@ -59,14 +59,14 @@ static void boot_cm4_app(void)
 int main(void)
 {
 #if defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    SCB_CleanInvalidateDCache_by_Addr((void *)APP_START, APP_LEN);
+    SCB_CleanInvalidateDCache_by_Addr((void *)CM4_LOADER_START, APP_LEN);
 #endif
 
     // Copy image to RAM.
-    memcpy((void *)APP_START, cm4_app_code, APP_LEN);
+    memcpy((void *)CM4_LOADER_START, cm4_app_code, APP_LEN);
 
 #if defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    SCB_CleanInvalidateDCache_by_Addr((void *)APP_START, APP_LEN);
+    SCB_CleanInvalidateDCache_by_Addr((void *)CM4_LOADER_START, APP_LEN);
 #endif
     
     boot_cm4_app();

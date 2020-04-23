@@ -78,10 +78,17 @@ static void init_flexram_dtcm_ecc(void)
 
 static void test_flexram_tcm_ecc_error(void)
 {
-    volatile uint32_t dat;
+    volatile uint8_t dat;
+
+    dat = *(uint8_t *)(CM7_COREMARK_START + 0);
+    if (dat)
+    {
+        __NOP();
+    }
+
     for (uint32_t i = 0; i < 256; i++)
     {
-        dat = *(uint32_t *)(CM7_COREMARK_START + i * 4);
+        dat = *(uint8_t *)(CM7_COREMARK_START + i);
         if (dat)
         {
             __NOP();

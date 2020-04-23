@@ -39,12 +39,14 @@ void HardFault_Handler(void)
 
 static void enable_mecc(void)
 {
+    // This only works on A0 silicon
+    // For B0 silicon, this register is readonly
     OCOTP->HW_OCOTP_FUSE004 |= 0x4;
     __ISB();
     __DSB();
 }
 
-static void enable_cm4_tcm_ecc(void)
+static void enable_lmem_tcm_ecc(void)
 {
     // Check eFuse 0x840[2] - MECC_ENABLE bit
     while (!(OCOTP->HW_OCOTP_FUSE004 & 0x4));
@@ -58,20 +60,23 @@ static void enable_cm4_tcm_ecc(void)
     *(uint32_t *)0xE0080404 |= 0x0B;        /* Enable CM4 TCRAM_U ECC */
 }
 
-static void init_cm4_tcm_ecc(void)
+static void init_lmem_itcm_ecc(void)
 {
     for (uint32_t i = 0; i < ITCM_SIZE; i += sizeof(uint32_t))
     {
         *(uint32_t *)(ITCM_START + i) = 0;
     }
+}
 
+static void init_lmem_dtcm_ecc(void)
+{
     for (uint32_t i = 0; i < DTCM_SIZE; i += sizeof(uint32_t))
     {
         *(uint32_t *)(DTCM_START + i) = 0;
     }
 }
 
-static void test_cm4_tcm_ecc_error(void)
+static void test_lmem_tcm_ecc_error(void)
 {
     volatile uint8_t dat;
 
@@ -99,9 +104,10 @@ static void test_cm4_tcm_ecc_error(void)
 int main(void)
 {
     enable_mecc();
-    enable_cm4_tcm_ecc();
-    //test_cm4_tcm_ecc_error();
-    init_cm4_tcm_ecc();
+    enable_lmem_tcm_ecc();
+    //test_lmem_tcm_ecc_error();
+    init_lmem_itcm_ecc();
+    init_lmem_dtcm_ecc();
 
     // Copy image to RAM.
     memcpy((void *)CM4_COREMARK_START, cm4_app_code, APP_LEN);

@@ -37,8 +37,18 @@ void HardFault_Handler(void)
     while (1);
 }
 
+static void enable_mecc(void)
+{
+    OCOTP->HW_OCOTP_FUSE004 |= 0x4;
+    __ISB();
+    __DSB();
+}
+
 static void enable_cm4_tcm_ecc(void)
 {
+    // Check eFuse 0x840[2] - MECC_ENABLE bit
+    while (!(OCOTP->HW_OCOTP_FUSE004 & 0x4));
+
     // MCM->LMPECR[9,1] - Enable TCRAM ECC 1-bit/Multi-bit IRQ
     *(uint32_t *)0xE0080480 |= 0x303;
 
@@ -71,12 +81,15 @@ static void test_cm4_tcm_ecc_error(void)
         __NOP();
     }
 
-    dat = *(uint8_t *)(CM4_COREMARK_START + 3);
-    if (dat)
+    for (uint32_t i = 0; i < 256; i++)
     {
-        __NOP();
+        dat = *(uint8_t *)(CM4_COREMARK_START + i);
+        if (dat)
+        {
+            __NOP();
+        }
     }
-    
+
     while (1);
 }
 
@@ -85,6 +98,7 @@ static void test_cm4_tcm_ecc_error(void)
  */
 int main(void)
 {
+    enable_mecc();
     enable_cm4_tcm_ecc();
     //test_cm4_tcm_ecc_error();
     init_cm4_tcm_ecc();

@@ -39,6 +39,9 @@ void HardFault_Handler(void)
 
 static void enable_cm4_tcm_ecc(void)
 {
+    // MCM->LMPECR[9,1] - Enable TCRAM ECC 1-bit/Multi-bit IRQ
+    *(uint32_t *)0xE0080480 |= 0x303;
+
     // MCM->LMDR0[3] - Enable TCRAML ECC
     *(uint32_t *)0xE0080400 |= 0x0B;        /* Enable CM4 TCRAM_L ECC */
     // MCM->LMDR1[3] - Enable TCRAMU ECC
@@ -58,12 +61,32 @@ static void init_cm4_tcm_ecc(void)
     }
 }
 
+static void test_cm4_tcm_ecc_error(void)
+{
+    volatile uint8_t dat;
+
+    dat = *(uint8_t *)(CM4_COREMARK_START + 0);
+    if (dat)
+    {
+        __NOP();
+    }
+
+    dat = *(uint8_t *)(CM4_COREMARK_START + 3);
+    if (dat)
+    {
+        __NOP();
+    }
+    
+    while (1);
+}
+
 /*!
  * @brief Main function
  */
 int main(void)
 {
     enable_cm4_tcm_ecc();
+    //test_cm4_tcm_ecc_error();
     init_cm4_tcm_ecc();
 
     // Copy image to RAM.

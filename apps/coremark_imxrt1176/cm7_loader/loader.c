@@ -51,6 +51,8 @@ static void enable_cm7_tcm_ecc(void)
 
 static void enable_flexram_tcm_ecc(void)
 {
+    FLEXRAM->INT_STAT_EN |= 0x3F18u;
+
     *(uint32_t *)(FLEXRAM_BASE + 0x108) |= (1u << 5); /* Enable CM7 TCM ECC */
     
     asm("NOP");
@@ -74,6 +76,21 @@ static void init_flexram_dtcm_ecc(void)
     }
 }
 
+static void test_flexram_tcm_ecc_error(void)
+{
+    volatile uint32_t dat;
+    for (uint32_t i = 0; i < 256; i++)
+    {
+        dat = *(uint32_t *)(CM7_COREMARK_START + i * 4);
+        if (dat)
+        {
+            __NOP();
+        }
+    }
+    
+    while (1);
+}
+
 /*!
  * @brief Main function
  */
@@ -81,6 +98,7 @@ int main(void)
 {
     enable_cm7_tcm_ecc();
     enable_flexram_tcm_ecc();
+    //test_flexram_tcm_ecc_error();
     init_flexram_itcm_ecc();
     init_flexram_dtcm_ecc();
 

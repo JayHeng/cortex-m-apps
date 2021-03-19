@@ -54,6 +54,8 @@ typedef struct _semc_test_config {
 } semc_test_config;
 
 semc_test_config test_config;
+
+int fail_stop;
    
 /*******************************************************************************
  * Code
@@ -71,7 +73,7 @@ int main(void)
 
     /* --------------- stress test --------------- */
     test_config.base_addr = 0x80000000;
-    test_config.test_size = 64 * 1024 * 1024;
+    test_config.test_size = 64 * 1024;
     test_config.loop_num = 1;
     test_config.dram_freq = semcclk;
     test_config.enable_cache = 0;
@@ -89,7 +91,9 @@ int main(void)
     PRINTF("                  DRAM Freq: %d;\r\n",test_config.dram_freq);
     PRINTF("                  Enable Cache: %d;\r\n", test_config.enable_cache);
 
-    /* Run memory stress test: 32-MByte,loop=1,page_size = 1kbyte */
+    fail_stop = 1;
+
+    /* Run memory stress test: 64KByte,loop=1,page_size = 1kbyte */
     memtester_main(test_config.base_addr, test_config.test_size, &memsuffix, test_config.loop_num, (1*1024));
 
     while (1)

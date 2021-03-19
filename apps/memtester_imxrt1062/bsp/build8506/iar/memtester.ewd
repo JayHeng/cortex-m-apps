@@ -88,7 +88,7 @@
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>7.80.4.12487</state>
+                    <state>8.50.6.28950</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -1521,7 +1521,7 @@
                 </option>
                 <option>
                     <name>MacFile</name>
-                    <state></state>
+                    <state>$PROJ_DIR$/evkmimxrt1060_sdram_init.mac</state>
                 </option>
                 <option>
                     <name>MemOverride</name>
@@ -1541,11 +1541,11 @@
                 </option>
                 <option>
                     <name>CExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CExtraOptions</name>
-                    <state></state>
+                    <state>--jlink_script_file=$PROJ_DIR$/evkmimxrt1060_sdram_init.jlinkscript</state>
                 </option>
                 <option>
                     <name>CFpuProcessor</name>

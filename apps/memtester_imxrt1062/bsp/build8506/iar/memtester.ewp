@@ -1277,6 +1277,7 @@
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
                     <state>CPU_MIMXRT1062DVL6A</state>
+                    <state>SKIP_SYSCLK_INIT</state>
                     <state>PRINTF_FLOAT_ENABLE=0</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
                     <state>PRINTF_ADVANCED_ENABLE=0</state>

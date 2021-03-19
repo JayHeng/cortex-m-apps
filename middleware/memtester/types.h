@@ -15,11 +15,14 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
+#include "fsl_common.h"
+
 typedef unsigned int ul;
 typedef unsigned int ull;
 typedef unsigned int volatile ulv;
 typedef unsigned char volatile u8v;
 typedef unsigned short volatile u16v;
+typedef unsigned int off_t;
 
 struct test {
     char *name;

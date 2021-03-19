@@ -24,4 +24,6 @@
 extern int use_phys;
 extern off_t physaddrbase;
 
+int memtester_main(ul physaddrbase, ul wantraw, char * memsuffix, ul loops,ul pagesize);
+
 #endif // __MEMTESTER_H__

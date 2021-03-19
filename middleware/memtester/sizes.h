@@ -17,6 +17,7 @@
 
 #define rand32() ((unsigned int) rand() | ( (unsigned int) rand() << 16))
 
+#define ULONG_MAX       (4294967295UL)
 #if (ULONG_MAX == 4294967295UL)
     #define rand_ul() rand32()
     #define UL_ONEBITS 0xffffffff
@@ -36,5 +37,6 @@
     #error long on this platform is not 32 or 64 bits
 #endif
 
+#define TEST_NARROW_WRITES 
 
 #endif // __SIZES_H__

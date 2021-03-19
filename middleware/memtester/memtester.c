@@ -95,30 +95,44 @@ void usage(char *me) {
     exit(EXIT_FAIL_NONSTARTER);
 }
 
-int main(int argc, char **argv) {
-    ul loops, loop, i;
-    size_t pagesize, wantraw, wantmb, wantbytes, wantbytes_orig, bufsize,
+/*******************************************************************************
+* Input parameters:
+* ---- phystestbase : memory base address
+* ---- wantraw      : memory size
+* ---- memsuffix    : memory unit, B,K,M,G for B, KB, MB, GB
+* ---- loop         : memory test code loop times
+* ---- pagesize     : memory pase size (Bytes)
+*/
+int memtester_main(ul phystestbase, ul wantraw, char *memsuffix, ul loops, ul pagesize) 
+{
+    ul loop, i;
+    size_t wantmb, wantbytes, wantbytes_orig, bufsize,
          halflen, count;
-    char *memsuffix, *addrsuffix, *loopsuffix;
-    ptrdiff_t pagesizemask;
+    //char *addrsuffix, *loopsuffix;
+    //ptrdiff_t pagesizemask;
     void volatile *buf, *aligned;
     ulv *bufa, *bufb;
-    int do_mlock = 1, done_mem = 0;
+    //int do_mlock = 1, done_mem = 0;
     int exit_code = 0;
-    int memfd, opt, memshift;
+    int /* memfd, opt,*/ memshift;
     size_t maxbytes = -1; /* addressable memory, in bytes */
     size_t maxmb = (maxbytes >> 20) + 1; /* addressable memory, in MB */
     /* Device to mmap memory from with -p, default is normal core */
+    /*
     char *device_name = "/dev/mem";
     struct stat statbuf;
     int device_specified = 0;
     char *env_testmask = 0;
+    */
     ul testmask = 0;
 
+    physaddrbase = phystestbase;
     PRINTF("memtester version " __version__ " (%d-bit)\n", UL_LEN);
     PRINTF("Copyright (C) 2001-2020 Charles Cazabon.\n");
     PRINTF("Licensed under the GNU General Public License version 2 (only).\n");
     PRINTF("\n");
+
+#if 0
     check_posix_system();
     pagesize = memtester_pagesize();
     pagesizemask = (ptrdiff_t) ~(pagesize - 1);
@@ -199,6 +213,8 @@ int main(int argc, char **argv) {
         PRINTF("failed to parse memory argument");
         usage(argv[0]); /* doesn't return */
     }
+#endif
+
     switch (*memsuffix) {
         case 'G':
         case 'g':
@@ -220,16 +236,21 @@ int main(int argc, char **argv) {
             memshift = 20; /* megabytes */
             break;
         default:
-            /* bad suffix */
-            usage(argv[0]); /* doesn't return */
+            PRINTF("ERR!!! memsuffix input not B|K|M|G  \r\n");
+            goto __MMETESTER_EXIT__;
     }
+    /*set use_phys*/
+    use_phys = 1;
+
     wantbytes_orig = wantbytes = ((size_t) wantraw << memshift);
     wantmb = (wantbytes_orig >> 20);
-    optind++;
+    //optind++;
     if (wantmb > maxmb) {
         PRINTF("This system can only address %u MB.\n", maxmb);
-        exit(EXIT_FAIL_NONSTARTER);
+        goto __MMETESTER_EXIT__;
     }
+
+#if 0
     if (wantbytes < pagesize) {
         PRINTF("bytes %d < pagesize %d -- memory argument too large?\n",
                 wantbytes, pagesize);
@@ -250,10 +271,15 @@ int main(int argc, char **argv) {
             usage(argv[0]); /* doesn't return */
         }
     }
+#endif
 
-    PRINTF("want %uMB (%u bytes)\n", wantmb, wantbytes);
+    PRINTF("want %dMB (%d bytes)\n", wantmb, wantbytes);
     buf = NULL;
-
+#if 1
+    bufsize = wantbytes; /* accept no less */
+    buf = (unsigned int *)physaddrbase;
+    aligned = buf;  
+#else
     if (use_phys) {
         memfd = open(device_name, O_RDWR | O_SYNC);
         if (memfd == -1) {
@@ -353,6 +379,7 @@ int main(int argc, char **argv) {
     } else {
         aligned = buf;
     }
+#endif
 
     halflen = bufsize / 2;
     count = halflen / sizeof(ul);
@@ -360,9 +387,9 @@ int main(int argc, char **argv) {
     bufb = (ulv *) ((size_t) aligned + halflen);
 
     for(loop=1; ((!loops) || loop <= loops); loop++) {
-        PRINTF("Loop %u", loop);
+        PRINTF("Loop %d", loop);
         if (loops) {
-            PRINTF("/%u", loops);
+            PRINTF("/%d", loops);
         }
         PRINTF(":\n");
         PRINTF("  %-20s: ", "Stuck Address");
@@ -390,7 +417,20 @@ int main(int argc, char **argv) {
         }
         PRINTF("\n");
     }
+
+#if 1
+    if (exit_code)
+      PRINTF("Done and Failed!\r\n");
+    else
+      PRINTF("Done and Passed!\r\n");
+    PRINTF("exit_code 0x%x \r\n", exit_code);
+#else
     if (do_mlock) munlock((void *) aligned, bufsize);
     PRINTF("Done.\n");
     exit(exit_code);
+#endif
+
+__MMETESTER_EXIT__:
+    PRINTF("\a");
+    return 0;
 }

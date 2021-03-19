@@ -48,9 +48,9 @@ struct test tests[] = {
 #ifdef _SC_VERSION
 void check_posix_system(void) {
     if (sysconf(_SC_VERSION) < 198808L) {
-        fprintf(stderr, "A POSIX system is required.  Don't be surprised if "
+        PRINTF("A POSIX system is required.  Don't be surprised if "
             "this craps out.\n");
-        fprintf(stderr, "_SC_VERSION is %lu\n", sysconf(_SC_VERSION));
+        PRINTF("_SC_VERSION is %u\n", sysconf(_SC_VERSION));
     }
 }
 #else
@@ -64,12 +64,12 @@ int memtester_pagesize(void) {
         perror("get page size failed");
         exit(EXIT_FAIL_NONSTARTER);
     }
-    printf("pagesize is %ld\n", (long) pagesize);
+    PRINTF("pagesize is %d\n", pagesize);
     return pagesize;
 }
 #else
 int memtester_pagesize(void) {
-    printf("sysconf(_SC_PAGE_SIZE) not supported; using pagesize of 8192\n");
+    PRINTF("sysconf(_SC_PAGE_SIZE) not supported; using pagesize of 8192\n");
     return 8192;
 }
 #endif
@@ -89,7 +89,7 @@ off_t physaddrbase = 0;
 
 /* Function definitions */
 void usage(char *me) {
-    fprintf(stderr, "\n"
+    PRINTF("\n"
             "Usage: %s [-p physaddrbase [-d device]] <mem>[B|K|M|G] [loops]\n",
             me);
     exit(EXIT_FAIL_NONSTARTER);
@@ -115,14 +115,14 @@ int main(int argc, char **argv) {
     char *env_testmask = 0;
     ul testmask = 0;
 
-    printf("memtester version " __version__ " (%d-bit)\n", UL_LEN);
-    printf("Copyright (C) 2001-2020 Charles Cazabon.\n");
-    printf("Licensed under the GNU General Public License version 2 (only).\n");
-    printf("\n");
+    PRINTF("memtester version " __version__ " (%d-bit)\n", UL_LEN);
+    PRINTF("Copyright (C) 2001-2020 Charles Cazabon.\n");
+    PRINTF("Licensed under the GNU General Public License version 2 (only).\n");
+    PRINTF("\n");
     check_posix_system();
     pagesize = memtester_pagesize();
     pagesizemask = (ptrdiff_t) ~(pagesize - 1);
-    printf("pagesizemask is 0x%tx\n", pagesizemask);
+    PRINTF("pagesizemask is 0x%tx\n", pagesizemask);
     
     /* If MEMTESTER_TEST_MASK is set, we use its value as a mask of which
        tests we run.
@@ -131,11 +131,11 @@ int main(int argc, char **argv) {
         errno = 0;
         testmask = strtoul(env_testmask, 0, 0);
         if (errno) {
-            fprintf(stderr, "error parsing MEMTESTER_TEST_MASK %s: %s\n", 
+            PRINTF("error parsing MEMTESTER_TEST_MASK %s: %s\n", 
                     env_testmask, strerror(errno));
             usage(argv[0]); /* doesn't return */
         }
-        printf("using testmask 0x%lx\n", testmask);
+        PRINTF("using testmask 0x%x\n", testmask);
     }
 
     while ((opt = getopt(argc, argv, "p:d:")) != -1) {
@@ -144,21 +144,18 @@ int main(int argc, char **argv) {
                 errno = 0;
                 physaddrbase = (off_t) strtoull(optarg, &addrsuffix, 16);
                 if (errno != 0) {
-                    fprintf(stderr,
-                            "failed to parse physaddrbase arg; should be hex "
+                    PRINTF("failed to parse physaddrbase arg; should be hex "
                             "address (0x123...)\n");
                     usage(argv[0]); /* doesn't return */
                 }
                 if (*addrsuffix != '\0') {
                     /* got an invalid character in the address */
-                    fprintf(stderr,
-                            "failed to parse physaddrbase arg; should be hex "
+                    PRINTF("failed to parse physaddrbase arg; should be hex "
                             "address (0x123...)\n");
                     usage(argv[0]); /* doesn't return */
                 }
                 if (physaddrbase & (pagesize - 1)) {
-                    fprintf(stderr,
-                            "bad physaddrbase arg; does not start on page "
+                    PRINTF("bad physaddrbase arg; does not start on page "
                             "boundary\n");
                     usage(argv[0]); /* doesn't return */
                 }
@@ -167,12 +164,12 @@ int main(int argc, char **argv) {
                 break;
             case 'd':
                 if (stat(optarg,&statbuf)) {
-                    fprintf(stderr, "can not use %s as device: %s\n", optarg, 
+                    PRINTF("can not use %s as device: %s\n", optarg, 
                             strerror(errno));
                     usage(argv[0]); /* doesn't return */
                 } else {
                     if (!S_ISCHR(statbuf.st_mode)) {
-                        fprintf(stderr, "can not mmap non-char device %s\n", 
+                        PRINTF("can not mmap non-char device %s\n", 
                                 optarg);
                         usage(argv[0]); /* doesn't return */
                     } else {
@@ -187,20 +184,19 @@ int main(int argc, char **argv) {
     }
 
     if (device_specified && !use_phys) {
-        fprintf(stderr, 
-                "for mem device, physaddrbase (-p) must be specified\n");
+        PRINTF("for mem device, physaddrbase (-p) must be specified\n");
         usage(argv[0]); /* doesn't return */
     }
     
     if (optind >= argc) {
-        fprintf(stderr, "need memory argument, in MB\n");
+        PRINTF("need memory argument, in MB\n");
         usage(argv[0]); /* doesn't return */
     }
 
     errno = 0;
     wantraw = (size_t) strtoul(argv[optind], &memsuffix, 0);
     if (errno != 0) {
-        fprintf(stderr, "failed to parse memory argument");
+        PRINTF("failed to parse memory argument");
         usage(argv[0]); /* doesn't return */
     }
     switch (*memsuffix) {
@@ -231,11 +227,11 @@ int main(int argc, char **argv) {
     wantmb = (wantbytes_orig >> 20);
     optind++;
     if (wantmb > maxmb) {
-        fprintf(stderr, "This system can only address %llu MB.\n", (ull) maxmb);
+        PRINTF("This system can only address %u MB.\n", maxmb);
         exit(EXIT_FAIL_NONSTARTER);
     }
     if (wantbytes < pagesize) {
-        fprintf(stderr, "bytes %ld < pagesize %ld -- memory argument too large?\n",
+        PRINTF("bytes %d < pagesize %d -- memory argument too large?\n",
                 wantbytes, pagesize);
         exit(EXIT_FAIL_NONSTARTER);
     }
@@ -246,22 +242,22 @@ int main(int argc, char **argv) {
         errno = 0;
         loops = strtoul(argv[optind], &loopsuffix, 0);
         if (errno != 0) {
-            fprintf(stderr, "failed to parse number of loops");
+            PRINTF("failed to parse number of loops");
             usage(argv[0]); /* doesn't return */
         }
         if (*loopsuffix != '\0') {
-            fprintf(stderr, "loop suffix %c\n", *loopsuffix);
+            PRINTF("loop suffix %c\n", *loopsuffix);
             usage(argv[0]); /* doesn't return */
         }
     }
 
-    printf("want %lluMB (%llu bytes)\n", (ull) wantmb, (ull) wantbytes);
+    PRINTF("want %uMB (%u bytes)\n", wantmb, wantbytes);
     buf = NULL;
 
     if (use_phys) {
         memfd = open(device_name, O_RDWR | O_SYNC);
         if (memfd == -1) {
-            fprintf(stderr, "failed to open %s for physical memory: %s\n",
+            PRINTF("failed to open %s for physical memory: %s\n",
                     device_name, strerror(errno));
             exit(EXIT_FAIL_NONSTARTER);
         }
@@ -269,13 +265,13 @@ int main(int argc, char **argv) {
                                      MAP_SHARED | MAP_LOCKED, memfd,
                                      physaddrbase);
         if (buf == MAP_FAILED) {
-            fprintf(stderr, "failed to mmap %s for physical memory: %s\n",
+            PRINTF("failed to mmap %s for physical memory: %s\n",
                     device_name, strerror(errno));
             exit(EXIT_FAIL_NONSTARTER);
         }
 
         if (mlock((void *) buf, wantbytes) < 0) {
-            fprintf(stderr, "failed to mlock mmap'ed space\n");
+            PRINTF("failed to mlock mmap'ed space\n");
             do_mlock = 0;
         }
 
@@ -290,16 +286,14 @@ int main(int argc, char **argv) {
             if (!buf) wantbytes -= pagesize;
         }
         bufsize = wantbytes;
-        printf("got  %lluMB (%llu bytes)", (ull) wantbytes >> 20,
-            (ull) wantbytes);
-        fflush(stdout);
+        PRINTF("got  %uMB (%u bytes)", wantbytes >> 20,
+            wantbytes);
         if (do_mlock) {
-            printf(", trying mlock ...");
-            fflush(stdout);
+            PRINTF(", trying mlock ...");
             if ((size_t) buf % pagesize) {
-                /* printf("aligning to page -- was 0x%tx\n", buf); */
+                /* PRINTF("aligning to page -- was 0x%tx\n", buf); */
                 aligned = (void volatile *) ((size_t) buf & pagesizemask) + pagesize;
-                /* printf("  now 0x%tx -- lost %d bytes\n", aligned,
+                /* PRINTF("  now 0x%tx -- lost %d bytes\n", aligned,
                  *      (size_t) aligned - (size_t) buf);
                  */
                 bufsize -= ((size_t) aligned - (size_t) buf);
@@ -310,49 +304,49 @@ int main(int argc, char **argv) {
             if (mlock((void *) aligned, bufsize) < 0) {
                 switch(errno) {
                     case EAGAIN: /* BSDs */
-                        printf("over system/pre-process limit, reducing...\n");
+                        PRINTF("over system/pre-process limit, reducing...\n");
                         free((void *) buf);
                         buf = NULL;
                         wantbytes -= pagesize;
                         break;
                     case ENOMEM:
-                        printf("too many pages, reducing...\n");
+                        PRINTF("too many pages, reducing...\n");
                         free((void *) buf);
                         buf = NULL;
                         wantbytes -= pagesize;
                         break;
                     case EPERM:
-                        printf("insufficient permission.\n");
-                        printf("Trying again, unlocked:\n");
+                        PRINTF("insufficient permission.\n");
+                        PRINTF("Trying again, unlocked:\n");
                         do_mlock = 0;
                         free((void *) buf);
                         buf = NULL;
                         wantbytes = wantbytes_orig;
                         break;
                     default:
-                        printf("failed for unknown reason.\n");
+                        PRINTF("failed for unknown reason.\n");
                         do_mlock = 0;
                         done_mem = 1;
                 }
             } else {
-                printf("locked.\n");
+                PRINTF("locked.\n");
                 done_mem = 1;
             }
         } else {
             done_mem = 1;
-            printf("\n");
+            PRINTF("\n");
         }
     }
 
-    if (!do_mlock) fprintf(stderr, "Continuing with unlocked memory; testing "
+    if (!do_mlock) PRINTF("Continuing with unlocked memory; testing "
                            "will be slower and less reliable.\n");
 
     /* Do alighnment here as well, as some cases won't trigger above if you
        define out the use of mlock() (cough HP/UX 10 cough). */
     if ((size_t) buf % pagesize) {
-        /* printf("aligning to page -- was 0x%tx\n", buf); */
+        /* PRINTF("aligning to page -- was 0x%tx\n", buf); */
         aligned = (void volatile *) ((size_t) buf & pagesizemask) + pagesize;
-        /* printf("  now 0x%tx -- lost %d bytes\n", aligned,
+        /* PRINTF("  now 0x%tx -- lost %d bytes\n", aligned,
          *      (size_t) aligned - (size_t) buf);
          */
         bufsize -= ((size_t) aligned - (size_t) buf);
@@ -366,15 +360,14 @@ int main(int argc, char **argv) {
     bufb = (ulv *) ((size_t) aligned + halflen);
 
     for(loop=1; ((!loops) || loop <= loops); loop++) {
-        printf("Loop %lu", loop);
+        PRINTF("Loop %u", loop);
         if (loops) {
-            printf("/%lu", loops);
+            PRINTF("/%u", loops);
         }
-        printf(":\n");
-        printf("  %-20s: ", "Stuck Address");
-        fflush(stdout);
+        PRINTF(":\n");
+        PRINTF("  %-20s: ", "Stuck Address");
         if (!test_stuck_address(aligned, bufsize / sizeof(ul))) {
-             printf("ok\n");
+             PRINTF("ok\n");
         } else {
             exit_code |= EXIT_FAIL_ADDRESSLINES;
         }
@@ -386,21 +379,18 @@ int main(int argc, char **argv) {
             if (testmask && (!((1 << i) & testmask))) {
                 continue;
             }
-            printf("  %-20s: ", tests[i].name);
+            PRINTF("  %-20s: ", tests[i].name);
             if (!tests[i].fp(bufa, bufb, count)) {
-                printf("ok\n");
+                PRINTF("ok\n");
             } else {
                 exit_code |= EXIT_FAIL_OTHERTEST;
             }
-            fflush(stdout);
             /* clear buffer */
             memset((void *) buf, 255, wantbytes);
         }
-        printf("\n");
-        fflush(stdout);
+        PRINTF("\n");
     }
     if (do_mlock) munlock((void *) aligned, bufsize);
-    printf("Done.\n");
-    fflush(stdout);
+    PRINTF("Done.\n");
     exit(exit_code);
 }

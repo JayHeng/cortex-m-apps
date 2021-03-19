@@ -13,13 +13,6 @@
  *
  */
 
-#include <sys/types.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-
-#include "types.h"
-#include "sizes.h"
 #include "memtester.h"
 
 char progress[] = "-\\|/";

@@ -12,11 +12,12 @@
  *
  */
 
-#include "sizes.h"
+#ifndef __TYPES_H__
+#define __TYPES_H__
 
-typedef unsigned long ul;
-typedef unsigned long long ull;
-typedef unsigned long volatile ulv;
+typedef unsigned int ul;
+typedef unsigned int ull;
+typedef unsigned int volatile ulv;
 typedef unsigned char volatile u8v;
 typedef unsigned short volatile u16v;
 
@@ -24,3 +25,5 @@ struct test {
     char *name;
     int (*fp)();
 };
+
+#endif // __TYPES_H__

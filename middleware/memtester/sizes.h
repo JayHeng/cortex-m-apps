@@ -12,7 +12,8 @@
  *
  */
 
-#include <limits.h>
+#ifndef __SIZES_H__
+#define __SIZES_H__
 
 #define rand32() ((unsigned int) rand() | ( (unsigned int) rand() << 16))
 
@@ -36,3 +37,4 @@
 #endif
 
 
+#endif // __SIZES_H__

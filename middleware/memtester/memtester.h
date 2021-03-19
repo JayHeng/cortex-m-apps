@@ -13,10 +13,14 @@
  *
  */
 
-#include <sys/types.h>
+#ifndef __MEMTESTER_H__
+#define __MEMTESTER_H__
+#include "types.h"
+#include "sizes.h"
 
 /* extern declarations. */
 
 extern int use_phys;
 extern off_t physaddrbase;
 
+#endif // __MEMTESTER_H__

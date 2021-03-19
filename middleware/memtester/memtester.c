@@ -14,19 +14,7 @@
 
 #define __version__ "4.5.0"
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <errno.h>
-
-#include "types.h"
-#include "sizes.h"
+#include "memtester.h"
 #include "tests.h"
 
 #define EXIT_FAIL_NONSTARTER    0x01

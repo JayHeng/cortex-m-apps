@@ -32,6 +32,19 @@ union {
 
 /* Function definitions. */
 
+#define KPRINTF Dummy_Printf
+#define KPUTCHAR Dummy_Putchar
+
+int Dummy_Printf(const char *formatString, ...)
+{
+    return 0;
+}
+
+int Dummy_Putchar(int ch)
+{
+    return 0;
+}
+
 int compare_regions(ulv *bufa, ulv *bufb, size_t count) {
     int r = 0;
     size_t i;
@@ -63,17 +76,17 @@ int test_stuck_address(ulv *bufa, size_t count) {
     size_t i;
     off_t physaddr;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < 16; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         p1 = (ulv *) bufa;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         for (i = 0; i < count; i++) {
             *p1 = ((j + i) % 2) == 0 ? (ul) p1 : ~((ul) p1);
             *p1++;
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         p1 = (ulv *) bufa;
         for (i = 0; i < count; i++, p1++) {
             if (*p1 != (((j + i) % 2) == 0 ? (ul) p1 : ~((ul) p1))) {
@@ -92,7 +105,7 @@ int test_stuck_address(ulv *bufa, size_t count) {
             }
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -102,15 +115,15 @@ int test_random_value(ulv *bufa, ulv *bufb, size_t count) {
     ul j = 0;
     size_t i;
 
-    PUTCHAR(' ');
+    KPUTCHAR(' ');
     for (i = 0; i < count; i++) {
         *p1++ = *p2++ = rand_ul();
         if (!(i % PROGRESSOFTEN)) {
-            PUTCHAR('\b');
-            PUTCHAR(progress[++j % PROGRESSLEN]);
+            KPUTCHAR('\b');
+            KPUTCHAR(progress[++j % PROGRESSLEN]);
         }
     }
-    PRINTF("\b \b");
+    KPRINTF("\b \b");
     return compare_regions(bufa, bufb, count);
 }
 
@@ -214,23 +227,23 @@ int test_solidbits_comparison(ulv *bufa, ulv *bufb, size_t count) {
     ul q;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < 64; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         q = (j % 2) == 0 ? UL_ONEBITS : 0;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
         for (i = 0; i < count; i++) {
             *p1++ = *p2++ = (i % 2) == 0 ? q : ~q;
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -241,23 +254,23 @@ int test_checkerboard_comparison(ulv *bufa, ulv *bufb, size_t count) {
     ul q;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < 64; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         q = (j % 2) == 0 ? CHECKERBOARD1 : CHECKERBOARD2;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
         for (i = 0; i < count; i++) {
             *p1++ = *p2++ = (i % 2) == 0 ? q : ~q;
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -267,22 +280,22 @@ int test_blockseq_comparison(ulv *bufa, ulv *bufb, size_t count) {
     unsigned int j;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < 256; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         for (i = 0; i < count; i++) {
             *p1++ = *p2++ = (ul) UL_BYTE(j);
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -292,12 +305,12 @@ int test_walkbits0_comparison(ulv *bufa, ulv *bufb, size_t count) {
     unsigned int j;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < UL_LEN * 2; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         for (i = 0; i < count; i++) {
             if (j < UL_LEN) { /* Walk it up. */
                 *p1++ = *p2++ = ONE << j;
@@ -305,13 +318,13 @@ int test_walkbits0_comparison(ulv *bufa, ulv *bufb, size_t count) {
                 *p1++ = *p2++ = ONE << (UL_LEN * 2 - j - 1);
             }
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -321,12 +334,12 @@ int test_walkbits1_comparison(ulv *bufa, ulv *bufb, size_t count) {
     unsigned int j;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < UL_LEN * 2; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         for (i = 0; i < count; i++) {
             if (j < UL_LEN) { /* Walk it up. */
                 *p1++ = *p2++ = UL_ONEBITS ^ (ONE << j);
@@ -334,13 +347,13 @@ int test_walkbits1_comparison(ulv *bufa, ulv *bufb, size_t count) {
                 *p1++ = *p2++ = UL_ONEBITS ^ (ONE << (UL_LEN * 2 - j - 1));
             }
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -350,12 +363,12 @@ int test_bitspread_comparison(ulv *bufa, ulv *bufb, size_t count) {
     unsigned int j;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (j = 0; j < UL_LEN * 2; j++) {
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
         p1 = (ulv *) bufa;
         p2 = (ulv *) bufb;
-        PRINTF("setting %3u", j);
+        KPRINTF("setting %3u", j);
         for (i = 0; i < count; i++) {
             if (j < UL_LEN) { /* Walk it up. */
                 *p1++ = *p2++ = (i % 2 == 0)
@@ -369,13 +382,13 @@ int test_bitspread_comparison(ulv *bufa, ulv *bufb, size_t count) {
                                     | (ONE << (UL_LEN * 2 + 1 - j)));
             }
         }
-        PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-        PRINTF("testing %3u", j);
+        KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+        KPRINTF("testing %3u", j);
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -386,26 +399,26 @@ int test_bitflip_comparison(ulv *bufa, ulv *bufb, size_t count) {
     ul q;
     size_t i;
 
-    PRINTF("           ");
+    KPRINTF("           ");
     for (k = 0; k < UL_LEN; k++) {
         q = ONE << k;
         for (j = 0; j < 8; j++) {
-            PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+            KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
             q = ~q;
-            PRINTF("setting %3u", k * 8 + j);
+            KPRINTF("setting %3u", k * 8 + j);
             p1 = (ulv *) bufa;
             p2 = (ulv *) bufb;
             for (i = 0; i < count; i++) {
                 *p1++ = *p2++ = (i % 2) == 0 ? q : ~q;
             }
-            PRINTF("\b\b\b\b\b\b\b\b\b\b\b");
-            PRINTF("testing %3u", k * 8 + j);
+            KPRINTF("\b\b\b\b\b\b\b\b\b\b\b");
+            KPRINTF("testing %3u", k * 8 + j);
             if (compare_regions(bufa, bufb, count)) {
                 return -1;
             }
         }
     }
-    PRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
+    KPRINTF("\b\b\b\b\b\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b");
     return 0;
 }
 
@@ -417,7 +430,7 @@ int test_8bit_wide_random(ulv* bufa, ulv* bufb, size_t count) {
     unsigned int b, j = 0;
     size_t i;
 
-    PUTCHAR(' ');
+    KPUTCHAR(' ');
     for (attempt = 0; attempt < 2;  attempt++) {
         if (attempt & 1) {
             p1 = (u8v *) bufa;
@@ -433,15 +446,15 @@ int test_8bit_wide_random(ulv* bufa, ulv* bufb, size_t count) {
                 *p1++ = *t++;
             }
             if (!(i % PROGRESSOFTEN)) {
-                PUTCHAR('\b');
-                PUTCHAR(progress[++j % PROGRESSLEN]);
+                KPUTCHAR('\b');
+                KPUTCHAR(progress[++j % PROGRESSLEN]);
             }
         }
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b \b");
+    KPRINTF("\b \b");
     return 0;
 }
 
@@ -452,7 +465,7 @@ int test_16bit_wide_random(ulv* bufa, ulv* bufb, size_t count) {
     unsigned int b, j = 0;
     size_t i;
 
-    PUTCHAR( ' ' );
+    KPUTCHAR( ' ' );
     for (attempt = 0; attempt < 2; attempt++) {
         if (attempt & 1) {
             p1 = (u16v *) bufa;
@@ -468,15 +481,15 @@ int test_16bit_wide_random(ulv* bufa, ulv* bufb, size_t count) {
                 *p1++ = *t++;
             }
             if (!(i % PROGRESSOFTEN)) {
-                PUTCHAR('\b');
-                PUTCHAR(progress[++j % PROGRESSLEN]);
+                KPUTCHAR('\b');
+                KPUTCHAR(progress[++j % PROGRESSLEN]);
             }
         }
         if (compare_regions(bufa, bufb, count)) {
             return -1;
         }
     }
-    PRINTF("\b \b");
+    KPRINTF("\b \b");
     return 0;
 }
 #endif

@@ -86,6 +86,7 @@ void usage(char *me);
 /* Global vars - so tests have access to this information */
 int use_phys = 0;
 off_t physaddrbase = 0;
+extern int fail_stop;
 
 /* Function definitions */
 void usage(char *me) {
@@ -392,11 +393,13 @@ int memtester_main(ul phystestbase, ul wantraw, char *memsuffix, ul loops, ul pa
             PRINTF("/%d", loops);
         }
         PRINTF(":\n");
-        PRINTF("  %-20s: ", "Stuck Address");
+        PRINTF("  %s: ", "Stuck Address");
         if (!test_stuck_address(aligned, bufsize / sizeof(ul))) {
              PRINTF("ok\n");
         } else {
             exit_code |= EXIT_FAIL_ADDRESSLINES;
+            if (fail_stop)
+              break;
         }
         for (i=0;;i++) {
             if (!tests[i].name) break;
@@ -406,11 +409,13 @@ int memtester_main(ul phystestbase, ul wantraw, char *memsuffix, ul loops, ul pa
             if (testmask && (!((1 << i) & testmask))) {
                 continue;
             }
-            PRINTF("  %-20s: ", tests[i].name);
+            PRINTF("  %s: ", tests[i].name);
             if (!tests[i].fp(bufa, bufb, count)) {
                 PRINTF("ok\n");
             } else {
                 exit_code |= EXIT_FAIL_OTHERTEST;
+                if (fail_stop)
+                  break;
             }
             /* clear buffer */
             memset((void *) buf, 255, wantbytes);

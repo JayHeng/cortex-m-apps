@@ -84,12 +84,12 @@ int main(void)
     }
 
     PRINTF("\r\n########## Print out from target board ##########\r\n");
-    PRINTF("\r\nDRAM test setting:\r\n");
-    PRINTF("                  Base Address: 0x%x;\r\n", test_config.base_addr);
-    PRINTF("                  Test Size: %d Bytes;\r\n", test_config.test_size);
-    PRINTF("                  Test Loop: %d;\r\n", test_config.loop_num);    
-    PRINTF("                  DRAM Freq: %d;\r\n",test_config.dram_freq);
-    PRINTF("                  Enable Cache: %d;\r\n", test_config.enable_cache);
+    PRINTF("\r\nSDRAM r/w test settings:\r\n");
+    PRINTF("      Base Addr: 0x%x;\r\n", test_config.base_addr);
+    PRINTF("      Test Size: %d Bytes;\r\n", test_config.test_size);
+    PRINTF("      Test Loop: %d;\r\n", test_config.loop_num);    
+    PRINTF("      SDRAM Freq: %d Hz;\r\n",test_config.dram_freq);
+    PRINTF("      Enable Cache: %d;\r\n\r\n", test_config.enable_cache);
 
     fail_stop = 1;
 

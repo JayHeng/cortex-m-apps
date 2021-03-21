@@ -46,16 +46,14 @@
  * Prototypes
  ******************************************************************************/
 typedef struct _semc_test_config {
-  uint32_t base_addr;
-  uint32_t test_size;
-  uint32_t loop_num;
-  uint32_t dram_freq;
-  uint32_t enable_cache;
-} semc_test_config;
+  uint32_t baseAddr;
+  uint32_t testSize;
+  uint32_t loopNum;
+  uint32_t dramFreq;
+  uint32_t enableCache;
+} semc_test_config_t;
 
-semc_test_config test_config;
-
-int fail_stop;
+int fail_stop = 1;
    
 /*******************************************************************************
  * Code
@@ -65,36 +63,33 @@ int fail_stop;
  */
 int main(void)
 {
-    uint32_t semcclk = 0;
     char memsuffix = 'B';
     /* Init board hardware. */
     BOARD_InitHardware();
-    semcclk = CLOCK_GetFreq(kCLOCK_SemcClk);
 
     /* --------------- stress test --------------- */
-    test_config.base_addr = 0x80000000;
-    test_config.test_size = 64 * 1024;
-    test_config.loop_num = 1;
-    test_config.dram_freq = semcclk;
-    test_config.enable_cache = 0;
+    semc_test_config_t testConfig;
+    testConfig.baseAddr = 0x80000000;
+    testConfig.testSize = 64 * 1024;
+    testConfig.loopNum = 1;
+    testConfig.dramFreq = CLOCK_GetFreq(kCLOCK_SemcClk);
+    testConfig.enableCache = 0;
     
-    if (!test_config.enable_cache) {
+    if (!testConfig.enableCache) {
         /* Disable D cache */
         SCB_DisableDCache();
     }
 
     PRINTF("\r\n########## Print out from target board ##########\r\n");
     PRINTF("\r\nSDRAM r/w test settings:\r\n");
-    PRINTF("      Base Addr: 0x%x;\r\n", test_config.base_addr);
-    PRINTF("      Test Size: %d Bytes;\r\n", test_config.test_size);
-    PRINTF("      Test Loop: %d;\r\n", test_config.loop_num);    
-    PRINTF("      SDRAM Freq: %d Hz;\r\n",test_config.dram_freq);
-    PRINTF("      Enable Cache: %d;\r\n\r\n", test_config.enable_cache);
+    PRINTF("      Base Addr: 0x%x;\r\n", testConfig.baseAddr);
+    PRINTF("      Test Size: %d Bytes;\r\n", testConfig.testSize);
+    PRINTF("      Test Loop: %d;\r\n", testConfig.loopNum);    
+    PRINTF("      SDRAM Freq: %d Hz;\r\n",testConfig.dramFreq);
+    PRINTF("      Enable Cache: %d;\r\n\r\n", testConfig.enableCache);
 
-    fail_stop = 1;
-
-    /* Run memory stress test: 64KByte,loop=1,page_size = 1kbyte */
-    memtester_main(test_config.base_addr, test_config.test_size, &memsuffix, test_config.loop_num, (1*1024));
+    /* Run memory stress test: 64KByte, loop=1, page_size = 1kbyte */
+    memtester_main(testConfig.baseAddr, testConfig.testSize, &memsuffix, testConfig.loopNum, (1*1024));
 
     while (1)
     {

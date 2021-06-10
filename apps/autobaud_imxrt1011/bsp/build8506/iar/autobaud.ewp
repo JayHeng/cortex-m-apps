@@ -1087,11 +1087,11 @@
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing.</state>
+                    <state>No specifier n, no float nor long long, no scan set, no assignment suppressing, without multibyte support.</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>No specifier a, A, no specifier n, no float nor long long.</state>
+                    <state>No specifier a, A, no specifier n, no float nor long long, without multibyte support.</state>
                 </option>
                 <option>
                     <name>GOutputBinary</name>
@@ -1337,7 +1337,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>11111110</state>
+                    <state>00000000</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -1410,6 +1410,8 @@
                     <state>$PROJ_DIR$/../../../../../components/uart</state>
                     <state>$PROJ_DIR$/../../../../../components/serial_manager</state>
                     <state>$PROJ_DIR$/../../../../../components/lists</state>
+                    <state>$PROJ_DIR$/../../../../../components/autobaud</state>
+                    <state>$PROJ_DIR$/../../../../../components/microseconds</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
                 </option>
                 <option>
@@ -1426,7 +1428,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -1435,7 +1437,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules98</name>
@@ -1773,7 +1775,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>dhrystone_a000.out</state>
+                    <state>autobaud.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -2149,6 +2151,9 @@
             <file>
                 <name>$PROJ_DIR$\..\..\src\pin_mux.h</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\src\pinmux_utility.c</name>
+            </file>
         </group>
     </group>
     <group>
@@ -2156,12 +2161,39 @@
         <group>
             <name>component</name>
             <group>
+                <name>autobaud</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\autobaud\autobaud.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\autobaud\autobaud_irq.c</name>
+                </file>
+            </group>
+            <group>
                 <name>lists</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\components\lists\generic_list.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\components\lists\generic_list.h</name>
+                </file>
+            </group>
+            <group>
+                <name>microseconds</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\microseconds\microseconds.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\microseconds\microseconds_common.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\microseconds\microseconds_cortexm_systick.c</name>
+                    <excluded>
+                        <configuration>Release</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\components\microseconds\microseconds_imxrt_pit.c</name>
                 </file>
             </group>
             <group>

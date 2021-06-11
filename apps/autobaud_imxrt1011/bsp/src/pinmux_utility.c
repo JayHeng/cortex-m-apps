@@ -26,7 +26,6 @@
 #define UART1_RX_GPIO_IRQHandler    GPIO1_Combined_0_15_IRQHandler
 
 #define UART1_TX_IOMUXC_MUX_FUNC    IOMUXC_GPIO_10_LPUART1_TXD
-#define UART1_TX_IOMUXC_PAD_DEFAULT 0x000010B0
 #define UART1_TX_GPIO_PIN_NUM       10 // gpiomux.io[10], sel gpio1/gpio2 via iomuxc_gpr26
 
 #define LPUART1_PAD_CTRL            (IOMUXC_SW_PAD_CTL_PAD_SRE(0) | IOMUXC_SW_PAD_CTL_PAD_DSE(6) | IOMUXC_SW_PAD_CTL_PAD_SPEED(2) | \
@@ -46,24 +45,6 @@ static pin_irq_callback_t s_pin_irq_func;
 /*******************************************************************************
  * Code
  ******************************************************************************/
-static inline void IOMUXC_RestoreDefault(uint32_t muxRegister,
-                                         uint32_t muxMode,
-                                         uint32_t inputRegister,
-                                         uint32_t inputDaisy,
-                                         uint32_t configRegister,
-                                         uint32_t configDefaultValue)
-{
-    *((volatile uint32_t *)muxRegister) = 0 /*Mux default value*/;
-    if (inputRegister)
-    {
-        *((volatile uint32_t *)inputRegister) = 0 /*Daisy defualt value*/;
-    }
-    if (configRegister)
-    {
-        *((volatile uint32_t *)configRegister) = configDefaultValue;
-    }
-}
-
 static inline void IOMUXC_SetUartAutoBaudPinMode(uint32_t muxRegister,
                                                  uint32_t muxMode,
                                                  uint32_t inputRegister,
@@ -96,24 +77,17 @@ static inline void IOMUXC_SetUartPinMode(
  * (Although there are many ALTx-pinmux configuration choices on various pins for the same
  * peripheral module)
  */
-void uart_pinmux_config(pinmux_type_t pinmux)
+void uart_pinmux_config(bool setGpio)
 {
-    switch (pinmux)
+    if (setGpio)
     {
-        case kPinmuxType_Default:
-            IOMUXC_RestoreDefault(UART1_TX_IOMUXC_MUX_FUNC, UART1_TX_IOMUXC_PAD_DEFAULT);
-            IOMUXC_RestoreDefault(UART1_TX_IOMUXC_MUX_FUNC, UART1_TX_IOMUXC_PAD_DEFAULT);
-            break;
-        case kPinmuxType_PollForActivity:
-            IOMUXC_SetUartAutoBaudPinMode(UART1_RX_IOMUXC_MUX_GPIO, UART1_RX_GPIO_BASE, UART1_RX_GPIO_PIN_NUM);
-            break;
-        case kPinmuxType_Peripheral:
-            // Enable pins for UART1.
-            IOMUXC_SetUartPinMode(UART1_RX_IOMUXC_MUX_FUNC);
-            IOMUXC_SetUartPinMode(UART1_TX_IOMUXC_MUX_FUNC);
-            break;
-        default:
-            break;
+        IOMUXC_SetUartAutoBaudPinMode(UART1_RX_IOMUXC_MUX_GPIO, UART1_RX_GPIO_BASE, UART1_RX_GPIO_PIN_NUM);
+    }
+    else
+    {
+        // Enable pins for UART1.
+        IOMUXC_SetUartPinMode(UART1_RX_IOMUXC_MUX_FUNC);
+        IOMUXC_SetUartPinMode(UART1_TX_IOMUXC_MUX_FUNC);
     }
 }
 

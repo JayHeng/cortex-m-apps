@@ -29,7 +29,7 @@ enum
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-extern void uart_pinmux_config(pinmux_type_t pinmux);
+extern void uart_pinmux_config(bool setGpio);
 
 /*******************************************************************************
  * Code
@@ -129,13 +129,15 @@ int main(void)
     CLOCK_EnableClock(kCLOCK_Pit);
     microseconds_init();
     //microseconds_delay(5000000);
-    uart_pinmux_config(kPinmuxType_PollForActivity);
+    bool setGpio = true;
+    uart_pinmux_config(setGpio);
     autobaud_init();
 
     uint32_t baudrate;
-    while (autobaud_get_rate(&baudrate) != kStatus_Success);
+    while (!autobaud_get_rate(&baudrate));
     autobaud_deinit();
-    uart_pinmux_config(kPinmuxType_Peripheral);
+    setGpio = false;
+    uart_pinmux_config(setGpio);
 
     //BOARD_InitDebugConsole();
     uint32_t uartClkSrcFreq = BOARD_DebugConsoleSrcFreq();

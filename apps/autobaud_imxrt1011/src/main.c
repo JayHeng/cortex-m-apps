@@ -144,6 +144,7 @@ int main(void)
     DbgConsole_Init(BOARD_DEBUG_UART_INSTANCE, baudrate, BOARD_DEBUG_UART_TYPE, uartClkSrcFreq);
 
     PRINTF("Autobaud test success\r\n");
+    PRINTF("Detected baudrate is %d\r\n", baudrate);
 
     while (1)
     {

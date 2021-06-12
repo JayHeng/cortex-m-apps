@@ -21,7 +21,7 @@ enum _autobaud_counts
     kNumberOfBitsForFirstByteMeasured = 8,
     //! 0xA6 字节（从起始位到停止位）第一个下降沿到最后一个下降沿之间的实际bit数
     kNumberOfBitsForSecondByteMeasured = 7,
-    //! 两个下降沿之间允许的最大超时
+    //! 两个下降沿之间允许的最大超时(us)
     kMaximumTimeBetweenFallingEdges = 80000,
     //! 对实际检测出的波特率值做对齐处理，以便于更好地配置UART模块
     kAutobaudStepSize = 1200
@@ -30,7 +30,7 @@ enum _autobaud_counts
 ////////////////////////////////////////////////////////////////////////////////
 // Prototypes
 ////////////////////////////////////////////////////////////////////////////////
-//! @brief 打开硬件定时器
+//! @brief 管脚下降沿跳变回调函数
 static void pin_transition_callback(void);
 //! @brief 使能GPIO管脚中断
 extern void enable_autobaud_pin_irq(pin_irq_callback_t func);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Freescale Semiconductor, Inc.
+ * Copyright (c) 2021 NXP
  * All rights reserved.
  *
  *
@@ -14,32 +14,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 enum _autobaud_counts
 {
-    //! the number of edge transitions being counted
-    kRequiredEdges = 14,
-    //! the number of bits being measured for the baud rate
-    //! for this sequence of kFramingPacketStartByte(0x5A) + kFramingPacketType_Ping(0xA6) there are
-    //! 20 bits total however the final rising edge is 1 bit before the stop bit so the final two bits
-    //! will not be measured since this is all edge transition based. Additionally we will not start the
-    //! timer until after the first rising transition from the start bit which is 2 bytes into the sequence
-    //! so there are a total of:
-    //! 20 - 1 (stop bit) - 1 (final rising bit) - 2 (bits to first rising edge) = 16
-    //! bits we are measuring the time for
-    kNumberOfBitsMeasured = 16,
-    //! 250 milliseconds = 250000 microseconds
-    kAutobaudDetectDelay = 250000
+    //! 0x5A 字节对应的下降沿个数
+    kFirstByteRequiredFallingEdges = 4,
+    //! 0xA6 字节对应的下降沿个数
+    kSecondByteRequiredFallingEdges = 3,
+    //! 0x5A 字节（从起始位到停止位）第一个下降沿到最后一个下降沿之间的实际bit数
+    kNumberOfBitsForFirstByteMeasured = 8,
+    //! 0xA6 字节（从起始位到停止位）第一个下降沿到最后一个下降沿之间的实际bit数
+    kNumberOfBitsForSecondByteMeasured = 7,
+    //! 两个下降沿之间允许的最大超时(us)
+    kMaximumTimeBetweenFallingEdges = 80000,
+    //! 对实际检测出的波特率值做对齐处理，以便于更好地配置UART模块
+    kAutobaudStepSize = 1200
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Prototypes
 ////////////////////////////////////////////////////////////////////////////////
-
+//! @brief 读取GPIO管脚输入电平
 extern uint32_t read_autobaud_pin(void);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
-static uint32_t s_initialEdge;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -47,11 +45,8 @@ static uint32_t s_initialEdge;
 
 void autobaud_init(void)
 {
-    do
-    {
-        s_initialEdge = read_autobaud_pin();
-    }
-    while (s_initialEdge != 1);
+    // 确保电平为高（空闲态）
+    while (read_autobaud_pin() != 1);
 }
 
 void autobaud_deinit(void)
@@ -61,84 +56,68 @@ void autobaud_deinit(void)
 
 bool autobaud_get_rate(uint32_t *rate)
 {
+    // 仅当电平为低（非空闲态）时才开始识别
     uint32_t currentEdge = read_autobaud_pin();
-
-    if (currentEdge != s_initialEdge)
+    if (currentEdge != 1)
     {
-        // If we get a transition on a UART then one of the UART peripherals
-        // is going to be the active peripheral so we can block and wait for autobaud
-        // to finish here
+        uint64_t ticks = microseconds_get_ticks();
+        uint32_t transitionCount = 1;
+        // 0x5A 字节检测时间起点
+        uint64_t firstByteTotalTicks = ticks;
+        uint64_t secondByteTotalTicks;
+        uint64_t lastToggleTicks = ticks;
+        // 计算出下降沿之间最大超时对应计数值
+        uint64_t ticksBetweenFailure = microseconds_convert_to_ticks(kMaximumTimeBetweenFallingEdges);
         uint32_t previousEdge = currentEdge;
-        // Keep track of any time outs
-        bool expired = false;
-        // Stores the running timer value
-        uint64_t currentTicks;
-        // Keeps a starting point for timeout reference and calculation
-        uint64_t startTicks = microseconds_get_ticks();
-        const uint64_t ticksTimeout = microseconds_convert_to_ticks(kAutobaudDetectDelay);
-
-        // When we get to this point we know that we are active but are somewhere in the start
-        // bit trough, due to other peripheral detection it is not guaranteed to be at the very start
-        // of the transition so now that we are only spinning in here we can get an exact start time
-        // at the next transition
-        while (1)
+        while (transitionCount < kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges)
         {
-            currentTicks = microseconds_get_ticks();
+            // 获取当前系统计数值
+            ticks = microseconds_get_ticks();
+            // 检查是否有电平翻转
             currentEdge = read_autobaud_pin();
-
-            // Check for the second transition
             if (currentEdge != previousEdge)
             {
-                break;
-            }
-
-            if ((currentTicks - startTicks) > ticksTimeout)
-            {
-                expired = true;
-                break;
-            }
-        }
-        previousEdge = currentEdge;
-
-        // Now we have gotten another transition so store the time of the previous transition. Two transitions
-        // have occurred now so up the counter again
-        startTicks = currentTicks;
-        // We have had two transitions at the point
-        uint32_t transitionCount = 2;
-
-        // keep counting our edge transitions until the required number is met
-        while (transitionCount < kRequiredEdges)
-        {
-            currentEdge = read_autobaud_pin();
-
-            if (currentEdge != previousEdge)
-            {
-                transitionCount++;
+                // 仅当电平翻转是下降沿时
+                if (previousEdge == 1)
+                {
+                    // 计数这次检测到的下降沿
+                    transitionCount++;
+                    // 记录本次下降沿发生时系统计数值
+                    lastToggleTicks = ticks;
+                    // 得到 0x5A 字节检测期间内对应计数值
+                    if (transitionCount == kFirstByteRequiredFallingEdges)
+                    {
+                        firstByteTotalTicks = ticks - firstByteTotalTicks;
+                    }
+                    // 0xA6 字节检测时间起点
+                    else if (transitionCount == kFirstByteRequiredFallingEdges + 1)
+                    {
+                        secondByteTotalTicks = ticks;
+                    }
+                    // 得到 0xA6 字节检测期间内对应计数值
+                    else if (transitionCount == kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges)
+                    {
+                        secondByteTotalTicks = ticks - secondByteTotalTicks;
+                    }
+                }
                 previousEdge = currentEdge;
             }
-
-            currentTicks = microseconds_get_ticks();
-
-            if ((currentTicks - startTicks) > ticksTimeout)
+            // 如果本次下降沿与上次下降沿之间间隔过长，则从头开始检测
+            if ((ticks - lastToggleTicks) > ticksBetweenFailure)
             {
-                expired = true;
-                break;
+                return false;
             }
         }
 
-        if (!expired)
-        {
-            *rate = (microseconds_get_clock() * kNumberOfBitsMeasured) / (uint32_t)(currentTicks - startTicks);
+        // 计算出实际检测到的波特率值
+        uint32_t calculatedBaud =
+            (microseconds_get_clock() * (kNumberOfBitsForFirstByteMeasured + kNumberOfBitsForSecondByteMeasured)) /
+            (uint32_t)(firstByteTotalTicks + secondByteTotalTicks);
+        // 对实际检测出的波特率值做对齐处理
+        // 公式：rounded = stepSize * (value/stepSize + .5)
+        *rate = ((((calculatedBaud * 10) / kAutobaudStepSize) + 5) / 10) * kAutobaudStepSize;
 
-            return true;
-        }
-        else
-        {
-            // The timer has expired meaning it has been too long since an
-            // edge has been detected, reset detection
-            s_initialEdge = currentEdge;
-            return false;
-        }
+        return true;
     }
     else
     {

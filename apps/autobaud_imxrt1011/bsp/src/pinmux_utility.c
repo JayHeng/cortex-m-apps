@@ -121,9 +121,19 @@ void disable_autobaud_pin_irq(void)
     s_pin_irq_func = 0;
 }
 
+#define AUTOBAUD_PIN_DEBOUNCE_READ_COUNT (20U)
+
 uint32_t read_autobaud_pin(void)
 {
-    return GPIO_PinRead(UART1_RX_GPIO_BASE, UART1_RX_GPIO_PIN_NUM);
+    // Sample the pin a number of times
+    uint32_t readCount = 0;
+    for (uint32_t i = 0; i < AUTOBAUD_PIN_DEBOUNCE_READ_COUNT; i++)
+    {
+        readCount += GPIO_PinRead(UART1_RX_GPIO_BASE, UART1_RX_GPIO_PIN_NUM);
+    }
+
+    // Most of measurements are the final value
+    return (readCount < (AUTOBAUD_PIN_DEBOUNCE_READ_COUNT / 2)) ? 0 : 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

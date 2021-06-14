@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2021 NXP
+ * Copyright (c) 2021, NXP
  * All rights reserved.
  *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
 #include "autobaud.h"
 #include "microseconds.h"
 
@@ -31,6 +30,8 @@ enum _autobaud_counts
 ////////////////////////////////////////////////////////////////////////////////
 // Prototypes
 ////////////////////////////////////////////////////////////////////////////////
+//! @brief 管脚下降沿跳变回调函数
+static void pin_transition_callback(void);
 //! @brief 读取GPIO管脚输入电平
 extern uint32_t read_autobaud_pin(void);
 
@@ -38,6 +39,16 @@ extern uint32_t read_autobaud_pin(void);
 // Variables
 ////////////////////////////////////////////////////////////////////////////////
 
+//!< 已检测到的下降沿个数
+static uint32_t s_transitionCount;
+//!< 0x5A 字节检测期间内对应计数值
+static uint64_t s_firstByteTotalTicks;
+//!< 0xA6 字节检测期间内对应计数值
+static uint64_t s_secondByteTotalTicks;
+//!< 上一次下降沿发生时系统计数值
+static uint64_t s_lastToggleTicks;
+//!< 下降沿之间最大超时对应计数值
+static uint64_t s_ticksBetweenFailure;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Code
@@ -45,6 +56,12 @@ extern uint32_t read_autobaud_pin(void);
 
 void autobaud_init(void)
 {
+    s_transitionCount = 0;
+    s_firstByteTotalTicks = 0;
+    s_secondByteTotalTicks = 0;
+    s_lastToggleTicks = 0;
+    // 计算出下降沿之间最大超时对应计数值
+    s_ticksBetweenFailure = microseconds_convert_to_ticks(kMaximumTimeBetweenFallingEdges);
     // 确保电平为高（空闲态）
     while (read_autobaud_pin() != 1);
 }
@@ -60,19 +77,10 @@ bool autobaud_get_rate(uint32_t *rate)
     uint32_t currentEdge = read_autobaud_pin();
     if (currentEdge != 1)
     {
-        uint64_t ticks = microseconds_get_ticks();
-        uint32_t transitionCount = 1;
-        // 0x5A 字节检测时间起点
-        uint64_t firstByteTotalTicks = ticks;
-        uint64_t secondByteTotalTicks;
-        uint64_t lastToggleTicks = ticks;
-        // 计算出下降沿之间最大超时对应计数值
-        uint64_t ticksBetweenFailure = microseconds_convert_to_ticks(kMaximumTimeBetweenFallingEdges);
+        pin_transition_callback();
         uint32_t previousEdge = currentEdge;
-        while (transitionCount < kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges)
+        while (s_transitionCount < kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges)
         {
-            // 获取当前系统计数值
-            ticks = microseconds_get_ticks();
             // 检查是否有电平翻转
             currentEdge = read_autobaud_pin();
             if (currentEdge != previousEdge)
@@ -80,39 +88,16 @@ bool autobaud_get_rate(uint32_t *rate)
                 // 仅当电平翻转是下降沿时
                 if (previousEdge == 1)
                 {
-                    // 计数这次检测到的下降沿
-                    transitionCount++;
-                    // 记录本次下降沿发生时系统计数值
-                    lastToggleTicks = ticks;
-                    // 得到 0x5A 字节检测期间内对应计数值
-                    if (transitionCount == kFirstByteRequiredFallingEdges)
-                    {
-                        firstByteTotalTicks = ticks - firstByteTotalTicks;
-                    }
-                    // 0xA6 字节检测时间起点
-                    else if (transitionCount == kFirstByteRequiredFallingEdges + 1)
-                    {
-                        secondByteTotalTicks = ticks;
-                    }
-                    // 得到 0xA6 字节检测期间内对应计数值
-                    else if (transitionCount == kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges)
-                    {
-                        secondByteTotalTicks = ticks - secondByteTotalTicks;
-                    }
+                    pin_transition_callback();
                 }
                 previousEdge = currentEdge;
-            }
-            // 如果本次下降沿与上次下降沿之间间隔过长，则从头开始检测
-            if ((ticks - lastToggleTicks) > ticksBetweenFailure)
-            {
-                return false;
             }
         }
 
         // 计算出实际检测到的波特率值
         uint32_t calculatedBaud =
             (microseconds_get_clock() * (kNumberOfBitsForFirstByteMeasured + kNumberOfBitsForSecondByteMeasured)) /
-            (uint32_t)(firstByteTotalTicks + secondByteTotalTicks);
+            (uint32_t)(s_firstByteTotalTicks + s_secondByteTotalTicks);
         // 对实际检测出的波特率值做对齐处理
         // 公式：rounded = stepSize * (value/stepSize + .5)
         *rate = ((((calculatedBaud * 10) / kAutobaudStepSize) + 5) / 10) * kAutobaudStepSize;
@@ -123,6 +108,47 @@ bool autobaud_get_rate(uint32_t *rate)
     {
         return false;
     }
+}
+
+void pin_transition_callback(void)
+{
+    // 获取当前系统计数值
+    uint64_t ticks = microseconds_get_ticks();
+    // 计数这次检测到的下降沿
+    s_transitionCount++;
+
+    // 如果本次下降沿与上次下降沿之间间隔过长，则从头开始检测
+    uint64_t delta = ticks - s_lastToggleTicks;
+    if (delta > s_ticksBetweenFailure)
+    {
+        s_transitionCount = 1;
+    }
+
+    switch (s_transitionCount)
+    {
+        case 1:
+            // 0x5A 字节检测时间起点
+            s_firstByteTotalTicks = ticks;
+            break;
+
+        case kFirstByteRequiredFallingEdges:
+            // 得到 0x5A 字节检测期间内对应计数值
+            s_firstByteTotalTicks = ticks - s_firstByteTotalTicks;
+            break;
+
+        case (kFirstByteRequiredFallingEdges + 1):
+            // 0xA6 字节检测时间起点
+            s_secondByteTotalTicks = ticks;
+            break;
+
+        case (kFirstByteRequiredFallingEdges + kSecondByteRequiredFallingEdges):
+            // 得到 0xA6 字节检测期间内对应计数值
+            s_secondByteTotalTicks = ticks - s_secondByteTotalTicks;
+            break;
+    }
+
+    // 记录本次下降沿发生时系统计数值
+    s_lastToggleTicks = ticks;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGProductVersion</name>
-                    <state>7.80.4.12487</state>
+                    <state>8.20.2.14834</state>
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
@@ -74,7 +74,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>MIMXRT1062xxx6A	NXP MIMXRT1062xxx6A</state>
+                    <state>MIMXRT1052xxx6B	NXP MIMXRT1052xxx6B</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -82,7 +82,7 @@
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGBufferedTerminalOutput</name>
@@ -99,7 +99,7 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>30</version>
-                    <state>41</state>
+                    <state>38</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
@@ -120,7 +120,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>MIMXRT1062xxx6A	NXP MIMXRT1062xxx6A</state>
+                    <state>MIMXRT1052xxx6B	NXP MIMXRT1052xxx6B</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -211,7 +211,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>DEBUG</state>
-                    <state>CPU_MIMXRT1062DVL6A</state>
+                    <state>CPU_MIMXRT1052DVL6B</state>
                     <state>PRINTF_FLOAT_ENABLE=0</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
                     <state>PRINTF_ADVANCED_ENABLE=0</state>
@@ -229,7 +229,7 @@
                 </option>
                 <option>
                     <name>CCPreprocLine</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCListCFile</name>
@@ -338,11 +338,11 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$/../../src</state>
-                    <state>$PROJ_DIR$/../../../src</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/drivers</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/utilities/debug_console_lite</state>
+                    <state>$PROJ_DIR$/../../src_v2</state>
+                    <state>$PROJ_DIR$/../../../src_v2</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/drivers</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/utilities/debug_console_lite</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/uart</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/lists</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
@@ -759,7 +759,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/iar/MIMXRT1062xxxxx_ram.icf</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/iar/MIMXRT1052xxxxx_ram.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -1077,15 +1077,15 @@
                 </option>
                 <option>
                     <name>ExePath</name>
-                    <state>$PROJ_DIR$\Release</state>
+                    <state>$PROJ_DIR$/Release</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
-                    <state>$PROJ_DIR$\Release\Obj</state>
+                    <state>$PROJ_DIR$/Release\Obj</state>
                 </option>
                 <option>
                     <name>ListPath</name>
-                    <state>$PROJ_DIR$\Release\List</state>
+                    <state>$PROJ_DIR$/Release\List</state>
                 </option>
                 <option>
                     <name>GEndianMode</name>
@@ -1123,7 +1123,7 @@
                 </option>
                 <option>
                     <name>OGProductVersion</name>
-                    <state>7.80.4.12487</state>
+                    <state>8.20.2.14834</state>
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
@@ -1131,7 +1131,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>MIMXRT1062xxx6A	NXP MIMXRT1062xxx6A</state>
+                    <state>MIMXRT1052xxx6A	NXP MIMXRT1052xxx6A</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -1177,7 +1177,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>MIMXRT1062xxx6A	NXP MIMXRT1062xxx6A</state>
+                    <state>MIMXRT1052xxx6A	NXP MIMXRT1052xxx6A</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -1268,7 +1268,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
-                    <state>CPU_MIMXRT1062DVL6A</state>
+                    <state>CPU_MIMXRT1052DVL6B</state>
                     <state>PRINTF_FLOAT_ENABLE=0</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
                     <state>PRINTF_ADVANCED_ENABLE=0</state>
@@ -1286,7 +1286,7 @@
                 </option>
                 <option>
                     <name>CCPreprocLine</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCListCFile</name>
@@ -1395,11 +1395,11 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$/../../src</state>
-                    <state>$PROJ_DIR$/../../../src</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/drivers</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/utilities/debug_console_lite</state>
+                    <state>$PROJ_DIR$/../../src_v2</state>
+                    <state>$PROJ_DIR$/../../../src_v2</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/drivers</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/utilities/debug_console_lite</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/uart</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/lists</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
@@ -1701,7 +1701,7 @@
                 </option>
                 <option>
                     <name>OCOutputOverride</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
@@ -1713,7 +1713,7 @@
                 </option>
                 <option>
                     <name>OOCObjCopyEnable</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
             </data>
         </settings>
@@ -1816,7 +1816,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1062/iar/MIMXRT1062xxxxx_ram.icf</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT1052/iar/MIMXRT1052xxxxx_ram.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -2116,44 +2116,38 @@
         </settings>
     </configuration>
     <group>
-        <name>IMXRT1062</name>
+        <name>IMXRT1052</name>
         <group>
             <name>bsp</name>
             <file>
-                <name>$PROJ_DIR$\..\..\src\app.h</name>
+                <name>$PROJ_DIR$\..\..\src_v2\board.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\board.c</name>
+                <name>$PROJ_DIR$\..\..\src_v2\board.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\board.h</name>
+                <name>$PROJ_DIR$\..\..\src_v2\clock_config.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\clock_config.c</name>
+                <name>$PROJ_DIR$\..\..\src_v2\clock_config.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
+                <name>$PROJ_DIR$\..\..\src_v2\pin_mux.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\src\hardware_init.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\src\pin_mux.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\src\pin_mux.h</name>
+                <name>$PROJ_DIR$\..\..\src_v2\pin_mux.h</name>
             </file>
         </group>
         <group>
             <name>coremark_bsp</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\src\core_portme.c</name>
+                <name>$PROJ_DIR$\..\..\..\src_v2\core_portme.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\src\cvt.c</name>
+                <name>$PROJ_DIR$\..\..\..\src_v2\cvt.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\src\ee_printf.c</name>
+                <name>$PROJ_DIR$\..\..\..\src_v2\ee_printf.c</name>
             </file>
         </group>
     </group>
@@ -2206,62 +2200,62 @@
             <group>
                 <name>drivers</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_clock.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_clock.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_clock.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_common.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_common.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_common.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_gpio.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_gpio.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_gpio.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_iomuxc.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_iomuxc.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_lpuart.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_lpuart.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_lpuart.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_pit.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\drivers\fsl_pit.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\drivers\fsl_pit.h</name>
                 </file>
             </group>
             <group>
                 <name>utilities</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1062\utilities\debug_console_lite\fsl_assert.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\utilities\debug_console_lite\fsl_assert.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1062\utilities\debug_console_lite\fsl_debug_console.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\utilities\debug_console_lite\fsl_debug_console.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1062\utilities\debug_console_lite\fsl_debug_console.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1052\utilities\debug_console_lite\fsl_debug_console.h</name>
                 </file>
             </group>
         </group>
         <group>
             <name>startup</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\iar\startup_MIMXRT1062.s</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\iar\startup_MIMXRT1052.s</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\system_MIMXRT1062.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1062\system_MIMXRT1062.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\devices\MIMXRT1052\system_MIMXRT1052.h</name>
             </file>
         </group>
     </group>

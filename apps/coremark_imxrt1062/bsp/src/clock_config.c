@@ -453,7 +453,8 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0);
 
     /* Configure PIT divider */   
-    CLOCK_SetMux(kCLOCK_PerclkMux, 1U); /* Set PERCLK_CLK source to OSC_CLK*/
+    //CLOCK_SetMux(kCLOCK_PerclkMux, 1U); /* Set PERCLK_CLK source to ipg clk*/
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0U); /* Set PERCLK_CLK source to OSC_CLK*/
     CLOCK_SetDiv(kCLOCK_PerclkDiv, 0U); /* Set PERCLK_CLK divider to 1 */
 
     /* Set SystemCoreClock variable. */

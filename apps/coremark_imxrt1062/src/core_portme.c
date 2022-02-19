@@ -142,7 +142,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#define CLOCKS_PER_SEC (24000000)
+#define CLOCKS_PER_SEC (CLOCK_GetPerClkFreq())
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1

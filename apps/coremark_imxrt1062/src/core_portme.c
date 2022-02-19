@@ -29,29 +29,63 @@
 	volatile ee_s32 seed4_volatile=ITERATIONS;
 	volatile ee_s32 seed5_volatile=0;
 
+/*
 volatile uint32_t s_timerHighCounter = 0;
 void PIT_IRQ_HANDLER(void)
 {
-    /* Clear interrupt flag.*/
+    // Clear interrupt flag.
     PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
     s_timerHighCounter++;
 }
 
 void timer_pit_init(void)
 {
-    /* Structure of initialize PIT */
+    s_timerHighCounter = 0;
+    // Structure of initialize PIT 
     pit_config_t pitConfig;
     PIT_GetDefaultConfig(&pitConfig);
-    /* Init pit module */
+    // Init pit module
     PIT_Init(PIT, &pitConfig);
-    /* Set max timer period for channel 0 */
+    // Set max timer period for channel 0 
     PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t)~0);
-    /* Enable timer interrupts for channel 0 */
+    // Enable timer interrupts for channel 0
     PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
-    /* Enable at the NVIC */
+    // Enable at the NVIC
     EnableIRQ(PIT_IRQ_ID);
-    /* Start channel 0 */
+    // Start channel 0
     PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+*/
+
+void timer_pit_init(void)
+{
+    // PIT clock gate control ON
+    CLOCK_EnableClock(kCLOCK_Pit);
+
+    // Turn on PIT: MDIS = 0, FRZ = 0
+    PIT->MCR = 0x00;
+
+    // Set up timer 1 to max value
+    PIT->CHANNEL[1].LDVAL = 0xFFFFFFFF;          // setup timer 1 for maximum counting period
+    PIT->CHANNEL[1].TCTRL = 0;                   // Disable timer 1 interrupts
+    PIT->CHANNEL[1].TFLG = 1;                    // clear the timer 1 flag
+    PIT->CHANNEL[1].TCTRL |= PIT_TCTRL_CHN_MASK; // chain timer 1 to timer 0
+    PIT->CHANNEL[1].TCTRL |= PIT_TCTRL_TEN_MASK; // start timer 1
+
+    // Set up timer 0 to max value
+    PIT->CHANNEL[0].LDVAL = 0xFFFFFFFF;         // setup timer 0 for maximum counting period
+    PIT->CHANNEL[0].TFLG = 1;                   // clear the timer 0 flag
+    PIT->CHANNEL[0].TCTRL = PIT_TCTRL_TEN_MASK; // start timer 0
+}
+
+void timer_pit_deinit(void)
+{
+    // Turn off PIT: MDIS = 1, FRZ = 0
+    PIT->CHANNEL[1].TCTRL = 0; // stop timer 1
+    PIT->CHANNEL[0].TCTRL = 0; // stop timer 1
+    PIT->CHANNEL[1].LDVAL = 0;
+    PIT->CHANNEL[0].LDVAL = 0;
+    PIT->MCR |= PIT_MCR_MDIS_MASK;
 }
 
 /* Porting : Timing functions
@@ -59,6 +93,7 @@ void timer_pit_init(void)
 	e.g. Read value from on board RTC, read value from cpu clock cycles performance counter etc. 
 	Sample implementation for standard time.h and windows.h definitions included.
 */
+/*
 CORETIMETYPE barebones_clock() {
     uint64_t retVal;
     uint32_t high;
@@ -72,6 +107,35 @@ CORETIMETYPE barebones_clock() {
 
     return retVal;
 }
+*/
+
+CORETIMETYPE barebones_clock() {
+    uint64_t valueH;
+    volatile uint32_t valueL;
+
+#if defined(FSL_FEATURE_PIT_HAS_LIFETIME_TIMER) && (FSL_FEATURE_PIT_HAS_LIFETIME_TIMER == 1)
+    // Note: first read LTMR64H and then LTMR64L. LTMR64H will have the value
+    //  of CVAL1 at the time of the first access, LTMR64L will have the value of CVAL0 at the
+    //  time of the first access, therefore the application does not need to worry about carry-over
+    //  effects of the running counter.
+    valueH = PIT->LTMR64H;
+    valueL = PIT->LTMR64L;
+#else
+    // Make sure that there are no rollover of valueL.
+    // Because the valueL always decreases, so, if the formal valueL is greater than
+    // current value, that means the valueH is updated during read valueL.
+    // In this case, we need to re-update valueH and valueL.
+    do
+    {
+        valueL = PIT->CHANNEL[0].CVAL;
+        valueH = PIT->CHANNEL[1].CVAL;
+    } while (valueL < PIT->CHANNEL[0].CVAL);
+#endif // FSL_FEATURE_PIT_HAS_LIFETIME_TIMER
+
+    // Invert to turn into an up counter
+    return ~((valueH << 32) | valueL);
+}
+
 /* Define : TIMER_RES_DIVIDER
 	Divider to trade off timer resolution and total time that can be measured.
 
@@ -157,6 +221,8 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 void portable_fini(core_portable *p)
 {
 	p->portable_id=0;
+    
+    timer_pit_deinit();
 }
 
 

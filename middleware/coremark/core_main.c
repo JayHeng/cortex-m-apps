@@ -285,7 +285,19 @@ MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 	total_errors+=check_data_types();
 	/* and report results */
 	ee_printf("CoreMark Size    : %lu\n",(ee_u32)results[0].size);
-	ee_printf("Total ticks      : %lu\n",(ee_u32)total_time);
+	//ee_printf("Total ticks      : %lu\n",(ee_u32)total_time);
+    // '%llu' doesn't work
+    //ee_printf("Total ticks      : %llu\n",total_time);
+    if (total_time & (~(uint64_t)0xFFFFFFFF))
+    {
+        ee_printf("Total ticks      : ");
+        ee_printf("%lu",  (ee_u32)(total_time / 1000000000));
+        ee_printf("%lu\n",(ee_u32)(total_time % 1000000000));
+    }
+    else
+    {
+        ee_printf("Total ticks      : %lu\n",(ee_u32)total_time);
+    }
 #if HAS_FLOAT
 	ee_printf("Total time (secs): %f\n",time_in_secs(total_time));
 	if (time_in_secs(total_time) > 0)

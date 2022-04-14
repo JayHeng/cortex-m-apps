@@ -3,16 +3,7 @@
  */
 #define _GNU_SOURCE
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <time.h>
-#include <string.h>
-#include <unistd.h>
+#include "mbw.h"
 
 /* how many runs to average by default */
 #define DEFAULT_NR_LOOPS 10

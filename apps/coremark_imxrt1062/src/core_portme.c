@@ -78,6 +78,34 @@ void timer_pit_init(void)
     PIT->CHANNEL[0].TCTRL = PIT_TCTRL_TEN_MASK; // start timer 0
 }
 
+void timer_pit_sdk_init(void)
+{
+    // PIT clock gate control ON
+    CLOCK_EnableClock(kCLOCK_Pit);
+
+    pit_config_t pitConfig;
+    PIT_GetDefaultConfig(&pitConfig);
+    // Init pit module
+    PIT_Init(PIT, &pitConfig);
+    // Set max timer period for channel 1
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_1, (uint32_t)~0);
+    // Disable timer interrupts for channel 1
+    PIT_DisableInterrupts(PIT, kPIT_Chnl_1, kPIT_TimerInterruptEnable);
+    // Clear timer channel 1 flag
+    PIT_ClearStatusFlags(PIT, kPIT_Chnl_1, kPIT_TimerFlag);
+    // Chain timer channel 1 to channel 0
+    PIT_SetTimerChainMode(PIT, kPIT_Chnl_1, true);
+    // Start timer channel 1
+    PIT_StartTimer(PIT, kPIT_Chnl_1);
+
+    // Set max timer period for channel 0
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (uint32_t)~0);
+    // Clear timer channel 0 flag
+    PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+    // Start timer channel 0
+    PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
 void timer_pit_deinit(void)
 {
     // Turn off PIT: MDIS = 1, FRZ = 0
@@ -86,6 +114,16 @@ void timer_pit_deinit(void)
     PIT->CHANNEL[1].LDVAL = 0;
     PIT->CHANNEL[0].LDVAL = 0;
     PIT->MCR |= PIT_MCR_MDIS_MASK;
+}
+
+void timer_pit_sdk_deinit(void)
+{
+    // Stop timer channel 1
+    PIT_StopTimer(PIT, kPIT_Chnl_1);
+    // Stop timer channel 0
+    PIT_StopTimer(PIT, kPIT_Chnl_0);
+    // Deinit pit module
+    PIT_Deinit(PIT);
 }
 
 /* Porting : Timing functions
@@ -205,7 +243,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     /* Init board hardware. */
     BOARD_InitHardware();
     /* Init timer for microsecond function. */
-    timer_pit_init();
+    timer_pit_sdk_init();
     
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
 		ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");
@@ -222,7 +260,7 @@ void portable_fini(core_portable *p)
 {
 	p->portable_id=0;
     
-    timer_pit_deinit();
+    timer_pit_sdk_deinit();
 }
 
 

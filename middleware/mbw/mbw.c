@@ -94,7 +94,7 @@ long *make_array(unsigned long long asize)
 double worker(unsigned long long asize, long *a, long *b, int type, unsigned long long block_size)
 {
     unsigned long long t;
-    struct timeval starttime, endtime;
+    timeval_t starttime, endtime;
     double te;
     unsigned int long_size=sizeof(long);
     /* array size in bytes */

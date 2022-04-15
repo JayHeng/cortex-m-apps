@@ -33,9 +33,9 @@
  */
 
 #include "fsl_device_registers.h"
-#include "fsl_debug_console.h"
 #include "board.h"
 #include "app.h"
+#include "mbw.h"
 
 /*******************************************************************************
  * Definitions
@@ -45,6 +45,10 @@
  * Prototypes
  ******************************************************************************/
 
+extern void timer_pit_init(void);
+extern void timer_pit_deinit(void);
+
+extern int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, uint32_t mem_start, uint32_t mem_size);
    
 /*******************************************************************************
  * Code
@@ -56,8 +60,9 @@ int main(void)
 {
     /* Init board hardware. */
     BOARD_InitHardware();
-
-    PRINTF("\r\n########## Print out from target board ##########\r\n");
+    timer_pit_init();
+    
+    mbw_main(0, 1, 0, 0x400, 0x202C0000, 0x80000);
 
     while (1)
     {

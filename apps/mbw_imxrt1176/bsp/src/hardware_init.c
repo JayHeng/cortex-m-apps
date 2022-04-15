@@ -37,8 +37,4 @@ void BOARD_InitHardware(void)
     print_rt_clocks();
 }
 
-uint32_t COREMARK_GetTimerClockFreq(void)
-{
-    return CLOCK_GetRootClockFreq(kCLOCK_Root_M7_Systick);
-}
 /*${function:end}*/

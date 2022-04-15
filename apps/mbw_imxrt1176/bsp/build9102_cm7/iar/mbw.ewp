@@ -212,9 +212,9 @@
                     <name>CCDefines</name>
                     <state>DEBUG</state>
                     <state>CPU_MIMXRT1176DVMAA_cm7</state>
-                    <state>PRINTF_FLOAT_ENABLE=0</state>
+                    <state>PRINTF_FLOAT_ENABLE=1</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
-                    <state>PRINTF_ADVANCED_ENABLE=0</state>
+                    <state>PRINTF_ADVANCED_ENABLE=1</state>
                     <state>SCANF_ADVANCED_ENABLE=0</state>
                 </option>
                 <option>
@@ -276,7 +276,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>11111110</state>
+                    <state>00000000</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -345,7 +345,7 @@
                     <state>$PROJ_DIR$/../../../../../components_v2/uart</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/lists</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
-                    <state>$PROJ_DIR$/../../../../../middleware/coremark</state>
+                    <state>$PROJ_DIR$/../../../../../middleware/mbw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -361,7 +361,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -370,7 +370,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCPosIndRopi</name>
@@ -1268,9 +1268,9 @@
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
                     <state>CPU_MIMXRT1176DVMAA_cm7</state>
-                    <state>PRINTF_FLOAT_ENABLE=0</state>
+                    <state>PRINTF_FLOAT_ENABLE=1</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
-                    <state>PRINTF_ADVANCED_ENABLE=0</state>
+                    <state>PRINTF_ADVANCED_ENABLE=1</state>
                     <state>SCANF_ADVANCED_ENABLE=0</state>
                 </option>
                 <option>
@@ -1401,7 +1401,7 @@
                     <state>$PROJ_DIR$/../../../../../components_v2/uart</state>
                     <state>$PROJ_DIR$/../../../../../components_v2/lists</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
-                    <state>$PROJ_DIR$/../../../../../middleware/coremark</state>
+                    <state>$PROJ_DIR$/../../../../../middleware/mbw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1703,7 +1703,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>coremark.bin</state>
+                    <state>mbw.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -1721,7 +1721,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>48</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -2171,6 +2171,18 @@
         </group>
         <group>
             <name>middleware</name>
+            <group>
+                <name>mbw</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw_port.c</name>
+                </file>
+            </group>
         </group>
         <group>
             <name>platform</name>
@@ -2226,6 +2238,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1176\drivers\fsl_lpuart.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1176\drivers\fsl_pit.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1176\drivers\fsl_pit.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT1176\drivers\fsl_pmu.c</name>

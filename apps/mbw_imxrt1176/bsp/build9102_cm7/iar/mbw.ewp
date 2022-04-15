@@ -2180,7 +2180,7 @@
                     <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw_port.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw_utils.c</name>
                 </file>
             </group>
         </group>
@@ -2280,5 +2280,8 @@
     </group>
     <file>
         <name>$PROJ_DIR$\..\..\..\src\main.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\..\..\..\src\mbw_port.c</name>
     </file>
 </project>

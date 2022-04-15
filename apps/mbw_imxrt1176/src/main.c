@@ -45,9 +45,6 @@
  * Prototypes
  ******************************************************************************/
 
-extern void timer_pit_init(void);
-extern void timer_pit_deinit(void);
-
 extern int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, uint32_t mem_start, uint32_t mem_size);
    
 /*******************************************************************************
@@ -60,7 +57,7 @@ int main(void)
 {
     /* Init board hardware. */
     BOARD_InitHardware();
-    timer_pit_init();
+    timer_init();
     
     mbw_main(0, 1, 0, 0x400, 0x202C0000, 0x80000);
 

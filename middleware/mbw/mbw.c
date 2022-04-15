@@ -70,7 +70,7 @@ long *make_array(unsigned long long asize)
     unsigned int long_size=sizeof(long);
     long *a;
 
-    a=calloc(asize, long_size);
+    a=my_calloc(asize, long_size);
 
     if(NULL==a) {
         PRINTF("Error allocating memory");
@@ -168,9 +168,10 @@ void printout(double te, double kt, int type)
 * ---- showavg      : Display average
 * ---- nr_loops     : number of runs per test
 * ---- block_size   : block size in bytes for - testno = 2
-* ---- kt           : array_size_in_KiB
+* ---- mem_start    : array start address
+* ---- mem_size     : array_size_in_Byte
 */
-int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, double kt) 
+int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, uint32_t mem_start, uint32_t mem_size) 
 //int main(int argc, char **argv)
 {
     unsigned int long_size=0;
@@ -192,11 +193,21 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
     /* what tests to run (-t x) */
     int tests[MAX_TESTS];
     //double mt=0; /* MiBytes transferred == array size in MiB */
+    double kt=0; /* MiBytes transferred == array size in KiB */
+    kt = mem_size / 1024.0;
     int quiet=0; /* suppress extra messages */
 
     tests[0]=0;
     tests[1]=0;
     tests[2]=0;
+    
+    g_myMem.memStart = mem_start;
+    g_myMem.memSize = mem_size;
+    for (uint32_t i = 0; i < MAX_MEM_REGIONS; i++)
+    {
+        g_myMem.regionStart[i] = 0;
+        g_myMem.regionSize[i] = 0;
+    }
 
 #if 0
     while((o=getopt(argc, argv, "haqn:t:b:")) != EOF) {
@@ -290,8 +301,8 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
         }
     }
 
-    a=make_array(asize);
-    b=make_array(asize);
+    a=make_array(asize/2);
+    b=make_array(asize/2);
 
     /* ------------------------------------------------------ */
     if(!quiet) {
@@ -315,8 +326,8 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
         }
     }
 
-    free(a);
-    free(b);
+    my_free(a);
+    my_free(b);
     return 0;
 }
 

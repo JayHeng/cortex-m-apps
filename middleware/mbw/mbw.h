@@ -19,4 +19,18 @@ typedef struct _timezone {
 int gettimeofday(timeval_t *tv, timezone_t *tz);
 void *mempcpy(void *restrict dest, const void *restrict src, size_t n);
 
+#define MAX_MEM_REGIONS (8)
+
+typedef struct _my_mem
+{
+   uint32_t memStart;
+   uint32_t memSize;
+   uint32_t regionStart[MAX_MEM_REGIONS];
+   uint32_t regionSize[MAX_MEM_REGIONS];
+} my_mem_t;
+
+extern my_mem_t g_myMem;
+void *my_calloc(size_t nitems, size_t size);
+void my_free(void *ptr);
+
 #endif // __MBW_H__

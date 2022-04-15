@@ -92,4 +92,12 @@ int gettimeofday(timeval_t *tv, timezone_t *tz)
     return 0;
 }
 
+// From glibc-2.26
+/* Copy memory to memory until the specified number of bytes
+   has been copied, return pointer to following byte.
+   Overlap is NOT handled correctly. */
+void *mempcpy(void *restrict dest, const void *restrict src, size_t n)
+{
+    return (void *)((uint8_t *)memcpy(dest, src, n) + n);
+}
 

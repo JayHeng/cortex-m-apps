@@ -17,5 +17,6 @@ typedef struct _timezone {
 } timezone_t;
 
 int gettimeofday(timeval_t *tv, timezone_t *tz);
+void *mempcpy(void *restrict dest, const void *restrict src, size_t n);
 
 #endif // __MBW_H__

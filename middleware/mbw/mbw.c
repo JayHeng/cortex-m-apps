@@ -159,34 +159,46 @@ void printout(double te, double mt, int type)
 }
 
 /* ------------------------------------------------------ */
-
-int main(int argc, char **argv)
+/*******************************************************************************
+* Input parameters:
+* ---- testno       : Test set type: 1, 2, 3
+                      1: memcpy test
+                      2: dumb (b[i]=a[i] style) test
+                      3: memcpy test with fixed block size
+* ---- showavg      : Display average
+* ---- nr_loops     : number of runs per test
+* ---- block_size   : block size in bytes for - testno = 2
+* ---- mt           : array_size_in_MiB
+*/
+int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, double mt) 
+//int main(int argc, char **argv)
 {
     unsigned int long_size=0;
     double te, te_sum; /* time elapsed */
     unsigned long long asize=0; /* array size (elements in array) */
     int i;
     long *a, *b; /* the two arrays to be copied from/to */
-    int o; /* getopt options */
-    unsigned long testno;
+    //int o; /* getopt options */
+    //unsigned long testno;
 
     /* options */
 
     /* how many runs to average? */
-    int nr_loops=DEFAULT_NR_LOOPS;
+    //int nr_loops=DEFAULT_NR_LOOPS;
     /* fixed memcpy block size for -t2 */
-    unsigned long long block_size=DEFAULT_BLOCK_SIZE;
+    //unsigned long long block_size=DEFAULT_BLOCK_SIZE;
     /* show average, -a */
-    int showavg=1;
+    //int showavg=1;
     /* what tests to run (-t x) */
     int tests[MAX_TESTS];
-    double mt=0; /* MiBytes transferred == array size in MiB */
+    //double mt=0; /* MiBytes transferred == array size in MiB */
     int quiet=0; /* suppress extra messages */
 
     tests[0]=0;
     tests[1]=0;
     tests[2]=0;
 
+#if 0
     while((o=getopt(argc, argv, "haqn:t:b:")) != EOF) {
         switch(o) {
             case 'h':
@@ -221,6 +233,22 @@ int main(int argc, char **argv)
                 break;
         }
     }
+#else
+    if (!nr_loops)
+    {
+        nr_loops=DEFAULT_NR_LOOPS;
+    }
+
+    if ((testno > 0) || (testno <= MAX_TESTS))
+    {
+        tests[testno-1]=1;
+    }
+
+    if (!block_size)
+    {
+        block_size=DEFAULT_BLOCK_SIZE;
+    }
+#endif
 
     /* default is to run all tests if no specific tests were requested */
     if( (tests[0]+tests[1]+tests[2]) == 0) {
@@ -229,12 +257,14 @@ int main(int argc, char **argv)
         tests[2]=1;
     }
 
+#if 0
     if(optind<argc) {
         mt=strtoul(argv[optind++], (char **)NULL, 10);
     } else {
         PRINTF("Error: no array size given!\n");
         exit(1);
     }
+#endif
 
     if(0>=mt) {
         PRINTF("Error: array size wrong!\n");
@@ -244,7 +274,7 @@ int main(int argc, char **argv)
     /* ------------------------------------------------------ */
 
     long_size=sizeof(long); /* the size of long on this platform */
-    asize=1024*1024/long_size*mt; /* how many longs then in one array? */
+    asize=(unsigned long long)(1024*1024/long_size*mt); /* how many longs then in one array? */
 
     if(asize*long_size < block_size) {
         PRINTF("Error: array size larger than block size (%llu bytes)!\n", block_size);

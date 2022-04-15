@@ -33,4 +33,9 @@ extern my_mem_t g_myMem;
 void *my_calloc(size_t nitems, size_t size);
 void my_free(void *ptr);
 
+void timer_init(void);
+void timer_deinit(void);
+uint64_t timer_clock(void);
+uint32_t timer_clocks_per_sec(void);
+
 #endif // __MBW_H__

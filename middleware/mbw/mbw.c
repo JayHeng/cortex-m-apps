@@ -134,12 +134,12 @@ double worker(unsigned long long asize, long *a, long *b, int type, unsigned lon
 
 /* pretty print worker's output in human-readable terms */
 /* te: elapsed time in seconds
- * mt: amount of transferred data in MiB
+ * kt: amount of transferred data in KiB
  * type: see 'worker' above
  *
  * return value: -
  */
-void printout(double te, double mt, int type)
+void printout(double te, double kt, int type)
 {
     switch(type) {
         case TEST_MEMCPY:
@@ -153,8 +153,8 @@ void printout(double te, double mt, int type)
             break;
     }
     PRINTF("Elapsed: %.5f\t", te);
-    PRINTF("MiB: %.5f\t", mt);
-    PRINTF("Copy: %.3f MiB/s\n", mt/te);
+    PRINTF("MiB: %.5f\t", kt/1024);
+    PRINTF("Copy: %.3f MiB/s\n", kt/1024/te);
     return;
 }
 
@@ -168,9 +168,9 @@ void printout(double te, double mt, int type)
 * ---- showavg      : Display average
 * ---- nr_loops     : number of runs per test
 * ---- block_size   : block size in bytes for - testno = 2
-* ---- mt           : array_size_in_MiB
+* ---- kt           : array_size_in_KiB
 */
-int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, double mt) 
+int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, double kt) 
 //int main(int argc, char **argv)
 {
     unsigned int long_size=0;
@@ -259,14 +259,14 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
 
 #if 0
     if(optind<argc) {
-        mt=strtoul(argv[optind++], (char **)NULL, 10);
+        kt=strtoul(argv[optind++], (char **)NULL, 10);
     } else {
         PRINTF("Error: no array size given!\n");
         exit(1);
     }
 #endif
 
-    if(0>=mt) {
+    if(0>=kt) {
         PRINTF("Error: array size wrong!\n");
         exit(1);
     }
@@ -274,7 +274,8 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
     /* ------------------------------------------------------ */
 
     long_size=sizeof(long); /* the size of long on this platform */
-    asize=(unsigned long long)(1024*1024/long_size*mt); /* how many longs then in one array? */
+    //asize=(1024*1024/long_size*mt); /* how many longs then in one array? */
+    asize=(unsigned long long)(1024/long_size*kt); /* how many longs then in one array? */
 
     if(asize*long_size < block_size) {
         PRINTF("Error: array size larger than block size (%llu bytes)!\n", block_size);
@@ -305,11 +306,11 @@ int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t bloc
                 te=worker(asize, a, b, testno, block_size);
                 te_sum+=te;
                 PRINTF("%d\t", i);
-                printout(te, mt, testno);
+                printout(te, kt, testno);
             }
             if(showavg) {
                 PRINTF("AVG\t");
-                printout(te_sum/nr_loops, mt, testno);
+                printout(te_sum/nr_loops, kt, testno);
             }
         }
     }

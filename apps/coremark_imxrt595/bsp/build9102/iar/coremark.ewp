@@ -215,7 +215,7 @@
                     <state>BOOT_HEADER_ENABLE=1</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>MCUXPRESSO_SDK</state>
-                    <state>ITERATIONS=40000</state>
+                    <state>ITERATIONS=20000</state>
                     <state>COMPILER_VERSION="IAR EWARM v9.10.2"</state>
                 </option>
                 <option>
@@ -337,8 +337,8 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$/../src</state>
                     <state>$PROJ_DIR$/../../src</state>
+                    <state>$PROJ_DIR$/../../../src</state>
                     <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/drivers</state>
                     <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S</state>
                     <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/utilities/str</state>
@@ -2264,6 +2264,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_common_arm.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_ctimer.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_ctimer.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_flexcomm.c</name>

@@ -7,9 +7,15 @@
 */ 
 #include "coremark.h"
 #include "core_portme.h"
-#include "app.h"
 #include "clock_config.h"
-#include "fsl_gpt.h"
+#include "fsl_ctimer.h"
+#include "fsl_debug_console.h"
+#include "pin_mux.h"
+#include "board.h"
+
+#define CTIMER CTIMER2                  /* Timer 3 */
+#define CTIMER_MAT0_OUT kCTIMER_Match_0 /* Match output 0 */
+#define CTIMER_CLK_FREQ CLOCK_GetCtimerClkFreq(2)
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -29,31 +35,53 @@
 	volatile ee_s32 seed4_volatile=ITERATIONS;
 	volatile ee_s32 seed5_volatile=0;
 
+/*******************************************************************************
+ * Prototypes
+ ******************************************************************************/
+void ctimer_match0_callback(uint32_t flags);
+
+/* Array of function pointers for callback for each channel */
+ctimer_callback_t ctimer_callback_table[] = {
+    ctimer_match0_callback, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+
+/*******************************************************************************
+ * Variables
+ ******************************************************************************/
+
+/* Match Configuration for Channel 0 */
+static ctimer_match_config_t matchConfig0;
+
+/*******************************************************************************
+ * Code
+ ******************************************************************************/
+
 volatile uint32_t s_timerHighCounter = 0;
-void SysTick_Handler(void)
+void ctimer_match0_callback(uint32_t flags)
 {
-    if (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk)
-    {
-        SysTick->VAL = 0;
-    }
     s_timerHighCounter++;
 }
 
 void timer_init(void)
 {
-#if __CORTEX_M == 7
-    SysTick->LOAD      = (uint32_t)(0xFFFFFF);                       /* set reload register */
-    NVIC_SetPriority(SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL); /* set Priority for Systick Interrupt */
-    SysTick->VAL  = 0UL;                                             /* Load the SysTick Counter Value */
-    SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-#elif __CORTEX_M == 4
-    gpt_config_t gpt;
-    GPT_GetDefaultConfig(&gpt);
-    GPT_Init(GPT2, &gpt);
-    /* Using 32K osc as timer clock source */
-    GPT_SetClockSource(GPT2, kGPT_ClockSource_LowFreq);
-    GPT_StartTimer(GPT2);
-#endif
+    ctimer_config_t config;
+
+    /* Use 16 MHz clock for the Ctimer2 */
+    CLOCK_AttachClk(kMAIN_CLK_to_CTIMER2);
+
+    CTIMER_GetDefaultConfig(&config);
+    CTIMER_Init(CTIMER, &config);
+
+    /* Configuration 0 */
+    matchConfig0.enableCounterReset = true;
+    matchConfig0.enableCounterStop = false;
+    matchConfig0.matchValue = (uint32_t)~0;
+    matchConfig0.outControl = kCTIMER_Output_Toggle;
+    matchConfig0.outPinInitState = false;
+    matchConfig0.enableInterrupt = true;
+
+    CTIMER_RegisterCallBack(CTIMER, &ctimer_callback_table[0], kCTIMER_SingleCallback);
+    CTIMER_SetupMatch(CTIMER, CTIMER_MAT0_OUT, &matchConfig0);
+    CTIMER_StartTimer(CTIMER);
 }
 
 /* Porting : Timing functions
@@ -62,19 +90,15 @@ void timer_init(void)
 	Sample implementation for standard time.h and windows.h definitions included.
 */
 CORETIMETYPE barebones_clock() {
-    uint64_t retVal;
-#if __CORTEX_M == 7
+    uint64_t retVal = 0;
     uint32_t high;
     uint32_t low;
     do
     {
         high = s_timerHighCounter;
-        low = (~(SysTick->VAL)) & 0xFFFFFF;
+        low = CTIMER_GetTimerCountValue(CTIMER);
     } while (high != s_timerHighCounter);
-    retVal = ((uint64_t)high << 24U) + low;
-#elif __CORTEX_M == 4
-    retVal = GPT_GetCurrentTimerCount(GPT2);
-#endif
+    retVal = ((uint64_t)high << 32U) + low;
 
     return retVal;
 }
@@ -84,11 +108,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#if __CORTEX_M == 7
-#define CLOCKS_PER_SEC (100000)
-#elif __CORTEX_M == 4
-#define CLOCKS_PER_SEC (32000)
-#endif
+#define CLOCKS_PER_SEC (16000000)
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
@@ -149,7 +169,9 @@ ee_u32 default_num_contexts=1;
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
     /* Init board hardware. */
-    BOARD_InitHardware();
+    BOARD_InitPins();
+    BOARD_BootClockRUN();
+    BOARD_InitDebugConsole();
     /* Init timer for microsecond function. */
     timer_init();
     

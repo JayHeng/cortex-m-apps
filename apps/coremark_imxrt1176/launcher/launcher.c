@@ -35,7 +35,7 @@ void HardFault_Handler(void)
 
 static void boot_cm4_app(void)
 {
-    IOMUXC_LPSR_GPR->GPR0 = IOMUXC_LPSR_GPR_GPR0_CM4_INIT_VTOR_LOW(CM4_LOADER_START);
+    IOMUXC_LPSR_GPR->GPR0 = IOMUXC_LPSR_GPR_GPR0_CM4_INIT_VTOR_LOW((CM4_LOADER_START & 0xFFFF) >> 3);
     IOMUXC_LPSR_GPR->GPR1 = IOMUXC_LPSR_GPR_GPR1_CM4_INIT_VTOR_HIGH(CM4_LOADER_START >> 16);
 
     /* If CM4 is already running (released by debugger), then reset the CM4.

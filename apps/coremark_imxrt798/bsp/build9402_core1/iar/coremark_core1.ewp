@@ -74,7 +74,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>MIMXRT798S_M33_0	NXP MIMXRT798S_M33_0</state>
+                    <state>MIMXRT798S_M33_1	NXP MIMXRT798S_M33_1</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -120,7 +120,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>MIMXRT798S_M33_0	NXP MIMXRT798S_M33_0</state>
+                    <state>MIMXRT798S_M33_1	NXP MIMXRT798S_M33_1</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -678,7 +678,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>sdk20-app.bin</state>
+                    <state>core1_image.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>

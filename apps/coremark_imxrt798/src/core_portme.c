@@ -179,7 +179,11 @@ ee_u32 default_num_contexts=1;
 	Target specific initialization code 
 	Test for some common mistakes.
 */
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 extern void set_power(void);
+extern void APP_BootCore1(void);
+extern void APP_CopyCore1Image(void);
+#endif
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
 //    *(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
@@ -196,6 +200,9 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 
     *(uint32_t*)0x40033000 = 0x85000001;
     *(uint32_t*)0x40034000 = 0x85000001;
+
+    APP_CopyCore1Image();
+    APP_BootCore1();
 
     ee_printf(".text section in SRAM P4\n");
     ee_printf(".data section in SRAM P16\n");

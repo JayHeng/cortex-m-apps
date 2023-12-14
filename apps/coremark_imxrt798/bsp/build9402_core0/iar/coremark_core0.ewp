@@ -725,23 +725,25 @@
                 </option>
                 <option>
                     <name>IlinkKeepSymbols</name>
-                    <state></state>
+                    <state>
+
+_coremark_core1_image</state>
                 </option>
                 <option>
                     <name>IlinkRawBinaryFile</name>
-                    <state></state>
+                    <state>$PROJ_DIR$/../../build9402_core1/iar/debug/core1_image.bin</state>
                 </option>
                 <option>
                     <name>IlinkRawBinarySymbol</name>
-                    <state></state>
+                    <state>_coremark_core1_image</state>
                 </option>
                 <option>
                     <name>IlinkRawBinarySegment</name>
-                    <state></state>
+                    <state>__core1_image</state>
                 </option>
                 <option>
                     <name>IlinkRawBinaryAlign</name>
-                    <state></state>
+                    <state>4</state>
                 </option>
                 <option>
                     <name>IlinkDefines</name>
@@ -2208,6 +2210,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\src_core0\board.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\src_core0\boot_core1.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\src_core0\clock_config.c</name>

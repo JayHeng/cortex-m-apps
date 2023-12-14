@@ -8,14 +8,16 @@
 #include "coremark.h"
 #include "core_portme.h"
 #include "clock_config.h"
-#include "fsl_mrt.h"
 #include "fsl_debug_console.h"
 #include "pin_mux.h"
 #include "board.h"
 
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+#include "fsl_mrt.h"
 #define MRT          MRT0             /* Timer 0 */
 #define MRT_CHANNEL  kMRT_Channel_0
 #define MRT_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
+#endif
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -50,6 +52,8 @@
  ******************************************************************************/
 
 volatile uint32_t s_timerHighCounter = 0;
+
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 void MRT0_IRQHandler(void)
 {
     /* Clear interrupt flag.*/
@@ -80,6 +84,12 @@ void timer_init(void)
     
     MRT_StartTimer(MRT0, MRT_CHANNEL, MRT_CHANNEL_INTVAL_IVALUE_MASK);
 }
+#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+void timer_init(void)
+{
+
+}
+#endif
 
 /* Porting : Timing functions
 	How to capture time and convert to seconds must be ported to whatever is supported by the platform.
@@ -93,7 +103,9 @@ CORETIMETYPE barebones_clock() {
     do
     {
         high = s_timerHighCounter;
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
         low = MRT_GetCurrentTimerCount(MRT, MRT_CHANNEL);
+#endif
     } while (high != s_timerHighCounter);
     retVal = ((uint64_t)high << 24U) + low;
 
@@ -105,7 +117,11 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 #define CLOCKS_PER_SEC MRT_CLK_FREQ
+#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+#define CLOCKS_PER_SEC 10000
+#endif
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
@@ -169,20 +185,29 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 //    *(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
     //*(uint32_t*)0x40033000 = (*(uint32_t*)0x40033000) | 0x1;
     //*(uint32_t*)0x40034000 = (*(uint32_t*)0x40034000) | 0x1;
-    
-    *(uint32_t*)0x40033000 = 0x85000001;
-    *(uint32_t*)0x40034000 = 0x85000001;
-  
+
     /* Init board hardware. */
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    set_power();
     ee_printf("--------------------------------\n");
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+    set_power();
+
+    *(uint32_t*)0x40033000 = 0x85000001;
+    *(uint32_t*)0x40034000 = 0x85000001;
+
     ee_printf(".text section in SRAM P4\n");
     ee_printf(".data section in SRAM P16\n");
     ee_printf("STACK section in SRAM P0\n");
     ee_printf("i.MXRT798 core0 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
+#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+    ee_printf(".text section in SRAM P18\n");
+    ee_printf(".data section in SRAM P26\n");
+    ee_printf("STACK section in SRAM P26\n");
+    ee_printf("i.MXRT798 core1 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
+#endif
+
     /* Init timer for microsecond function. */
     timer_init();
     

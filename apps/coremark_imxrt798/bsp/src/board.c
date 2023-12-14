@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 NXP
+ * Copyright 2023 NXP
  * All rights reserved.
  *
  *
@@ -9,34 +9,38 @@
 #include <stdint.h>
 #include "fsl_common.h"
 #include "fsl_debug_console.h"
-#include "fsl_clock.h"
-#include "fsl_flexspi.h"
+#if defined(MIMXRT798S_cm33_core0_SERIES)
 #include "fsl_cache.h"
-#include "fsl_power.h"
+#endif
+#include "fsl_clock.h"
+#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
+#include "fsl_lpi2c.h"
+#endif /* SDK_I2C_BASED_COMPONENT_USED */
 #include "clock_config.h"
 #include "board.h"
-#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
-#include "fsl_i2c.h"
-#endif /* SDK_I2C_BASED_COMPONENT_USED */
-#if defined BOARD_USE_CODEC
-#include "fsl_i3c.h"
-#endif
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#define BOARD_FLEXSPI_DLL_LOCK_RETRY (10)
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+#define HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_READ   0
+#define HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_WRITE  1
+#define HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ  2
+#define HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE 3
+#define HYPERRAM_CMD_LUT_SEQ_IDX_REG_READ    4
+#define HYPERRAM_CMD_LUT_SEQ_IDX_REG_WRITE   5
+#define HYPERRAM_CMD_LUT_SEQ_IDX_RESET       6
+
+#define CUSTOM_LUT_LENGTH 40
+#endif
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-AT_QUICKACCESS_SECTION_DATA(static uint32_t s_ispPin[3]);
-AT_QUICKACCESS_SECTION_DATA(static uint32_t s_flexspiPin[10]);
+
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static status_t flexspi_hyper_ram_write_mcr(FLEXSPI_Type *base, uint8_t regAddr, uint32_t *mrVal);
-static status_t flexspi_hyper_ram_get_mcr(FLEXSPI_Type *base, uint8_t regAddr, uint32_t *mrVal);
-static status_t flexspi_hyper_ram_reset(FLEXSPI_Type *base);
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -45,71 +49,130 @@ void BOARD_InitDebugConsole(void)
 {
     uint32_t uartClkSrcFreq;
 
-    /* attach FRG0 clock to FLEXCOMM0 (debug console) */
-    CLOCK_SetFRGClock(BOARD_DEBUG_UART_FRG_CLK);
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+    CLOCK_AttachClk(BOARD_DEBUG_UART_FCCLK_ATTACH);
+    CLOCK_SetClkDiv(BOARD_DEBUG_UART_FCCLK_DIV, 1U);
+
+    /* attach FC0 clock to LP_FLEXCOMM (debug console) */
     CLOCK_AttachClk(BOARD_DEBUG_UART_CLK_ATTACH);
+#else
+    CLOCK_AttachClk(BOARD_DEBUG_UART_CLK_ATTACH);
+    CLOCK_SetClkDiv(BOARD_DEBUG_UART_CLK_DIV, 1U);
+#endif
 
     uartClkSrcFreq = BOARD_DEBUG_UART_CLK_FREQ;
 
     DbgConsole_Init(BOARD_DEBUG_UART_INSTANCE, BOARD_DEBUG_UART_BAUDRATE, BOARD_DEBUG_UART_TYPE, uartClkSrcFreq);
 }
 
-static status_t flexspi_hyper_ram_write_mcr(FLEXSPI_Type *base, uint8_t regAddr, uint32_t *mrVal)
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+void BOARD_ConfigMPU(void)
 {
-    flexspi_transfer_t flashXfer;
+    uint8_t attr;
+#if defined(__CC_ARM) || defined(__ARMCC_VERSION)
+    extern uint32_t Image$$RW_m_ncache$$Base[];
+    /* RW_m_ncache_unused is a auxiliary region which is used to get the whole size of noncache section */
+    extern uint32_t Image$$RW_m_ncache_unused$$Base[];
+    extern uint32_t Image$$RW_m_ncache_unused$$ZI$$Limit[];
+    uint32_t nonCacheStart = (uint32_t)Image$$RW_m_ncache$$Base;
+    uint32_t nonCacheSize  = ((uint32_t)Image$$RW_m_ncache_unused$$Base == nonCacheStart) ?
+                                 0 :
+                                 ((uint32_t)Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
+#elif defined(__MCUXPRESSO)
+    extern uint32_t __base_NCACHE_REGION;
+    extern uint32_t __top_NCACHE_REGION;
+    uint32_t nonCacheStart = (uint32_t)(&__base_NCACHE_REGION);
+    uint32_t nonCacheSize  = (uint32_t)(&__top_NCACHE_REGION) - nonCacheStart;
+#elif defined(__ICCARM__) || defined(__GNUC__)
+    extern uint32_t __NCACHE_REGION_START[];
+    extern uint32_t __NCACHE_REGION_SIZE[];
+    uint32_t nonCacheStart = (uint32_t)__NCACHE_REGION_START;
+    uint32_t nonCacheSize  = (uint32_t)__NCACHE_REGION_SIZE;
+#else
+#error "Unsupported compiler"
+#endif
+
+    XCACHE_DisableCache(XCACHE0);
+    XCACHE_DisableCache(XCACHE1);
+
+    /* Disable MPU */
+    ARM_MPU_Disable();
+
+    /* Attr0: device memory. */
+    ARM_MPU_SetMemAttr(0U, ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE, ARM_MPU_ATTR_DEVICE));
+    /* Attr1: non cacheable. */
+    ARM_MPU_SetMemAttr(1U, ARM_MPU_ATTR(ARM_MPU_ATTR_NON_CACHEABLE, ARM_MPU_ATTR_NON_CACHEABLE));
+    /* Attr2: non transient, write through, read allocate. */
+    attr = ARM_MPU_ATTR_MEMORY_(0U, 0U, 1U, 0U);
+    ARM_MPU_SetMemAttr(2U, ARM_MPU_ATTR(attr, attr));
+    /* Attr3: non transient, write back, read/write allocate. */
+    attr = ARM_MPU_ATTR_MEMORY_(0U, 1U, 1U, 1U);
+    ARM_MPU_SetMemAttr(3U, ARM_MPU_ATTR(attr, attr));
+
+    /* Region 0: [0x0, 0x1FFFFFFF], non-shareable, read/write, any privileged, executable. Attr 2 (write through). */
+    ARM_MPU_SetRegion(0U, ARM_MPU_RBAR(0U, ARM_MPU_SH_NON, 0U, 1U, 0U), ARM_MPU_RLAR(0x1FFFFFFFU, 2U));
+    /* Region 2 (Peripherals): [0x40000000, 0x5FFFFFFF], non-shareable, read/write, non-privileged, executable. Attr 0
+     * (device). */
+    ARM_MPU_SetRegion(2U, ARM_MPU_RBAR(0x40000000U, ARM_MPU_SH_NON, 0U, 1U, 0U), ARM_MPU_RLAR(0x5FFFFFFF, 0U));
+
+    if (nonCacheSize != 0)
+    {
+        /* The MPU region size should a granularity of 32 bytes. */
+        assert((nonCacheSize & 0x1FU) == 0x0U);
+
+        /* Region 1 setting : outter-shareable, read-write,  non-privileged, executable. Attr 1. (non-cacheable) */
+        ARM_MPU_SetRegion(1U, ARM_MPU_RBAR(nonCacheStart, ARM_MPU_SH_OUTER, 0U, 1U, 0U),
+                          ARM_MPU_RLAR(nonCacheStart + nonCacheSize - 1, 1U));
+    }
+
+    /*
+     * Enable MPU and HFNMIENA feature
+     * HFNMIENA ensures the core uses MPU configuration when in hard fault, NMI, and FAULTMASK handlers,
+     * otherwise all memory regions are accessed without MPU protection.
+     */
+    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk | MPU_CTRL_HFNMIENA_Msk);
+
+    /* Enable code & system cache */
+    XCACHE_EnableCache(XCACHE0);
+    XCACHE_EnableCache(XCACHE1);
+
+    /* flush pipeline */
+    __DSB();
+    __ISB();
+}
+
+status_t xspi_hyper_ram_write_mcr(XSPI_Type *base, uint32_t regAddr, uint32_t *mrVal)
+{
+    xspi_transfer_t flashXfer;
     status_t status;
 
     /* Write data */
     flashXfer.deviceAddress = regAddr;
-    flashXfer.port          = kFLEXSPI_PortA1;
-    flashXfer.cmdType       = kFLEXSPI_Write;
-    flashXfer.SeqNumber     = 1;
-    flashXfer.seqIndex      = 3;
-    flashXfer.data          = mrVal;
-    flashXfer.dataSize      = 1;
-
-    status = FLEXSPI_TransferBlocking(base, &flashXfer);
-
-    return status;
-}
-
-static status_t flexspi_hyper_ram_get_mcr(FLEXSPI_Type *base, uint8_t regAddr, uint32_t *mrVal)
-{
-    flexspi_transfer_t flashXfer;
-    status_t status;
-
-    /* Read data */
-    flashXfer.deviceAddress = regAddr;
-    flashXfer.port          = kFLEXSPI_PortA1;
-    flashXfer.cmdType       = kFLEXSPI_Read;
-    flashXfer.SeqNumber     = 1;
-    flashXfer.seqIndex      = 2;
+    flashXfer.cmdType       = kXSPI_Write;
+    flashXfer.seqIndex      = HYPERRAM_CMD_LUT_SEQ_IDX_REG_WRITE;
     flashXfer.data          = mrVal;
     flashXfer.dataSize      = 2;
 
-    status = FLEXSPI_TransferBlocking(base, &flashXfer);
+    status = XSPI_TransferBlocking(base, &flashXfer);
 
     return status;
 }
 
-static status_t flexspi_hyper_ram_reset(FLEXSPI_Type *base)
+status_t xspi_hyper_ram_reset(XSPI_Type *base, uint32_t ambaAddr)
 {
-    flexspi_transfer_t flashXfer;
+    xspi_transfer_t flashXfer;
     status_t status;
 
     /* Write data */
-    flashXfer.deviceAddress = 0x0U;
-    flashXfer.port          = kFLEXSPI_PortA1;
-    flashXfer.cmdType       = kFLEXSPI_Command;
-    flashXfer.SeqNumber     = 1;
-    flashXfer.seqIndex      = 4;
+    flashXfer.deviceAddress = ambaAddr;
+    flashXfer.cmdType       = kXSPI_Command;
+    flashXfer.seqIndex      = HYPERRAM_CMD_LUT_SEQ_IDX_RESET;
 
-    status = FLEXSPI_TransferBlocking(base, &flashXfer);
+    status = XSPI_TransferBlocking(base, &flashXfer);
 
     if (status == kStatus_Success)
     {
-        /* for loop of 50000 is about 1ms (@200 MHz CPU) */
-        for (uint32_t i = 2000000U; i > 0; i--)
+        for (uint32_t i = 300000U; i > 0; i--)
         {
             __NOP();
         }
@@ -117,426 +180,219 @@ static status_t flexspi_hyper_ram_reset(FLEXSPI_Type *base)
     return status;
 }
 
-/* Initialize psram. */
-status_t BOARD_InitPsRam(void)
+status_t BOARD_Init16bitsPsRam(XSPI_Type *base)
 {
-    flexspi_device_config_t deviceconfig = {
-        .flexspiRootClk       = 396000000, /* 396MHZ SPI serial clock, DDR serial clock 198M */
-        .isSck2Enabled        = false,
-        .flashSize            = 0x2000, /* 64Mb/KByte */
-        .CSIntervalUnit       = kFLEXSPI_CsIntervalUnit1SckCycle,
-        .CSInterval           = 5,
-        .CSHoldTime           = 3,
-        .CSSetupTime          = 3,
-        .dataValidTime        = 1,
-        .columnspace          = 0,
-        .enableWordAddress    = false,
-        .AWRSeqIndex          = 1,
-        .AWRSeqNumber         = 1,
-        .ARDSeqIndex          = 0,
-        .ARDSeqNumber         = 1,
-        .AHBWriteWaitUnit     = kFLEXSPI_AhbWriteWaitUnit2AhbCycle,
-        .AHBWriteWaitInterval = 0,
-        .enableWriteMask      = true,
-    };
+    xspi_config_t config;
+    uint32_t mr0Val[1];
+    uint32_t mr1Val[1];
+    uint32_t mr2Val[1];
+    status_t ret      = kStatus_Success;
+    uint32_t ambaAddr = 0U;
 
-    uint32_t customLUT[64] = {
-        /* Read Data */
-        [0] =
-            FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_8PAD, 0x20, kFLEXSPI_Command_RADDR_DDR, kFLEXSPI_8PAD, 0x20),
-        [1] = FLEXSPI_LUT_SEQ(kFLEXSPI_Command_DUMMY_RWDS_DDR, kFLEXSPI_8PAD, 0x07, kFLEXSPI_Command_READ_DDR,
-                              kFLEXSPI_8PAD, 0x04),
+    const uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
+        /* Linear Sync Read */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_READ] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0, kXSPI_Command_DDR, kXSPI_8PAD, 0),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_READ + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x8),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_READ + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_READ_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_STOP, kXSPI_8PAD, 0),
 
-        /* Write Data */
-        [4] =
-            FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_8PAD, 0xA0, kFLEXSPI_Command_RADDR_DDR, kFLEXSPI_8PAD, 0x20),
-        [5] = FLEXSPI_LUT_SEQ(kFLEXSPI_Command_DUMMY_RWDS_DDR, kFLEXSPI_8PAD, 0x07, kFLEXSPI_Command_WRITE_DDR,
-                              kFLEXSPI_8PAD, 0x04),
+        /* Linear Sync Write */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_WRITE] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0x80, kXSPI_Command_DDR, kXSPI_8PAD, 0x80),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_WRITE + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x8),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_SYNC_WRITE + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_WRITE_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_STOP, kXSPI_8PAD, 0),
 
-        /* Read Register */
-        [8] =
-            FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_8PAD, 0x40, kFLEXSPI_Command_RADDR_DDR, kFLEXSPI_8PAD, 0x20),
-        [9] = FLEXSPI_LUT_SEQ(kFLEXSPI_Command_DUMMY_RWDS_DDR, kFLEXSPI_8PAD, 0x07, kFLEXSPI_Command_READ_DDR,
-                              kFLEXSPI_8PAD, 0x04),
+        /* Linear Burst Read */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DDR, kXSPI_8PAD, 0x20),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0xc),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x2, kXSPI_Command_READ_DDR, kXSPI_8PAD, 0x40),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ + 3] =
+            XSPI_LUT_SEQ(kXSPI_Command_STOP, kXSPI_8PAD, 0x0, kXSPI_Command_STOP, kXSPI_8PAD, 0x0),
 
-        /* Write Register */
-        [12] =
-            FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_8PAD, 0xC0, kFLEXSPI_Command_RADDR_DDR, kFLEXSPI_8PAD, 0x20),
-        [13] = FLEXSPI_LUT_SEQ(kFLEXSPI_Command_WRITE_DDR, kFLEXSPI_8PAD, 0x08, kFLEXSPI_Command_STOP, kFLEXSPI_1PAD,
-                               0x00),
+        /* Linear Burst Write */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0xA0, kXSPI_Command_DDR, kXSPI_8PAD, 0xA0),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x4),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x2, kXSPI_Command_WRITE_DDR, kXSPI_8PAD, 0x40),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE + 3] =
+            XSPI_LUT_SEQ(kXSPI_Command_STOP, kXSPI_8PAD, 0x0, kXSPI_Command_STOP, kXSPI_8PAD, 0x0),
+
+        /* Mode Register Read */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_READ] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0x40, kXSPI_Command_DDR, kXSPI_8PAD, 0x40),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_READ + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x2),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_READ + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_DUMMY_SDR, kXSPI_8PAD, 0x2, kXSPI_Command_READ_DDR, kXSPI_8PAD, 0x4),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_READ + 3] =
+            XSPI_LUT_SEQ(kXSPI_Command_STOP, kXSPI_8PAD, 0x0, kXSPI_Command_STOP, kXSPI_8PAD, 0x0),
+
+        /* Mode Register write */
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_WRITE] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0xC0, kXSPI_Command_DDR, kXSPI_8PAD, 0xC0),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_WRITE + 1] =
+            XSPI_LUT_SEQ(kXSPI_Command_RADDR_DDR, kXSPI_8PAD, 0x20, kXSPI_Command_WRITE_DDR, kXSPI_8PAD, 0x1),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_REG_WRITE + 2] =
+            XSPI_LUT_SEQ(kXSPI_Command_STOP, kXSPI_8PAD, 0x0, kXSPI_Command_STOP, kXSPI_8PAD, 0x0),
 
         /* reset */
-        [16] =
-            FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_8PAD, 0xFF, kFLEXSPI_Command_DUMMY_SDR, kFLEXSPI_8PAD, 0x03),
-
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_RESET] =
+            XSPI_LUT_SEQ(kXSPI_Command_DDR, kXSPI_8PAD, 0xFF, kXSPI_Command_DDR, kXSPI_8PAD, 0xFF),
+        [5 * HYPERRAM_CMD_LUT_SEQ_IDX_RESET + 1] XSPI_LUT_SEQ(kXSPI_Command_STOP, kXSPI_8PAD, 0x0, kXSPI_Command_STOP,
+                                                              kXSPI_8PAD, 0x0),
     };
 
-    uint32_t mr0mr1[1];
-    uint32_t mr4mr8[1];
-    uint32_t mr0Val[1];
-    uint32_t mr4Val[1];
-    uint32_t mr8Val[1];
-    flexspi_config_t config;
-    cache64_config_t cacheCfg;
-    status_t status = kStatus_Success;
+    xspi_device_config_t deviceconfig = {
+        .flashA1Size   = 0x8000U, /* 256Mb/KByte */
+        .sampleTimeRef = kXSPI_2xFlashHalfClock,
+        .CSHoldTime    = 3,
+        .CSSetupTime   = 3,
+        .AWRSeqIndex   = HYPERRAM_CMD_LUT_SEQ_IDX_BURST_WRITE,
+        .ARDSeqIndex   = HYPERRAM_CMD_LUT_SEQ_IDX_BURST_READ,
+        .enableDdr     = true,
+    };
 
-    POWER_DisablePD(kPDRUNCFG_APD_FLEXSPI1_SRAM);
-    POWER_DisablePD(kPDRUNCFG_PPD_FLEXSPI1_SRAM);
-    POWER_ApplyPD();
+    if (base == XSPI2)
+    {
+        ambaAddr = XSPI2_AMBA_BASE;
+        POWER_DisablePD(kPDRUNCFG_APD_XSPI2);
+        POWER_DisablePD(kPDRUNCFG_PPD_XSPI2);
+        POWER_ApplyPD();
 
-    CLOCK_AttachClk(kAUX0_PLL_to_FLEXSPI1_CLK);
-    CLOCK_SetClkDiv(kCLOCK_DivFlexspi1Clk, 1);
-
-    RESET_PeripheralReset(kFLEXSPI1_RST_SHIFT_RSTn);
+        CLOCK_AttachClk(kCOMMON_BASE_to_XSPI2);
+        CLOCK_SetClkDiv(kCLOCK_DivXspi2Clk, 1);
 #if (defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-    /* Need to explicitly enable FlexSPI1 clock in mpi_loader_extram_loader case.
-     * In that case, FlexSPI driver need to be used before data sections copy. So
-     * global variables are forbidden with FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL=1.
-     */
-    CLOCK_EnableClock(kCLOCK_Flexspi1);
+        CLOCK_EnableClock(kCLOCK_Xspi2);
 #endif
-
-    /* As cache depends on FlexSPI power and clock, cache must be initialized after FlexSPI power/clock is set */
-    CACHE64_GetDefaultConfig(&cacheCfg);
-    CACHE64_Init(CACHE64_POLSEL1, &cacheCfg);
-#if BOARD_ENABLE_PSRAM_CACHE
-    CACHE64_EnableWriteBuffer(CACHE64_CTRL1, true);
-    CACHE64_EnableCache(CACHE64_CTRL1);
-#endif
-
-    /* Get FLEXSPI default settings and configure the flexspi. */
-    FLEXSPI_GetDefaultConfig(&config);
-
-    /* Init FLEXSPI. */
-    config.rxSampleClock = kFLEXSPI_ReadSampleClkExternalInputFromDqsPad;
-    /*Set AHB buffer size for reading data through AHB bus. */
-    config.ahbConfig.enableAHBPrefetch    = true;
-    config.ahbConfig.enableAHBBufferable  = true;
-    config.ahbConfig.enableAHBCachable    = true;
-    config.ahbConfig.enableReadAddressOpt = true;
-    for (uint8_t i = 1; i < FSL_FEATURE_FLEXSPI_AHB_BUFFER_COUNT - 1; i++)
-    {
-        config.ahbConfig.buffer[i].bufferSize = 0;
-    }
-    /* FlexSPI1 has total 2KB RX buffer.
-     * Set GPU/Display master to use AHB Rx Buffer0.
-     */
-    config.ahbConfig.buffer[0].masterIndex    = 11;   /* GPU/Display */
-    config.ahbConfig.buffer[0].bufferSize     = 1024; /* Allocate 1KB bytes for GPU/Display */
-    config.ahbConfig.buffer[0].enablePrefetch = true;
-    config.ahbConfig.buffer[0].priority       = 7; /* Set GPU/Display to highest priority. */
-    /* All other masters use last buffer with 1KB bytes. */
-    config.ahbConfig.buffer[FSL_FEATURE_FLEXSPI_AHB_BUFFER_COUNT - 1].bufferSize = 1024;
-#if !(defined(FSL_FEATURE_FLEXSPI_HAS_NO_MCR0_COMBINATIONEN) && FSL_FEATURE_FLEXSPI_HAS_NO_MCR0_COMBINATIONEN)
-    config.enableCombination = true;
-#endif
-    FLEXSPI_Init(BOARD_FLEXSPI_PSRAM, &config);
-
-    /* Configure flash settings according to serial flash feature. */
-    FLEXSPI_SetFlashConfig(BOARD_FLEXSPI_PSRAM, &deviceconfig, kFLEXSPI_PortA1);
-
-    /* Update LUT table. */
-    FLEXSPI_UpdateLUT(BOARD_FLEXSPI_PSRAM, 0, customLUT, ARRAY_SIZE(customLUT));
-
-    /* Do software reset. */
-    FLEXSPI_SoftwareReset(BOARD_FLEXSPI_PSRAM);
-
-    /* Reset hyper ram. */
-    status = flexspi_hyper_ram_reset(BOARD_FLEXSPI_PSRAM);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    status = flexspi_hyper_ram_get_mcr(BOARD_FLEXSPI_PSRAM, 0x0, mr0mr1);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    status = flexspi_hyper_ram_get_mcr(BOARD_FLEXSPI_PSRAM, 0x4, mr4mr8);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    /* Enable RBX, burst length set to 1K. - MR8 */
-    mr8Val[0] = (mr4mr8[0] & 0xFF00U) >> 8U;
-    mr8Val[0] = mr8Val[0] | 0x0F;
-    status    = flexspi_hyper_ram_write_mcr(BOARD_FLEXSPI_PSRAM, 0x8, mr8Val);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    /* Set LC code to 0x04(LC=7, maximum frequency 200M) - MR0. */
-    mr0Val[0] = mr0mr1[0] & 0x00FFU;
-    mr0Val[0] = (mr0Val[0] & ~0x3CU) | (4U << 2U);
-    status    = flexspi_hyper_ram_write_mcr(BOARD_FLEXSPI_PSRAM, 0x0, mr0Val);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    /* Set WLC code to 0x01(WLC=7, maximum frequency 200M) - MR4. */
-    mr4Val[0] = mr4mr8[0] & 0x00FFU;
-    mr4Val[0] = (mr4Val[0] & ~0xE0U) | (1U << 5U);
-    status    = flexspi_hyper_ram_write_mcr(BOARD_FLEXSPI_PSRAM, 0x4, mr4Val);
-    if (status != kStatus_Success)
-    {
-        return status;
-    }
-
-    return status;
-}
-
-void BOARD_DeinitFlash(FLEXSPI_Type *base)
-{
-    /* Enable FLEXSPI clock again */
-    CLKCTL0->PSCCTL0_SET = CLKCTL0_PSCCTL0_SET_FLEXSPI0_OTFAD_CLK_MASK;
-
-    /* Enable FLEXSPI module */
-    base->MCR0 &= ~FLEXSPI_MCR0_MDIS_MASK;
-
-    /* Wait until FLEXSPI is not busy */
-    while (!((base->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (base->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {
-    }
-    /* Disable module during the reset procedure */
-    base->MCR0 |= FLEXSPI_MCR0_MDIS_MASK;
-}
-
-void BOARD_InitFlash(FLEXSPI_Type *base)
-{
-    uint32_t status;
-    uint32_t lastStatus;
-    uint32_t retry;
-
-    /* If serial root clock is >= 100 MHz, DLLEN set to 1, OVRDEN set to 0, then SLVDLYTARGET setting of 0x0 is
-     * recommended. */
-    base->DLLCR[0] = 0x1U;
-
-    /* Enable FLEXSPI module */
-    base->MCR0 &= ~FLEXSPI_MCR0_MDIS_MASK;
-
-    base->MCR0 |= FLEXSPI_MCR0_SWRESET_MASK;
-    while (base->MCR0 & FLEXSPI_MCR0_SWRESET_MASK)
-    {
-    }
-
-    /* Need to wait DLL locked if DLL enabled */
-    if (0U != (base->DLLCR[0] & FLEXSPI_DLLCR_DLLEN_MASK))
-    {
-        lastStatus = base->STS2;
-        retry      = BOARD_FLEXSPI_DLL_LOCK_RETRY;
-        /* Wait slave delay line locked and slave reference delay line locked. */
-        do
-        {
-            status = base->STS2;
-            if ((status & (FLEXSPI_STS2_AREFLOCK_MASK | FLEXSPI_STS2_ASLVLOCK_MASK)) ==
-                (FLEXSPI_STS2_AREFLOCK_MASK | FLEXSPI_STS2_ASLVLOCK_MASK))
-            {
-                /* Locked */
-                retry = 100;
-                break;
-            }
-            else if (status == lastStatus)
-            {
-                /* Same delay cell number in calibration */
-                retry--;
-            }
-            else
-            {
-                retry      = BOARD_FLEXSPI_DLL_LOCK_RETRY;
-                lastStatus = status;
-            }
-        } while (retry > 0);
-        /* According to ERR011377, need to delay at least 100 NOPs to ensure the DLL is locked. */
-        for (; retry > 0U; retry--)
-        {
-            __NOP();
-        }
-    }
-}
-
-/* BOARD_SetFlexspiClock run in RAM used to configure FlexSPI clock source and divider when XIP. */
-void BOARD_SetFlexspiClock(FLEXSPI_Type *base, uint32_t src, uint32_t divider)
-{
-    if (base == FLEXSPI0)
-    {
-        if ((CLKCTL0->FLEXSPI0FCLKSEL != CLKCTL0_FLEXSPI0FCLKSEL_SEL(src)) ||
-            ((CLKCTL0->FLEXSPI0FCLKDIV & CLKCTL0_FLEXSPI0FCLKDIV_DIV_MASK) != (divider - 1)))
-        {
-            /* Always deinit FLEXSPI and init FLEXSPI for the flash to make sure the flash works correctly after the
-             FLEXSPI root clock changed as the default FLEXSPI configuration may does not work for the new root clock
-             frequency. */
-            BOARD_DeinitFlash(base);
-
-            /* Disable clock before changing clock source */
-            CLKCTL0->PSCCTL0_CLR = CLKCTL0_PSCCTL0_CLR_FLEXSPI0_OTFAD_CLK_MASK;
-            /* Update flexspi clock. */
-            CLKCTL0->FLEXSPI0FCLKSEL = CLKCTL0_FLEXSPI0FCLKSEL_SEL(src);
-            CLKCTL0->FLEXSPI0FCLKDIV |= CLKCTL0_FLEXSPI0FCLKDIV_RESET_MASK; /* Reset the divider counter */
-            CLKCTL0->FLEXSPI0FCLKDIV = CLKCTL0_FLEXSPI0FCLKDIV_DIV(divider - 1);
-            while ((CLKCTL0->FLEXSPI0FCLKDIV) & CLKCTL0_FLEXSPI0FCLKDIV_REQFLAG_MASK)
-            {
-            }
-            /* Enable FLEXSPI clock again */
-            CLKCTL0->PSCCTL0_SET = CLKCTL0_PSCCTL0_SET_FLEXSPI0_OTFAD_CLK_MASK;
-
-            BOARD_InitFlash(base);
-        }
-    }
-    else if (base == FLEXSPI1)
-    {
-        if ((CLKCTL0->FLEXSPI1FCLKSEL != CLKCTL0_FLEXSPI1FCLKSEL_SEL(src)) ||
-            ((CLKCTL0->FLEXSPI1FCLKDIV & CLKCTL0_FLEXSPI1FCLKDIV_DIV_MASK) != (divider - 1)))
-        {
-            /* Always deinit FLEXSPI and init FLEXSPI for the flash to make sure the flash works correctly after the
-             FLEXSPI root clock changed as the default FLEXSPI configuration may does not work for the new root clock
-             frequency. */
-            BOARD_DeinitFlash(base);
-
-            /* Disable clock before changing clock source */
-            CLKCTL0->PSCCTL0_CLR = CLKCTL0_PSCCTL0_CLR_FLEXSPI1_CLK_MASK;
-            /* Update flexspi clock. */
-            CLKCTL0->FLEXSPI1FCLKSEL = CLKCTL0_FLEXSPI1FCLKSEL_SEL(src);
-            CLKCTL0->FLEXSPI1FCLKDIV |= CLKCTL0_FLEXSPI1FCLKDIV_RESET_MASK; /* Reset the divider counter */
-            CLKCTL0->FLEXSPI1FCLKDIV = CLKCTL0_FLEXSPI1FCLKDIV_DIV(divider - 1);
-            while ((CLKCTL0->FLEXSPI1FCLKDIV) & CLKCTL0_FLEXSPI1FCLKDIV_REQFLAG_MASK)
-            {
-            }
-            /* Enable FLEXSPI clock again */
-            CLKCTL0->PSCCTL0_SET = CLKCTL0_PSCCTL0_SET_FLEXSPI1_CLK_MASK;
-
-            BOARD_InitFlash(base);
-        }
     }
     else
     {
-        return;
+        ambaAddr = XSPI1_AMBA_BASE;
+        POWER_DisablePD(kPDRUNCFG_APD_XSPI1);
+        POWER_DisablePD(kPDRUNCFG_PPD_XSPI1);
+        POWER_ApplyPD();
+
+        CLOCK_AttachClk(kCOMPUTE_BASE_to_XSPI1);
+        CLOCK_SetClkDiv(kCLOCK_DivXspi1Clk, 1);
+#if (defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
+        CLOCK_EnableClock(kCLOCK_Xspi1);
+#endif
     }
+
+    /* Get XSPI default settings and configure the xspi. */
+    XSPI_GetDefaultConfig(base, &config, &deviceconfig);
+    config.rxSampleClock = kXSPI_ReadSampleClkExternalInputFromDqsPad;
+    /*Set AHB buffer size for reading data through AHB bus. */
+    config.ahbConfig.enableAHBPrefetch = false;
+    config.enableDqsOut                = true;
+
+    XSPI_Init(base, &config);
+    /* Configure flash settings according to serial flash feature. */
+    XSPI_SetFlashConfig(base, &deviceconfig);
+
+    /* Update LUT table. */
+    XSPI_UpdateLUT(base, 0, customLUT, CUSTOM_LUT_LENGTH);
+
+    /* Reset hyper ram. */
+    ret = xspi_hyper_ram_reset(base, ambaAddr);
+    if (ret != kStatus_Success)
+    {
+        return ret;
+    }
+
+    /* change wlc to 7 */
+    mr0Val[0] = 0x20;
+    ret       = xspi_hyper_ram_write_mcr(base, ambaAddr + 0x4U, mr0Val);
+    if (ret != kStatus_Success)
+    {
+        return ret;
+    }
+    /* change rlc to 14 */
+    mr1Val[0] = 0x30;
+    ret       = xspi_hyper_ram_write_mcr(base, ambaAddr + 0U, mr1Val);
+    if (ret != kStatus_Success)
+    {
+        return ret;
+    }
+    mr2Val[0] = 0x4D;
+    ret       = xspi_hyper_ram_write_mcr(base, ambaAddr + 0x8U, mr2Val);
+    if (ret != kStatus_Success)
+    {
+        return ret;
+    }
+
+    /* Enable X16 mode. */
+    XSPI_EnableX16Mode(base);
+
+    return ret;
 }
 
-/* This function is used to change FlexSPI clock to a stable source before clock sources(Such as PLL and Main clock)
- * updating in case XIP(execute code on FLEXSPI memory.) */
-void BOARD_FlexspiClockSafeConfig(void)
+#endif /* MIMXRT798S_cm33_core0_SERIES */
+
+/* Disable the secure check for Media Domain */
+void BOARD_InitAHBSC(void)
 {
-    /* Move FLEXSPI clock source from main clock to FRO192M / 2 to avoid instruction/data fetch issue in XIP when
-     * updating PLL and main clock.
-     */
-    BOARD_SetFlexspiClock(FLEXSPI0, 3U, 2U);
-}
+    /* Write enable  */
+    GLIKEY2->CTRL_0 = 0x00060000;
+    GLIKEY2->CTRL_0 = 0x00020001;
+    GLIKEY2->CTRL_0 = 0x00010001;
+    GLIKEY2->CTRL_1 = 0x00290000;
+    GLIKEY2->CTRL_0 = 0x00020001;
+    GLIKEY2->CTRL_1 = 0x00280000;
+    GLIKEY2->CTRL_0 = 0x00000001;
 
-void BOARD_SetDeepSleepPinConfig(void)
-{
-    /* Backup Pin configuration. */
-    s_ispPin[0]     = IOPCTL->PIO[1][15];
-    s_ispPin[1]     = IOPCTL->PIO[3][28];
-    s_ispPin[2]     = IOPCTL->PIO[3][29];
-    s_flexspiPin[0] = IOPCTL->PIO[1][18];
-    s_flexspiPin[1] = IOPCTL->PIO[1][19];
-    s_flexspiPin[2] = IOPCTL->PIO[1][20];
-    s_flexspiPin[3] = IOPCTL->PIO[1][21];
-    s_flexspiPin[4] = IOPCTL->PIO[1][22];
-    s_flexspiPin[5] = IOPCTL->PIO[1][23];
-    s_flexspiPin[6] = IOPCTL->PIO[1][24];
-    s_flexspiPin[7] = IOPCTL->PIO[1][25];
-    s_flexspiPin[8] = IOPCTL->PIO[1][26];
-    s_flexspiPin[9] = IOPCTL->PIO[1][27];
-
-    /* Disable ISP Pin pull-ups and input buffers to avoid current leakage */
-    IOPCTL->PIO[1][15] = 0;
-    IOPCTL->PIO[3][28] = 0;
-    IOPCTL->PIO[3][29] = 0;
-
-    /* Disable unnecessary input buffers */
-    IOPCTL->PIO[1][18] &= ~IOPCTL_PIO_IBENA_MASK;
-    IOPCTL->PIO[1][19] &= ~IOPCTL_PIO_IBENA_MASK;
-
-    /* Enable pull-ups floating FlexSPI0 pins */
-    IOPCTL->PIO[1][20] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][21] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][22] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][23] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][24] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][25] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][26] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-    IOPCTL->PIO[1][27] |= IOPCTL_PIO_PUPDENA_MASK | IOPCTL_PIO_PUPDSEL_MASK;
-}
-
-void BOARD_RestoreDeepSleepPinConfig(void)
-{
-    /* Restore the Pin configuration. */
-    IOPCTL->PIO[1][15] = s_ispPin[0];
-    IOPCTL->PIO[3][28] = s_ispPin[1];
-    IOPCTL->PIO[3][29] = s_ispPin[2];
-
-    IOPCTL->PIO[1][18] = s_flexspiPin[0];
-    IOPCTL->PIO[1][19] = s_flexspiPin[1];
-    IOPCTL->PIO[1][20] = s_flexspiPin[2];
-    IOPCTL->PIO[1][21] = s_flexspiPin[3];
-    IOPCTL->PIO[1][22] = s_flexspiPin[4];
-    IOPCTL->PIO[1][23] = s_flexspiPin[5];
-    IOPCTL->PIO[1][24] = s_flexspiPin[6];
-    IOPCTL->PIO[1][25] = s_flexspiPin[7];
-    IOPCTL->PIO[1][26] = s_flexspiPin[8];
-    IOPCTL->PIO[1][27] = s_flexspiPin[9];
-}
-
-void BOARD_EnterDeepSleep(const uint32_t exclude_from_pd[4])
-{
-    BOARD_SetDeepSleepPinConfig();
-    POWER_EnterDeepSleep(exclude_from_pd);
-    BOARD_RestoreDeepSleepPinConfig();
-}
-
-void BOARD_EnterDeepPowerDown(const uint32_t exclude_from_pd[4])
-{
-    BOARD_SetDeepSleepPinConfig();
-    POWER_EnterDeepPowerDown(exclude_from_pd);
-    /* After deep power down wakeup, the code will restart and cannot reach here. */
-    BOARD_RestoreDeepSleepPinConfig();
+    /*Disable secure and secure privilege checking. */
+    AHBSC_MEDIA->MISC_CTRL_DP_REG = 0x000086aa;
+    AHBSC_MEDIA->MISC_CTRL_REG    = 0x000086aa;
 }
 
 #if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
-void BOARD_I2C_Init(I2C_Type *base, uint32_t clkSrc_Hz)
+void BOARD_I2C_Init(LPI2C_Type *base, uint32_t clkSrc_Hz)
 {
-    i2c_master_config_t i2cConfig = {0};
+    lpi2c_master_config_t i2cConfig = {0};
 
-    I2C_MasterGetDefaultConfig(&i2cConfig);
-    I2C_MasterInit(base, &i2cConfig, clkSrc_Hz);
+    LPI2C_MasterGetDefaultConfig(&i2cConfig);
+    LPI2C_MasterInit(base, &i2cConfig, clkSrc_Hz);
 }
 
-status_t BOARD_I2C_Send(I2C_Type *base,
+status_t BOARD_I2C_Send(LPI2C_Type *base,
                         uint8_t deviceAddress,
                         uint32_t subAddress,
                         uint8_t subaddressSize,
                         uint8_t *txBuff,
                         uint8_t txBuffSize)
 {
-    i2c_master_transfer_t masterXfer;
+    lpi2c_master_transfer_t masterXfer;
 
     /* Prepare transfer structure. */
     masterXfer.slaveAddress   = deviceAddress;
-    masterXfer.direction      = kI2C_Write;
+    masterXfer.direction      = kLPI2C_Write;
     masterXfer.subaddress     = subAddress;
     masterXfer.subaddressSize = subaddressSize;
     masterXfer.data           = txBuff;
     masterXfer.dataSize       = txBuffSize;
-    masterXfer.flags          = kI2C_TransferDefaultFlag;
+    masterXfer.flags          = kLPI2C_TransferDefaultFlag;
 
-    return I2C_MasterTransferBlocking(base, &masterXfer);
+    return LPI2C_MasterTransferBlocking(base, &masterXfer);
 }
 
-status_t BOARD_I2C_Receive(I2C_Type *base,
+status_t BOARD_I2C_Receive(LPI2C_Type *base,
                            uint8_t deviceAddress,
                            uint32_t subAddress,
                            uint8_t subaddressSize,
                            uint8_t *rxBuff,
                            uint8_t rxBuffSize)
 {
-    i2c_master_transfer_t masterXfer;
+    lpi2c_master_transfer_t masterXfer;
 
     /* Prepare transfer structure. */
     masterXfer.slaveAddress   = deviceAddress;
@@ -544,100 +400,12 @@ status_t BOARD_I2C_Receive(I2C_Type *base,
     masterXfer.subaddressSize = subaddressSize;
     masterXfer.data           = rxBuff;
     masterXfer.dataSize       = rxBuffSize;
-    masterXfer.direction      = kI2C_Read;
-    masterXfer.flags          = kI2C_TransferDefaultFlag;
+    masterXfer.direction      = kLPI2C_Read;
+    masterXfer.flags          = kLPI2C_TransferDefaultFlag;
 
-    return I2C_MasterTransferBlocking(base, &masterXfer);
-}
-#endif
-
-#if defined BOARD_USE_CODEC
-void BOARD_I3C_Init(I3C_Type *base, uint32_t clkSrc_Hz)
-{
-    i3c_master_config_t i3cConfig;
-
-    I3C_MasterGetDefaultConfig(&i3cConfig);
-    I3C_MasterInit(base, &i3cConfig, clkSrc_Hz);
+    return LPI2C_MasterTransferBlocking(base, &masterXfer);
 }
 
-status_t BOARD_I3C_Send(I3C_Type *base,
-                        uint8_t deviceAddress,
-                        uint32_t subAddress,
-                        uint8_t subaddressSize,
-                        uint8_t *txBuff,
-                        uint8_t txBuffSize)
-{
-    i3c_master_transfer_t masterXfer;
-
-    /* Prepare transfer structure. */
-    masterXfer.slaveAddress   = deviceAddress;
-    masterXfer.direction      = kI3C_Write;
-    masterXfer.busType        = kI3C_TypeI2C;
-    masterXfer.subaddress     = subAddress;
-    masterXfer.subaddressSize = subaddressSize;
-    masterXfer.data           = txBuff;
-    masterXfer.dataSize       = txBuffSize;
-    masterXfer.flags          = kI3C_TransferDefaultFlag;
-    masterXfer.busType        = kI3C_TypeI2C;
-
-    return I3C_MasterTransferBlocking(base, &masterXfer);
-}
-
-status_t BOARD_I3C_Receive(I3C_Type *base,
-                           uint8_t deviceAddress,
-                           uint32_t subAddress,
-                           uint8_t subaddressSize,
-                           uint8_t *rxBuff,
-                           uint8_t rxBuffSize)
-{
-    i3c_master_transfer_t masterXfer;
-
-    /* Prepare transfer structure. */
-    masterXfer.slaveAddress   = deviceAddress;
-    masterXfer.subaddress     = subAddress;
-    masterXfer.subaddressSize = subaddressSize;
-    masterXfer.data           = rxBuff;
-    masterXfer.dataSize       = rxBuffSize;
-    masterXfer.direction      = kI3C_Read;
-    masterXfer.busType        = kI3C_TypeI2C;
-    masterXfer.flags          = kI3C_TransferDefaultFlag;
-    masterXfer.busType        = kI3C_TypeI2C;
-
-    return I3C_MasterTransferBlocking(base, &masterXfer);
-}
-
-void BOARD_Codec_I2C_Init(void)
-{
-#if BOARD_I3C_CODEC
-    BOARD_I3C_Init(BOARD_CODEC_I2C_BASEADDR, BOARD_CODEC_I2C_CLOCK_FREQ);
-#else
-    BOARD_I2C_Init(BOARD_CODEC_I2C_BASEADDR, BOARD_CODEC_I2C_CLOCK_FREQ);
-#endif
-}
-
-status_t BOARD_Codec_I2C_Send(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize)
-{
-#if BOARD_I3C_CODEC
-    return BOARD_I3C_Send(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *)txBuff,
-#else
-    return BOARD_I2C_Send(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, (uint8_t *)txBuff,
-#endif
-                          txBuffSize);
-}
-
-status_t BOARD_Codec_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
-{
-#if BOARD_I3C_CODEC
-    return BOARD_I3C_Receive(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
-#else
-    return BOARD_I2C_Receive(BOARD_CODEC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
-#endif
-}
-#endif
-
-#if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
 void BOARD_PMIC_I2C_Init(void)
 {
     BOARD_I2C_Init(BOARD_PMIC_I2C_BASEADDR, BOARD_PMIC_I2C_CLOCK_FREQ);
@@ -655,40 +423,4 @@ status_t BOARD_PMIC_I2C_Receive(
 {
     return BOARD_I2C_Receive(BOARD_PMIC_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
 }
-
-void BOARD_MIPIPanelTouch_I2C_Init(void)
-{
-    BOARD_I2C_Init(BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR, BOARD_MIPI_PANEL_TOUCH_I2C_CLOCK_FREQ);
-}
-
-status_t BOARD_MIPIPanelTouch_I2C_Send(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize)
-{
-    return BOARD_I2C_Send(BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize,
-                          (uint8_t *)txBuff, txBuffSize);
-}
-
-status_t BOARD_MIPIPanelTouch_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
-{
-    return BOARD_I2C_Receive(BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff,
-                             rxBuffSize);
-}
-
-void BOARD_Accel_I2C_Init(void)
-{
-    BOARD_I2C_Init(BOARD_ACCEL_I2C_BASEADDR, BOARD_ACCEL_I2C_CLOCK_FREQ);
-}
-
-status_t BOARD_Accel_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint32_t txBuff)
-{
-    uint8_t data = (uint8_t)txBuff;
-    return BOARD_I2C_Send(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, &data, 1);
-}
-
-status_t BOARD_Accel_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
-{
-    return BOARD_I2C_Receive(BOARD_ACCEL_I2C_BASEADDR, deviceAddress, subAddress, subAddressSize, rxBuff, rxBuffSize);
-}
-#endif /* SDK_I2C_BASED_COMPONENT_USED */
+#endif

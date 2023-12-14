@@ -44,7 +44,7 @@
                 </option>
                 <option>
                     <name>MemFile</name>
-                    <state>$TOOLKIT_DIR$\config\debugger\NXP\MIMXRT595S_M33.ddf</state>
+                    <state>$TOOLKIT_DIR$\config\debugger\NXP\MIMXRT798S_M33_0.ddf</state>
                 </option>
                 <option>
                     <name>RunToEnable</name>
@@ -84,7 +84,7 @@
                 </option>
                 <option>
                     <name>OCDynDriverList</name>
-                    <state>CMSISDAP_ID</state>
+                    <state>JLINK_ID</state>
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
@@ -112,7 +112,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$/config/flashloader/NXP/FlashIMXRT500_MX25U.board</state>
+                    <state>$TOOLKIT_DIR$/config/flashloader/NXP/FlashIMXRT700_EVK.board</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
@@ -956,7 +956,7 @@
                 <option>
                     <name>CCJLinkResetList</name>
                     <version>6</version>
-                    <state>5</state>
+                    <state>7</state>
                 </option>
                 <option>
                     <name>CCJLinkInterfaceCmdLine</name>

@@ -1,7 +1,6 @@
 /*
- * Copyright 2018-2021 NXP
+ * Copyright 2023 NXP
  * All rights reserved.
- *
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,204 +12,136 @@
 #include "fsl_common.h"
 #include "fsl_reset.h"
 #include "fsl_gpio.h"
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+#include "fsl_xspi.h"
+#include "fsl_power.h"
+#endif
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
 /*! @brief The board name */
-#define BOARD_NAME      "EVK-MIMXRT595"
-#define BOARD_I3C_CODEC (1)
+#define BOARD_NAME "MIMXRT700-EVK"
 
 /*! @brief The UART to use for debug messages. */
-#define BOARD_DEBUG_UART_TYPE     kSerialPort_Uart
-#define BOARD_DEBUG_UART_BASEADDR (uint32_t) USART0
-#define BOARD_DEBUG_UART_INSTANCE 0U
-#define BOARD_DEBUG_UART_CLK_FREQ CLOCK_GetFlexcommClkFreq(0)
-#define BOARD_DEBUG_UART_FRG_CLK \
-    (&(const clock_frg_clk_config_t){0U, kCLOCK_FrgPllDiv, 255U, 0U}) /*!< Select FRG0 mux as frg_pll */
-#define BOARD_DEBUG_UART_CLK_ATTACH kFRG_to_FLEXCOMM0
-#define BOARD_UART_IRQ_HANDLER      FLEXCOMM0_IRQHandler
-#define BOARD_UART_IRQ              FLEXCOMM0_IRQn
-
-#if BOARD_I3C_CODEC
-#define BOARD_CODEC_I2C_BASEADDR   I3C0
-#define BOARD_CODEC_I2C_INSTANCE   0
-#define BOARD_CODEC_I2C_CLOCK_FREQ CLOCK_GetI3cClkFreq()
+#define BOARD_DEBUG_UART_TYPE kSerialPort_Uart
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+#define BOARD_DEBUG_UART_BASEADDR     (uint32_t) LPUART0
+#define BOARD_DEBUG_UART_INSTANCE     0U
+#define BOARD_DEBUG_UART_CLK_FREQ     CLOCK_GetLPFlexCommClkFreq(0)
+#define BOARD_DEBUG_UART_CLK_ATTACH   kFCCLK0_to_FLEXCOMM0
+#define BOARD_DEBUG_UART_FCCLK_DIV    kCLOCK_DivFcclk0Clk
+#define BOARD_DEBUG_UART_FCCLK_ATTACH kOSC_CLK_to_FCCLK0
+#define BOARD_UART_IRQ_HANDLER        LP_FLEXCOMM0_IRQHandler
+#define BOARD_UART_IRQ                LP_FLEXCOMM0_IRQn
+#elif defined(MIMXRT798S_cm33_core1_SERIES)
+#if USE_EVK_BOARD
+#define BOARD_DEBUG_UART_BASEADDR   (uint32_t) LPUART19
+#define BOARD_DEBUG_UART_INSTANCE   19U
+#define BOARD_DEBUG_UART_CLK_FREQ   CLOCK_GetLPFlexCommClkFreq(19)
+#define BOARD_DEBUG_UART_CLK_ATTACH kSENSE_BASE_to_FLEXCOMM19
+#define BOARD_DEBUG_UART_CLK_DIV    kCLOCK_DivLPFlexComm19Clk
+#define BOARD_UART_IRQ_HANDLER      LP_FLEXCOMM19_IRQHandler
+#define BOARD_UART_IRQ              LP_FLEXCOMM19_IRQn
 #else
-#define BOARD_CODEC_I2C_BASEADDR   I2C4
-#define BOARD_CODEC_I2C_INSTANCE   4
-#define BOARD_CODEC_I2C_CLOCK_FREQ CLOCK_GetFlexcommClkFreq(4)
-#endif
-
-#define BOARD_FLEXSPI_PSRAM FLEXSPI1
-#ifndef BOARD_ENABLE_PSRAM_CACHE
-#define BOARD_ENABLE_PSRAM_CACHE 1
+#define BOARD_DEBUG_UART_BASEADDR   (uint32_t) LPUART18
+#define BOARD_DEBUG_UART_INSTANCE   18U
+#define BOARD_DEBUG_UART_CLK_FREQ   CLOCK_GetLPFlexCommClkFreq(18)
+#define BOARD_DEBUG_UART_CLK_ATTACH kSENSE_BASE_to_FLEXCOMM18
+#define BOARD_DEBUG_UART_CLK_DIV    kCLOCK_DivLPFlexComm18Clk
+#define BOARD_UART_IRQ_HANDLER      LP_FLEXCOMM18_IRQHandler
+#define BOARD_UART_IRQ              LP_FLEXCOMM18_IRQn
+#endif /* USE_EVK_BOARD*/
+#else
+#error "Unsupported core!"
 #endif
 
 #ifndef BOARD_DEBUG_UART_BAUDRATE
 #define BOARD_DEBUG_UART_BAUDRATE 115200
 #endif /* BOARD_DEBUG_UART_BAUDRATE */
 
-/* PCA9420 */
-#define BOARD_PMIC_I2C_BASEADDR   I2C15
-#define BOARD_PMIC_I2C_CLOCK_FREQ CLOCK_GetFlexcommClkFreq(15)
-
-/* Accelerometer */
-#define BOARD_ACCEL_I2C_BASEADDR   I2C4
-#define BOARD_ACCEL_I2C_ADDR       0x1E
-#define BOARD_ACCEL_I2C_CLOCK_FREQ CLOCK_GetFlexcommClkFreq(4)
-
-/* Board led color mapping */
-#define LOGIC_LED_ON  1U
-#define LOGIC_LED_OFF 0U
-
-#ifndef BOARD_LED_RED_GPIO
-#define BOARD_LED_RED_GPIO GPIO
-#endif
-#define BOARD_LED_RED_GPIO_PORT 0U
-#ifndef BOARD_LED_RED_GPIO_PIN
-#define BOARD_LED_RED_GPIO_PIN 14U
-#endif
-
+/* Board RGB LED color mapping */
+#define LOGIC_LED_ON  0U
+#define LOGIC_LED_OFF 1U
 #ifndef BOARD_LED_GREEN_GPIO
-#define BOARD_LED_GREEN_GPIO GPIO
+#define BOARD_LED_GREEN_GPIO GPIO0
 #endif
-#define BOARD_LED_GREEN_GPIO_PORT 1U
 #ifndef BOARD_LED_GREEN_GPIO_PIN
-#define BOARD_LED_GREEN_GPIO_PIN 0U
+#define BOARD_LED_GREEN_GPIO_PIN 18U
 #endif
 #ifndef BOARD_LED_BLUE_GPIO
-#define BOARD_LED_BLUE_GPIO GPIO
+#define BOARD_LED_BLUE_GPIO GPIO0
 #endif
-#define BOARD_LED_BLUE_GPIO_PORT 3U
 #ifndef BOARD_LED_BLUE_GPIO_PIN
 #define BOARD_LED_BLUE_GPIO_PIN 17U
 #endif
 
-#ifndef BOARD_FLASH_RESET_GPIO
-#define BOARD_FLASH_RESET_GPIO GPIO
+#ifndef BOARD_LED_RED_GPIO
+#define BOARD_LED_RED_GPIO GPIO8
 #endif
-#ifndef BOARD_FLASH_RESET_GPIO_PORT
-#define BOARD_FLASH_RESET_GPIO_PORT 4U
-#endif
-#ifndef BOARD_FLASH_RESET_GPIO_PIN
-#define BOARD_FLASH_RESET_GPIO_PIN 5U
+#ifndef BOARD_LED_RED_GPIO_PIN
+#define BOARD_LED_RED_GPIO_PIN 6U
 #endif
 
-/* Board microphone defines */
-#ifndef BOARD_DMIC_NUM
-#define BOARD_DMIC_NUM 2
-#endif
+#define LED_RED_INIT(output)                                           \
+    GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, output); \
+    BOARD_LED_RED_GPIO->PDDR |= (1U << BOARD_LED_RED_GPIO_PIN)                         /*!< Enable target LED_RED */
+#define LED_RED_ON()  GPIO_PortClear(BOARD_LED_RED_GPIO, 1U << BOARD_LED_RED_GPIO_PIN) /*!< Turn on target LED_RED */
+#define LED_RED_OFF() GPIO_PortSet(BOARD_LED_RED_GPIO, 1U << BOARD_LED_RED_GPIO_PIN)   /*!< Turn off target LED_RED */
+#define LED_RED_TOGGLE() \
+    GPIO_PortToggle(BOARD_LED_RED_GPIO, 1U << BOARD_LED_RED_GPIO_PIN)                  /*!< Toggle on target LED_RED1 */
 
-#define LED_RED_INIT(output)                                                          \
-    GPIO_PinInit(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, BOARD_LED_RED_GPIO_PIN, \
-                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED_RED */
-#define LED_RED_ON()                                          \
-    GPIO_PortSet(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, \
-                 1U << BOARD_LED_RED_GPIO_PIN) /*!< Turn on target LED_RED */
-#define LED_RED_OFF()                                           \
-    GPIO_PortClear(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, \
-                   1U << BOARD_LED_RED_GPIO_PIN) /*!< Turn off target LED_RED */
-#define LED_RED_TOGGLE()                                         \
-    GPIO_PortToggle(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PORT, \
-                    1U << BOARD_LED_RED_GPIO_PIN) /*!< Toggle on target LED_RED */
+#define LED_GREEN_INIT(output)                                             \
+    GPIO_PinWrite(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PIN, output); \
+    BOARD_LED_GREEN_GPIO->PDDR |= (1U << BOARD_LED_GREEN_GPIO_PIN)        /*!< Enable target LED_GREEN */
+#define LED_GREEN_ON() \
+    GPIO_PortClear(BOARD_LED_GREEN_GPIO, 1U << BOARD_LED_GREEN_GPIO_PIN)  /*!< Turn on target LED_GREEN */
+#define LED_GREEN_OFF() \
+    GPIO_PortSet(BOARD_LED_GREEN_GPIO, 1U << BOARD_LED_GREEN_GPIO_PIN)    /*!< Turn off target LED_GREEN */
+#define LED_GREEN_TOGGLE() \
+    GPIO_PortToggle(BOARD_LED_GREEN_GPIO, 1U << BOARD_LED_GREEN_GPIO_PIN) /*!< Toggle on target LED_GREEN */
 
-#define LED_GREEN_INIT(output)                                                              \
-    GPIO_PinInit(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PORT, BOARD_LED_GREEN_GPIO_PIN, \
-                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED_GREEN */
-#define LED_GREEN_ON()                                            \
-    GPIO_PortSet(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PORT, \
-                 1U << BOARD_LED_GREEN_GPIO_PIN) /*!< Turn on target LED_GREEN */
-#define LED_GREEN_OFF()                                             \
-    GPIO_PortClear(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PORT, \
-                   1U << BOARD_LED_GREEN_GPIO_PIN) /*!< Turn off target LED_GREEN */
-#define LED_GREEN_TOGGLE()                                           \
-    GPIO_PortToggle(BOARD_LED_GREEN_GPIO, BOARD_LED_GREEN_GPIO_PORT, \
-                    1U << BOARD_LED_GREEN_GPIO_PIN) /*!< Toggle on target LED_GREEN */
-
-#define LED_BLUE_INIT(output)                                                            \
-    GPIO_PinInit(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, BOARD_LED_BLUE_GPIO_PIN, \
-                 &(gpio_pin_config_t){kGPIO_DigitalOutput, (output)}) /*!< Enable target LED_BLUE */
-#define LED_BLUE_ON()                                           \
-    GPIO_PortSet(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, \
-                 1U << BOARD_LED_BLUE_GPIO_PIN) /*!< Turn on target LED_BLUE */
-#define LED_BLUE_OFF()                                            \
-    GPIO_PortClear(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, \
-                   1U << BOARD_LED_BLUE_GPIO_PIN) /*!< Turn off target LED_BLUE */
-#define LED_BLUE_TOGGLE()                                          \
-    GPIO_PortToggle(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, \
-                    1U << BOARD_LED_BLUE_GPIO_PIN) /*!< Toggle on target LED_BLUE */
+#define LED_BLUE_INIT(output)                                            \
+    GPIO_PinWrite(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PIN, output); \
+    BOARD_LED_BLUE_GPIO->PDDR |= (1U << BOARD_LED_BLUE_GPIO_PIN)        /*!< Enable target LED_BLUE */
+#define LED_BLUE_ON()                                                                                \
+    GPIO_PortClear(BOARD_LED_BLUE_GPIO, 1U << BOARD_LED_BLUE_GPIO_PIN)  /*!< Turn on target LED_BLUE \
+                                                                         */
+#define LED_BLUE_OFF()                                                                                \
+    GPIO_PortSet(BOARD_LED_BLUE_GPIO, 1U << BOARD_LED_BLUE_GPIO_PIN)    /*!< Turn off target LED_BLUE \
+                                                                         */
+#define LED_BLUE_TOGGLE() \
+    GPIO_PortToggle(BOARD_LED_BLUE_GPIO, 1U << BOARD_LED_BLUE_GPIO_PIN) /*!< Toggle on target LED_BLUE */
 
 /* Board SW PIN */
-#ifndef BOARD_SW1_GPIO
-#define BOARD_SW1_GPIO GPIO
+#ifndef BOARD_SW5_GPIO /* User button 1 */
+#define BOARD_SW5_GPIO GPIO0
 #endif
-#define BOARD_SW1_GPIO_PORT 0U
-#ifndef BOARD_SW1_GPIO_PIN
-#define BOARD_SW1_GPIO_PIN 25U
+#ifndef BOARD_SW5_GPIO_PIN
+#define BOARD_SW5_GPIO_PIN 9U
+#endif
+#ifndef BOARD_SW6_GPIO /* User button 3 */
+#define BOARD_SW6_GPIO GPIO8
+#endif
+#ifndef BOARD_SW6_GPIO_PIN
+#define BOARD_SW6_GPIO_PIN 5U
+#endif
+#ifndef BOARD_SW7_GPIO /* User button 2 */
+#define BOARD_SW7_GPIO GPIO1
+#endif
+#ifndef BOARD_SW7_GPIO_PIN
+#define BOARD_SW7_GPIO_PIN 3U
 #endif
 
-#ifndef BOARD_SW2_GPIO
-#define BOARD_SW2_GPIO GPIO
-#endif
-#define BOARD_SW2_GPIO_PORT 0U
-#ifndef BOARD_SW2_GPIO_PIN
-#define BOARD_SW2_GPIO_PIN 10U
-#endif
+#define BOARD_ACCEL_I2C_BASEADDR LPI2C20
 
-/* USB PHY condfiguration */
-#define BOARD_USB_PHY_D_CAL     (0x0CU)
-#define BOARD_USB_PHY_TXCAL45DP (0x06U)
-#define BOARD_USB_PHY_TXCAL45DM (0x06U)
+#define BOARD_CODEC_I2C_BASEADDR   LPI2C2
+#define BOARD_CODEC_I2C_CLOCK_FREQ CLOCK_GetLPI2cClkFreq(2)
+#define BOARD_CODEC_I2C_INSTANCE   2
 
-#define BOARD_FLASH_SIZE (0x4000000U)
+#define BOARD_PMIC_I2C_BASEADDR   LPI2C15
+#define BOARD_PMIC_I2C_CLOCK_FREQ CLOCK_GetLPI2cClkFreq(15)
 
-/* SSD1963 (TFT_PROTO_5) panel. */
-/* RST pin. */
-#define BOARD_SSD1963_RST_PORT 5
-#define BOARD_SSD1963_RST_PIN  0
-/* CS pin. */
-#define BOARD_SSD1963_CS_PORT 5
-#define BOARD_SSD1963_CS_PIN  1
-/* D/C pin, also named RS pin. */
-#define BOARD_SSD1963_RS_PORT 4
-#define BOARD_SSD1963_RS_PIN  31
-/* Touch panel. */
-#define BOARD_SSD1963_TOUCH_I2C_BASEADDR   I2C4
-#define BOARD_SSD1963_TOUCH_I2C_CLOCK_FREQ CLOCK_GetFlexcommClkFreq(4)
-
-/* MIPI panel. */
-/* RST pin. */
-#define BOARD_MIPI_RST_PORT 3
-#define BOARD_MIPI_RST_PIN  21
-/* POWER pin .*/
-#define BOARD_MIPI_POWER_PORT 3
-#define BOARD_MIPI_POWER_PIN  15
-/* Backlight pin. */
-#define BOARD_MIPI_BL_PORT 0
-#define BOARD_MIPI_BL_PIN  12
-/* TE pin. */
-#define BOARD_MIPI_TE_PORT 3
-#define BOARD_MIPI_TE_PIN  18
-
-/* Touch panel. */
-#define BOARD_MIPI_PANEL_TOUCH_I2C_BASEADDR   I2C4
-#define BOARD_MIPI_PANEL_TOUCH_I2C_CLOCK_FREQ CLOCK_GetFlexcommClkFreq(4)
-#define BOARD_MIPI_PANEL_TOUCH_RST_PORT       4
-#define BOARD_MIPI_PANEL_TOUCH_RST_PIN        4
-#define BOARD_MIPI_PANEL_TOUCH_INT_PORT       3
-#define BOARD_MIPI_PANEL_TOUCH_INT_PIN        19
-
-#define BOARD_BT_UART_INSTANCE 0
-#define BOARD_BT_UART_BAUDRATE 3000000
-#define BOARD_BT_UART_CLK_FREQ CLOCK_GetFlexcommClkFreq(0U)
-#define BOARD_BT_UART_FRG_CLK \
-    (&(const clock_frg_clk_config_t){0, kCLOCK_FrgMainClk, 255, 0}) /*!< Select FRG0 mux as frg_pll */
-#define BOARD_BT_UART_CLK_ATTACH  kFRG_to_FLEXCOMM0
-#define BOARD_BT_UART_RST         kFC0_RST_SHIFT_RSTn
-#define BOARD_BT_UART_IRQ         FLEXCOMM0_IRQn
-#define BOARD_BT_UART_IRQ_HANDLER FLEXCOMM0_IRQHandler
-#define BOARD_BT_UART_CLKSRC      kCLOCK_Flexcomm0
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
@@ -220,25 +151,22 @@ extern "C" {
  ******************************************************************************/
 
 void BOARD_InitDebugConsole(void);
-status_t BOARD_InitPsRam(void);
-void BOARD_FlexspiClockSafeConfig(void);
-AT_QUICKACCESS_SECTION_CODE(void BOARD_SetFlexspiClock(FLEXSPI_Type *base, uint32_t src, uint32_t divider));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_DeinitFlash(FLEXSPI_Type *base));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_InitFlash(FLEXSPI_Type *base));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_SetDeepSleepPinConfig(void));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_RestoreDeepSleepPinConfig(void));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_EnterDeepSleep(const uint32_t exclude_from_pd[4]));
-AT_QUICKACCESS_SECTION_CODE(void BOARD_EnterDeepPowerDown(const uint32_t exclude_from_pd[4]));
+#if defined(MIMXRT798S_cm33_core0_SERIES)
+void BOARD_ConfigMPU(void);
+status_t BOARD_Init16bitsPsRam(XSPI_Type *base);
+#endif
+/* Initializes the AHB Secure Controller */
+void BOARD_InitAHBSC(void);
 
 #if defined(SDK_I2C_BASED_COMPONENT_USED) && SDK_I2C_BASED_COMPONENT_USED
-void BOARD_I2C_Init(I2C_Type *base, uint32_t clkSrc_Hz);
-status_t BOARD_I2C_Send(I2C_Type *base,
+void BOARD_I2C_Init(LPI2C_Type *base, uint32_t clkSrc_Hz);
+status_t BOARD_I2C_Send(LPI2C_Type *base,
                         uint8_t deviceAddress,
                         uint32_t subAddress,
                         uint8_t subaddressSize,
                         uint8_t *txBuff,
                         uint8_t txBuffSize);
-status_t BOARD_I2C_Receive(I2C_Type *base,
+status_t BOARD_I2C_Receive(LPI2C_Type *base,
                            uint8_t deviceAddress,
                            uint32_t subAddress,
                            uint8_t subaddressSize,
@@ -250,39 +178,7 @@ status_t BOARD_PMIC_I2C_Send(
     uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize);
 status_t BOARD_PMIC_I2C_Receive(
     uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
-
-void BOARD_MIPIPanelTouch_I2C_Init(void);
-status_t BOARD_MIPIPanelTouch_I2C_Send(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize);
-status_t BOARD_MIPIPanelTouch_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
-
-void BOARD_Accel_I2C_Init(void);
-status_t BOARD_Accel_I2C_Send(uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint32_t txBuff);
-status_t BOARD_Accel_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
 #endif /* SDK_I2C_BASED_COMPONENT_USED */
-
-#if defined BOARD_USE_CODEC
-void BOARD_I3C_Init(I3C_Type *base, uint32_t clkSrc_Hz);
-status_t BOARD_I3C_Send(I3C_Type *base,
-                        uint8_t deviceAddress,
-                        uint32_t subAddress,
-                        uint8_t subaddressSize,
-                        uint8_t *txBuff,
-                        uint8_t txBuffSize);
-status_t BOARD_I3C_Receive(I3C_Type *base,
-                           uint8_t deviceAddress,
-                           uint32_t subAddress,
-                           uint8_t subaddressSize,
-                           uint8_t *rxBuff,
-                           uint8_t rxBuffSize);
-void BOARD_Codec_I2C_Init(void);
-status_t BOARD_Codec_I2C_Send(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, const uint8_t *txBuff, uint8_t txBuffSize);
-status_t BOARD_Codec_I2C_Receive(
-    uint8_t deviceAddress, uint32_t subAddress, uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
-#endif
 
 #if defined(__cplusplus)
 }

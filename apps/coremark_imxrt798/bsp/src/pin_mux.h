@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 NXP
+ * Copyright 2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -34,7 +34,6 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define IOPCTL_PIO_ANAMUX_DI 0x00u        /*!<@brief Analog mux is disabled */
-#define IOPCTL_PIO_FULLDRIVE_DI 0x00u     /*!<@brief Normal drive */
 #define IOPCTL_PIO_FUNC1 0x01u            /*!<@brief Selects pin function 1 */
 #define IOPCTL_PIO_INBUF_DI 0x00u         /*!<@brief Disable input buffer function */
 #define IOPCTL_PIO_INBUF_EN 0x40u         /*!<@brief Enables input buffer function */
@@ -45,6 +44,10 @@ void BOARD_InitBootPins(void);
 #define IOPCTL_PIO_PUPD_DI 0x00u          /*!<@brief Disable pull-up / pull-down function */
 #define IOPCTL_PIO_PUPD_EN 0x10u          /*!<@brief Enable pull-up / pull-down function */
 #define IOPCTL_PIO_SLEW_RATE_NORMAL 0x00u /*!<@brief Normal mode */
+#define IOPCTL_PIO_DRIVE_100OHM (0x0 << 12) /*!< Selects transmitter current drive 100ohm */
+#define IOPCTL_PIO_DRIVE_66OHM  (0x1 << 12) /*!< Selects transmitter current drive 66ohm */
+#define IOPCTL_PIO_DRIVE_50OHM  (0x2 << 12) /*!< Selects transmitter current drive 50ohm */
+#define IOPCTL_PIO_DRIVE_33OHM  (0x3 << 12) /*!< Selects transmitter current drive 33ohm */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

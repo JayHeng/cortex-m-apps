@@ -62,7 +62,7 @@
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>A compact configuration of the C/C++14 runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -74,7 +74,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>MIMXRT595S_M33	NXP MIMXRT595S_M33</state>
+                    <state>MIMXRT798S_M33_0	NXP MIMXRT798S_M33_0</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -120,7 +120,7 @@
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>MIMXRT595S_M33	NXP MIMXRT595S_M33</state>
+                    <state>MIMXRT798S_M33_0	NXP MIMXRT798S_M33_0</state>
                 </option>
                 <option>
                     <name>FPU2</name>
@@ -189,7 +189,7 @@
                 <option>
                     <name>TrustZoneModes</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGAarch64Abi</name>
@@ -228,12 +228,12 @@
                 <option>
                     <name>CCDefines</name>
                     <state>DEBUG</state>
-                    <state>CPU_MIMXRT595SFFOC_cm33</state>
-                    <state>BOOT_HEADER_ENABLE=1</state>
-                    <state>SERIAL_PORT_TYPE_UART=1</state>
+                    <state>CPU_MIMXRT798SGFOA_cm33_core0</state>
+                    <state>BOOT_HEADER_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
+                    <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>ITERATIONS=20000</state>
-                    <state>COMPILER_VERSION="IAR EWARM v9.10.2"</state>
+                    <state>COMPILER_VERSION="IAR EWARM v9.40.2"</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -356,13 +356,13 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$/../../src</state>
                     <state>$PROJ_DIR$/../../../src</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/drivers</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/utilities/str</state>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/utilities/debug_console</state>
-                    <state>$PROJ_DIR$/../../../../../components_v2/uart</state>
-                    <state>$PROJ_DIR$/../../../../../components_v2/serial_manager</state>
-                    <state>$PROJ_DIR$/../../../../../components_v2/lists</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S/drivers</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S/utilities/str</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S/utilities/debug_console</state>
+                    <state>$PROJ_DIR$/../../../../../components_v3/uart</state>
+                    <state>$PROJ_DIR$/../../../../../components_v3/serial_manager</state>
+                    <state>$PROJ_DIR$/../../../../../components_v3/lists</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
                     <state>$PROJ_DIR$/../../../../../middleware/coremark</state>
                 </option>
@@ -781,7 +781,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/../../../../../devices_v2/MIMXRT595S/iar/MIMXRT595Sxxxx_cm33_ram.icf</state>
+                    <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S/iar/MIMXRT798Sxxxx_cm33_core0_ram.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -2257,37 +2257,37 @@
         <group>
             <name>lists</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\lists\fsl_component_generic_list.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\lists\fsl_component_generic_list.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\lists\fsl_component_generic_list.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\lists\fsl_component_generic_list.h</name>
             </file>
         </group>
         <group>
             <name>serial_manager</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\serial_manager\fsl_component_serial_manager.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\serial_manager\fsl_component_serial_manager.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\serial_manager\fsl_component_serial_manager.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\serial_manager\fsl_component_serial_manager.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\serial_manager\fsl_component_serial_port_internal.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\serial_manager\fsl_component_serial_port_internal.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\serial_manager\fsl_component_serial_port_uart.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\serial_manager\fsl_component_serial_port_uart.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\serial_manager\fsl_component_serial_port_uart.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\serial_manager\fsl_component_serial_port_uart.h</name>
             </file>
         </group>
         <group>
             <name>uart</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\uart\fsl_adapter_uart.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\uart\fsl_adapter_lpuart.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\components_v2\uart\fsl_adapter_usart.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\components_v3\uart\fsl_adapter_uart.h</name>
             </file>
         </group>
     </group>
@@ -2306,103 +2306,91 @@
     <group>
         <name>device</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\fsl_device_registers.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\fsl_device_registers.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\MIMXRT595S_cm33.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\MIMXRT798S_cm33_core0.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\MIMXRT595S_cm33_features.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\MIMXRT798S_cm33_core0_features.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\system_MIMXRT595S_cm33.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\system_MIMXRT798S_cm33_core0.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\system_MIMXRT595S_cm33.h</name>
-        </file>
-    </group>
-    <group>
-        <name>doc</name>
-        <file>
-            <name>$PROJ_DIR$\..\readme.txt</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\system_MIMXRT798S_cm33_core0.h</name>
         </file>
     </group>
     <group>
         <name>drivers</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_cache.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_cache.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_cache.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_cache.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_clock.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_clock.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_clock.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_clock.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_common.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_common.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_common.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_common.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_common_arm.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_common_arm.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_common_arm.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_common_arm.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_ctimer.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_gpio.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_ctimer.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_gpio.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_flexcomm.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_iopctl.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_flexcomm.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_lpflexcomm.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_flexspi.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_lpflexcomm.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_flexspi.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_lpuart.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_gpio.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_lpuart.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_gpio.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_mrt.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_iap.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_mrt.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_iap.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_power.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_iopctl.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_power.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_power.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_reset.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_power.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_reset.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_reset.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_xspi.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_reset.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_usart.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\drivers\fsl_usart.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_xspi.h</name>
         </file>
     </group>
     <group>
@@ -2429,28 +2417,28 @@
     <group>
         <name>startup</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\iar\startup_MIMXRT595S_cm33.s</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\iar\startup_MIMXRT798S_cm33_core0.s</name>
         </file>
     </group>
     <group>
         <name>utilities</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\fsl_assert.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\fsl_assert.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\debug_console\fsl_debug_console.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\debug_console\fsl_debug_console.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\debug_console\fsl_debug_console.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\debug_console\fsl_debug_console.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\debug_console\fsl_debug_console_conf.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\debug_console\fsl_debug_console_conf.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\str\fsl_str.c</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\str\fsl_str.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\devices_v2\MIMXRT595S\utilities\str\fsl_str.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\utilities\str\fsl_str.h</name>
         </file>
     </group>
 </project>

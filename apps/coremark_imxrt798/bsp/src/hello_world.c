@@ -32,8 +32,10 @@ int main(void)
     char ch;
 
     /* Init board hardware. */
+    BOARD_ConfigMPU();
     BOARD_InitPins();
     BOARD_BootClockRUN();
+
     BOARD_InitDebugConsole();
 
     PRINTF("hello world.\r\n");

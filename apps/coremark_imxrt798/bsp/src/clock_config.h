@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 NXP
+ * Copyright 2023 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,6 +13,7 @@
 #define _CLOCK_CONFIG_H_
 
 #include "fsl_common.h"
+#include "fsl_clock.h"
 
 /*******************************************************************************
  * Definitions
@@ -45,7 +46,7 @@ void BOARD_InitBootClocks(void);
 /*******************************************************************************
  * Definitions for BOARD_BootClockRUN configuration
  ******************************************************************************/
-#define BOARD_BOOTCLOCKRUN_CORE_CLOCK 198000000U /*!< Core clock frequency: 198000000Hz */
+#define BOARD_BOOTCLOCKRUN_CORE_CLOCK 192000000U /*!< Core clock frequency: 192000000Hz */
 
 /*******************************************************************************
  * API for BOARD_BootClockRUN configuration

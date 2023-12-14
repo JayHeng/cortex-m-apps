@@ -354,7 +354,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$/../../src</state>
+                    <state>$PROJ_DIR$/../../src_core0</state>
                     <state>$PROJ_DIR$/../../../src</state>
                     <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S/drivers</state>
                     <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT798S</state>
@@ -2204,28 +2204,28 @@
     <group>
         <name>board</name>
         <file>
-            <name>$PROJ_DIR$\..\..\src\board.c</name>
+            <name>$PROJ_DIR$\..\..\src_core0\board.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\board.h</name>
+            <name>$PROJ_DIR$\..\..\src_core0\board.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\clock_config.c</name>
+            <name>$PROJ_DIR$\..\..\src_core0\clock_config.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
+            <name>$PROJ_DIR$\..\..\src_core0\clock_config.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\env_pmc_drv.c</name>
+            <name>$PROJ_DIR$\..\..\src_core0\env_pmc_drv.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\env_pmc_drv.h</name>
+            <name>$PROJ_DIR$\..\..\src_core0\env_pmc_drv.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\pin_mux.c</name>
+            <name>$PROJ_DIR$\..\..\src_core0\pin_mux.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\src\pin_mux.h</name>
+            <name>$PROJ_DIR$\..\..\src_core0\pin_mux.h</name>
         </file>
     </group>
     <group>

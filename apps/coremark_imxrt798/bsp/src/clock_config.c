@@ -87,11 +87,11 @@ void BOARD_BootClockRUN(void)
     CLOCK_EnableSysOscClk(true, true, BOARD_SYSOSC_SETTLING_US); /* Enable system OSC */
     CLOCK_SetXtalFreq(BOARD_XTAL_SYS_CLK_HZ);                    /* Sets external XTAL OSC freq */
 
-    CLOCK_EnableFroClkFreq(FRO0, 150000000U, kCLOCK_FroAllOutEn);
-    CLOCK_EnableFroClkFreqCloseLoop(FRO2, &froAutotrimCfg, kCLOCK_FroAllOutEn);
+    //CLOCK_EnableFroClkFreq(FRO0, 150000000U, kCLOCK_FroAllOutEn);
+    //CLOCK_EnableFroClkFreqCloseLoop(FRO2, &froAutotrimCfg, kCLOCK_FroAllOutEn);
 
     CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
-    CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
+    //CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
 
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
     CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */

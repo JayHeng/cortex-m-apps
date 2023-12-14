@@ -8,14 +8,14 @@
 #include "coremark.h"
 #include "core_portme.h"
 #include "clock_config.h"
-#include "fsl_ctimer.h"
+#include "fsl_mrt.h"
 #include "fsl_debug_console.h"
 #include "pin_mux.h"
 #include "board.h"
 
-#define CTIMER CTIMER2                  /* Timer 3 */
-#define CTIMER_MAT0_OUT kCTIMER_Match_0 /* Match output 0 */
-#define CTIMER_CLK_FREQ CLOCK_GetCtimerClkFreq(2)
+#define MRT          MRT0             /* Timer 0 */
+#define MRT_CHANNEL  kMRT_Channel_0
+#define MRT_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
 
 #if VALIDATION_RUN
 	volatile ee_s32 seed1_volatile=0x3415;
@@ -38,50 +38,47 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-void ctimer_match0_callback(uint32_t flags);
 
-/* Array of function pointers for callback for each channel */
-ctimer_callback_t ctimer_callback_table[] = {
-    ctimer_match0_callback, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 
-/* Match Configuration for Channel 0 */
-static ctimer_match_config_t matchConfig0;
 
 /*******************************************************************************
  * Code
  ******************************************************************************/
 
 volatile uint32_t s_timerHighCounter = 0;
-void ctimer_match0_callback(uint32_t flags)
+void MRT0_IRQHandler(void)
 {
+    /* Clear interrupt flag.*/
+    MRT_ClearStatusFlags(MRT, MRT_CHANNEL, kMRT_TimerInterruptFlag);
     s_timerHighCounter++;
+    SDK_ISR_EXIT_BARRIER;
 }
 
 void timer_init(void)
 {
-    ctimer_config_t config;
+    /* Structure of initialize MRT */
+    mrt_config_t mrtConfig;
 
-    /* Use 16 MHz clock for the Ctimer2 */
-    CLOCK_AttachClk(kMAIN_CLK_to_CTIMER2);
+    /* mrtConfig.enableMultiTask = false; */
+    MRT_GetDefaultConfig(&mrtConfig);
 
-    CTIMER_GetDefaultConfig(&config);
-    CTIMER_Init(CTIMER, &config);
+    /* Init mrt module */
+    MRT_Init(MRT, &mrtConfig);
 
-    /* Configuration 0 */
-    matchConfig0.enableCounterReset = true;
-    matchConfig0.enableCounterStop = false;
-    matchConfig0.matchValue = (uint32_t)~0;
-    matchConfig0.outControl = kCTIMER_Output_Toggle;
-    matchConfig0.outPinInitState = false;
-    matchConfig0.enableInterrupt = true;
+    /* Setup Channel 0 to be repeated */
+    MRT_SetupChannelMode(MRT, MRT_CHANNEL, kMRT_RepeatMode);
 
-    CTIMER_RegisterCallBack(CTIMER, &ctimer_callback_table[0], kCTIMER_SingleCallback);
-    CTIMER_SetupMatch(CTIMER, CTIMER_MAT0_OUT, &matchConfig0);
-    CTIMER_StartTimer(CTIMER);
+    /* Enable timer interrupts for channel 0 */
+    MRT_EnableInterrupts(MRT, MRT_CHANNEL, kMRT_TimerInterruptEnable);
+
+    /* Enable at the NVIC */
+    EnableIRQ(MRT0_IRQn);
+    
+    MRT_StartTimer(MRT0, MRT_CHANNEL, MRT_CHANNEL_INTVAL_IVALUE_MASK);
 }
 
 /* Porting : Timing functions
@@ -96,9 +93,9 @@ CORETIMETYPE barebones_clock() {
     do
     {
         high = s_timerHighCounter;
-        low = CTIMER_GetTimerCountValue(CTIMER);
+        low = MRT_GetCurrentTimerCount(MRT, MRT_CHANNEL);
     } while (high != s_timerHighCounter);
-    retVal = ((uint64_t)high << 32U) + low;
+    retVal = ((uint64_t)high << 24U) + low;
 
     return retVal;
 }
@@ -108,7 +105,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#define CLOCKS_PER_SEC CLOCK_GetCtimerClkFreq(2)
+#define CLOCKS_PER_SEC MRT_CLK_FREQ
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1

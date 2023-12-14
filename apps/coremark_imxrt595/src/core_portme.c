@@ -172,6 +172,8 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
+    ee_printf("--------------------------------\n");
+    ee_printf("i.MXRT595 core clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
     /* Init timer for microsecond function. */
     timer_init();
     

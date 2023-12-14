@@ -165,10 +165,22 @@ ee_u32 default_num_contexts=1;
 */
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
+//    *(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
+    //*(uint32_t*)0x40033000 = (*(uint32_t*)0x40033000) | 0x1;
+    //*(uint32_t*)0x40034000 = (*(uint32_t*)0x40034000) | 0x1;
+    
+    *(uint32_t*)0x40033000 = 0x85000001;
+    *(uint32_t*)0x40034000 = 0x85000001;
+  
     /* Init board hardware. */
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
+    ee_printf("--------------------------------\n");
+    ee_printf(".text section in SRAM P4\n");
+    ee_printf(".data section in SRAM P16\n");
+    ee_printf("STACK section in SRAM P0\n");
+    ee_printf("i.MXRT798 core0 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
     /* Init timer for microsecond function. */
     timer_init();
     

@@ -99,10 +99,10 @@ void BOARD_BootClockRUN(void)
     // PFDx (12 - 35)
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
     //////////////////////////////////////////////////
-    CLOCK_InitMainPfd(kCLOCK_Pfd0, 32U); /* 297MHz */
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 32U); /* 297MHz */
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 26U); /* 365MHz */
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 25U); /* 380MHz */
-    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U); /* 396MHz */
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U); /* 396MHz */
     CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
 
     //CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);    /* Switch to PLL 528/2=264MHZ */
@@ -111,11 +111,11 @@ void BOARD_BootClockRUN(void)
     CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
 
     /* Configure Audio PLL clock source. */
-    CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
-    CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
+    //CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
+    //CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
 
-    CLOCK_AttachClk(kFRO0_DIV1_to_VDD2_CLKOUT);
-    CLOCK_SetClkDiv(kCLOCK_DivClockOut, 10U);
+    //CLOCK_AttachClk(kFRO0_DIV1_to_VDD2_CLKOUT);
+    //CLOCK_SetClkDiv(kCLOCK_DivClockOut, 10U);
 
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 }

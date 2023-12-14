@@ -30,17 +30,18 @@ pmc_ldo_config_t pmc_ldo1_active_cfg, pmc_ldo2_active_cfg;
 pmc_dcdc_config_t pmc_dcdc_od_cfg = {
     .dcdcMode = kPMC_HighPower,
     .dcdcVsel = kPMC_DCDC_VSEL1,//VSEL0 reset value = 1.0, VSEL1 reset value = 1.1
-    .dcdcVoltage = 1100-6.25*5,//mV
+    .dcdcVoltage = 1100 +6.25*8,//mV
 };
 pmc_ldo_config_t pmc_ldo1_od_cfg = {
     .ldoMode = kPMC_LDO_HighPower,
     .ldoVsel = kPMC_LDO_VSEL3,//VSEL3 reset value = 1.0
-    .ldoVoltage = 1000-12.5*2,
+    .ldoVoltage = 1000-12.5*1,
 };
 pmc_ldo_config_t pmc_ldo2_od_cfg = {
     .ldoMode = kPMC_LDO_HighPower,
     .ldoVsel = kPMC_LDO_VSEL3,//VSEL3 reset value = 1.0
-    .ldoVoltage = 1000-12.5*2,
+    //.ldoVoltage = 1000-12.5*1,
+    .ldoVoltage = 1100,
 };
 
 pmc_dcdc_config_t pmc_dcdc_sd_cfg = {

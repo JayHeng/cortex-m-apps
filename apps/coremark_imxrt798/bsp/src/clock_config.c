@@ -93,12 +93,22 @@ void BOARD_BootClockRUN(void)
     CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
     //CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
 
+    // Fmainpll0_out = 528MHz
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
-    CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
+    // F(PFDx) = Fmainpll0_out * (18 / PFDx)
+    // PFDx (12 - 35)
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
+    //////////////////////////////////////////////////
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 32U); /* 297MHz */
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 26U); /* 365MHz */
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 25U); /* 380MHz */
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U); /* 396MHz */
     CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
 
-    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);
-    CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); /* Switch to PLL 528/2=264MHZ */
+    //CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);    /* Switch to PLL 528/2=264MHZ */
+    //////////////////////////////////////////////////
+    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
+    CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
 
     /* Configure Audio PLL clock source. */
     CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */

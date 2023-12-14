@@ -232,7 +232,7 @@
                     <state>BOOT_HEADER_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
-                    <state>ITERATIONS=20000</state>
+                    <state>ITERATIONS=25000</state>
                     <state>COMPILER_VERSION="IAR EWARM v9.40.2"</state>
                 </option>
                 <option>
@@ -2214,6 +2214,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\src\clock_config.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\src\env_pmc_drv.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\src\env_pmc_drv.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\src\pin_mux.c</name>

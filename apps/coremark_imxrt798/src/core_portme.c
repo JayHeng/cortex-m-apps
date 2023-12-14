@@ -163,6 +163,7 @@ ee_u32 default_num_contexts=1;
 	Target specific initialization code 
 	Test for some common mistakes.
 */
+extern void set_power(void);
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
 //    *(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
@@ -176,6 +177,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
+    set_power();
     ee_printf("--------------------------------\n");
     ee_printf(".text section in SRAM P4\n");
     ee_printf(".data section in SRAM P16\n");

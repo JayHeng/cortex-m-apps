@@ -37,7 +37,9 @@ uint32_t get_core1_image_size(void);
 /*******************************************************************************
  * Code
  ******************************************************************************/
-   
+#if defined(__ICCARM__)
+#pragma optimize=none
+#endif
 static void sram_unsecure(void){
 //pre_main: AHB Secure control configure....
   *((uint32_t *)0x4017cc00) = 0x00060000;//clear bit18
@@ -125,6 +127,9 @@ static void sram_unsecure(void){
   *((uint32_t *)0x5017cc00) = 0x00000007; 
 }
 
+#if defined(__ICCARM__)
+#pragma optimize=none
+#endif
 static void PMC_ReleasePower()
 {
 #if defined(MIMXRT798S_cm33_core0_SERIES)
@@ -154,6 +159,9 @@ uint32_t get_core1_image_size()
     return image_size;
 }
 
+#if defined(__ICCARM__)
+#pragma optimize=none
+#endif
 void APP_BootCore1(void)
 {
     sram_unsecure();
@@ -185,6 +193,9 @@ void APP_BootCore1(void)
 /*!
  * @brief Function to copy core1 image to execution address.
  */
+#if defined(__ICCARM__)
+#pragma optimize=none
+#endif
 void APP_CopyCore1Image(void)
 {
     /* Calculate size of the image  - not required on MCUXpresso IDE. MCUXpresso copies the secondary core

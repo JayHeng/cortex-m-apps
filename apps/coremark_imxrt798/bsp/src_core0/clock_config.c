@@ -89,9 +89,10 @@ void BOARD_BootClockRUN(void)
 
     //CLOCK_EnableFroClkFreq(FRO0, 150000000U, kCLOCK_FroAllOutEn);
     //CLOCK_EnableFroClkFreqCloseLoop(FRO2, &froAutotrimCfg, kCLOCK_FroAllOutEn);
+    CLOCK_EnableFroClkFreq(FRO2, 300000000U, kCLOCK_FroAllOutEn);    
 
     CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
-    //CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
+    CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
 
     // Fmainpll0_out = 528MHz
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);

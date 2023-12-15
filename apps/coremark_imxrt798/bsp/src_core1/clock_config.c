@@ -138,5 +138,8 @@ void BOARD_InitBootClocks(void)
  ******************************************************************************/
 void BOARD_BootClockRUN(void)
 {
+    CLOCK_AttachClk(kFRO2_DIV3_to_SENSE_BASE);
+    CLOCK_SetClkDiv(kCLOCK_DivSenseMainClk, 1);
+    CLOCK_AttachClk(kSENSE_BASE_to_SENSE_MAIN);
 }
 #endif

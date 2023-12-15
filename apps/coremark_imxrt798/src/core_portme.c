@@ -12,6 +12,7 @@
 #include "pin_mux.h"
 #include "board.h"
 #include "fsl_mrt.h"
+#include "fsl_gpio.h"
 #if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 #define MRT             MRT0             /* Timer 0 */
 #define MRT_CHANNEL     kMRT_Channel_0
@@ -176,12 +177,10 @@ ee_u32 default_num_contexts=1;
 extern void set_power(void);
 extern void APP_BootCore1(void);
 extern void APP_CopyCore1Image(void);
-#elif  (defined(CPU_MIMXRT798SGFOA_cm33_core1))
-
 #endif
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-//    *(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
+    //*(uint32_t*)0x40001010 = (*(uint32_t*)0x40001010) | 0x6;
     //*(uint32_t*)0x40033000 = (*(uint32_t*)0x40033000) | 0x1;
     //*(uint32_t*)0x40034000 = (*(uint32_t*)0x40034000) | 0x1;
 
@@ -204,6 +203,18 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     ee_printf("STACK section in SRAM P0\n");
     ee_printf("i.MXRT798 core0 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
 #elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+    /* Define the init structure for the output LED pin*/
+    gpio_pin_config_t led_config = {
+        kGPIO_DigitalOutput,
+        0,
+    };
+    RESET_ClearPeripheralReset(kGPIO8_RST_SHIFT_RSTn);
+    CLOCK_EnableClock(kCLOCK_Gpio8);
+    RESET_PeripheralReset(kGPIO8_RST_SHIFT_RSTn);
+    /* Init output LED GPIO. */
+    GPIO_PinInit(GPIO8, 6, &led_config);
+    GPIO_PortToggle(GPIO8, 1u << 6);
+
     ee_printf(".text section in SRAM P18\n");
     ee_printf(".data section in SRAM P26\n");
     ee_printf("STACK section in SRAM P26\n");

@@ -11,11 +11,18 @@
 #include "fsl_debug_console.h"
 #include "pin_mux.h"
 #include "board.h"
-
-#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 #include "fsl_mrt.h"
-#define MRT          MRT0             /* Timer 0 */
-#define MRT_CHANNEL  kMRT_Channel_0
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+#define MRT             MRT0             /* Timer 0 */
+#define MRT_CHANNEL     kMRT_Channel_0
+#define MRT_IRQ         MRT0_IRQn
+#define MRT_IRQHANDLER  MRT0_IRQHandler
+#define MRT_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
+#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+#define MRT             MRT1             /* Timer 1 */
+#define MRT_CHANNEL     kMRT_Channel_0
+#define MRT_IRQ         MRT1_IRQn
+#define MRT_IRQHANDLER  MRT1_IRQHandler
 #define MRT_CLK_FREQ CLOCK_GetFreq(kCLOCK_BusClk)
 #endif
 
@@ -52,9 +59,7 @@
  ******************************************************************************/
 
 volatile uint32_t s_timerHighCounter = 0;
-
-#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
-void MRT0_IRQHandler(void)
+void MRT_IRQHANDLER(void)
 {
     /* Clear interrupt flag.*/
     MRT_ClearStatusFlags(MRT, MRT_CHANNEL, kMRT_TimerInterruptFlag);
@@ -80,16 +85,10 @@ void timer_init(void)
     MRT_EnableInterrupts(MRT, MRT_CHANNEL, kMRT_TimerInterruptEnable);
 
     /* Enable at the NVIC */
-    EnableIRQ(MRT0_IRQn);
+    EnableIRQ(MRT_IRQ);
     
-    MRT_StartTimer(MRT0, MRT_CHANNEL, MRT_CHANNEL_INTVAL_IVALUE_MASK);
+    MRT_StartTimer(MRT, MRT_CHANNEL, MRT_CHANNEL_INTVAL_IVALUE_MASK);
 }
-#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
-void timer_init(void)
-{
-
-}
-#endif
 
 /* Porting : Timing functions
 	How to capture time and convert to seconds must be ported to whatever is supported by the platform.
@@ -103,9 +102,7 @@ CORETIMETYPE barebones_clock() {
     do
     {
         high = s_timerHighCounter;
-#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
         low = MRT_GetCurrentTimerCount(MRT, MRT_CHANNEL);
-#endif
     } while (high != s_timerHighCounter);
     retVal = ((uint64_t)high << 24U) + low;
 
@@ -117,11 +114,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
 #define CLOCKS_PER_SEC MRT_CLK_FREQ
-#elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
-#define CLOCKS_PER_SEC 10000
-#endif
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1
@@ -183,6 +176,8 @@ ee_u32 default_num_contexts=1;
 extern void set_power(void);
 extern void APP_BootCore1(void);
 extern void APP_CopyCore1Image(void);
+#elif  (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+
 #endif
 void portable_init(core_portable *p, int *argc, char *argv[])
 {

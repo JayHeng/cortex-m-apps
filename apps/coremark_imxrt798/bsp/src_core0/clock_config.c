@@ -97,17 +97,17 @@ void BOARD_BootClockRUN(void)
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
     // F(PFDx) = Fmainpll0_out * (18 / PFDx)
     // PFDx (12 - 35)
-    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
     //////////////////////////////////////////////////
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 32U); /* 297MHz */
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 26U); /* 365MHz */
     //CLOCK_InitMainPfd(kCLOCK_Pfd0, 25U); /* 380MHz */
-    CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U); /* 396MHz */
+    //CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U); /* 396MHz */
     CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
 
-    //CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);    /* Switch to PLL 528/2=264MHZ */
+    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);    /* Switch to PLL 528/2=264MHZ */
     //////////////////////////////////////////////////
-    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
+    //CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
     CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
 
     /* Configure Audio PLL clock source. */

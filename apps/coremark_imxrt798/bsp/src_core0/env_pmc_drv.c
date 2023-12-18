@@ -35,7 +35,7 @@ pmc_dcdc_config_t pmc_dcdc_od_cfg = {
 pmc_ldo_config_t pmc_ldo1_od_cfg = {
     .ldoMode = kPMC_LDO_HighPower,
     .ldoVsel = kPMC_LDO_VSEL3,//VSEL3 reset value = 1.0
-    .ldoVoltage = 1000-12.5*1,
+    .ldoVoltage = 900,
 };
 pmc_ldo_config_t pmc_ldo2_od_cfg = {
     .ldoMode = kPMC_LDO_HighPower,

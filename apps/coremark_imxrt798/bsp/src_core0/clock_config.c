@@ -111,10 +111,12 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
     CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
 
+#if !defined(XIP_FLASH)
     /* Configure Audio PLL clock source. */
-    //CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
-    //CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
-
+    CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
+    CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
+#endif
+    
     CLOCK_AttachClk(kFRO0_DIV1_to_VDD2_CLKOUT);
     CLOCK_SetClkDiv(kCLOCK_DivClockOut, 10U);
 

@@ -2430,7 +2430,7 @@ _coremark_core1_image</state>
                 <option>
                     <name>CCDefines</name>
                     <state>DEBUG</state>
-                    <state>RUN_XIP</state>
+                    <state>XIP_FLASH</state>
                     <state>CPU_MIMXRT798SGFOA_cm33_core0</state>
                     <state>BOOT_HEADER_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
@@ -2899,7 +2899,7 @@ _coremark_core1_image</state>
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>184</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>

@@ -84,9 +84,9 @@ void BOARD_BootClockRUN(void)
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
     // F(PFDx) = Fmainpll0_out * (18 / PFDx)
     // PFDx (12 - 35)
-    CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U);
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U);
     CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
-    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);      
+    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
     CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
 
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;

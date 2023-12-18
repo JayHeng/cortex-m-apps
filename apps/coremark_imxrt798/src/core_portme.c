@@ -184,12 +184,12 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     //*(uint32_t*)0x40033000 = (*(uint32_t*)0x40033000) | 0x1;
     //*(uint32_t*)0x40034000 = (*(uint32_t*)0x40034000) | 0x1;
 
+#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+    //BOARD_ConfigMPU();
     /* Init board hardware. */
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    ee_printf("--------------------------------\n");
-#if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
     set_power();
 
     *(uint32_t*)0x40033000 = 0x85000001;
@@ -197,6 +197,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 
     APP_CopyCore1Image();
     APP_BootCore1();
+    ee_printf("--------------------------------\n");
 #if defined(RUN_XIP)
     ee_printf(".text section in XSPI0 Flash\n");
 #else
@@ -206,6 +207,11 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     ee_printf("STACK section in SRAM P0\n");
     ee_printf("i.MXRT798 core0 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));
 #elif (defined(CPU_MIMXRT798SGFOA_cm33_core1))
+    /* Init board hardware. */
+    BOARD_InitPins();
+    BOARD_BootClockRUN();
+    BOARD_InitDebugConsole();
+
     /* Define the init structure for the output LED pin*/
     gpio_pin_config_t led_config = {
         kGPIO_DigitalOutput,
@@ -218,6 +224,7 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     GPIO_PinInit(GPIO8, 6, &led_config);
     GPIO_PortToggle(GPIO8, 1u << 6);
 
+    ee_printf("--------------------------------\n");
     ee_printf(".text section in SRAM P18\n");
     ee_printf(".data section in SRAM P26\n");
     ee_printf("STACK section in SRAM P26\n");

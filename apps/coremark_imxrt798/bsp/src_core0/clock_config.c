@@ -66,6 +66,32 @@ void BOARD_InitBootClocks(void)
 /*******************************************************************************
  * Code for BOARD_BootClockRUN configuration
  ******************************************************************************/
+#if defined(RUN_XIP)
+void BOARD_BootClockRUN(void)
+{
+    /* Power up OSC */
+    POWER_DisablePD(kPDRUNCFG_PD_SYSXTAL);
+    CLOCK_EnableSysOscClk(true, true, BOARD_SYSOSC_SETTLING_US); /* Enable system OSC */
+    CLOCK_SetXtalFreq(BOARD_XTAL_SYS_CLK_HZ);                    /* Sets external XTAL OSC freq */
+
+    CLOCK_AttachClk(kOSC_CLK_to_FCCLK0);
+
+    /* Ungate FRO2 clock. */
+    POWER_DisablePD(kPDRUNCFG_GATE_FRO2);
+    CLOCK_EnableFroClkFreq(FRO2, 300000000U, kCLOCK_FroAllOutEn);    
+
+    // Fmainpll0_out = 528MHz
+    CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
+    // F(PFDx) = Fmainpll0_out * (18 / PFDx)
+    // PFDx (12 - 35)
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U);
+    CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
+    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);      
+    CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
+
+    SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
+}
+#else
 void BOARD_BootClockRUN(void)
 {
     const clock_fro_config_t froAutotrimCfg = {
@@ -86,16 +112,14 @@ void BOARD_BootClockRUN(void)
     POWER_DisablePD(kPDRUNCFG_PD_SYSXTAL);
     CLOCK_EnableSysOscClk(true, true, BOARD_SYSOSC_SETTLING_US); /* Enable system OSC */
     CLOCK_SetXtalFreq(BOARD_XTAL_SYS_CLK_HZ);                    /* Sets external XTAL OSC freq */
-    CLOCK_AttachClk(kOSC_CLK_to_FCCLK0);
 
     //CLOCK_EnableFroClkFreq(FRO0, 150000000U, kCLOCK_FroAllOutEn);
     //CLOCK_EnableFroClkFreqCloseLoop(FRO2, &froAutotrimCfg, kCLOCK_FroAllOutEn);
     CLOCK_EnableFroClkFreq(FRO2, 300000000U, kCLOCK_FroAllOutEn);    
 
-    //CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
-    //CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
+    CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
+    CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
 
-/*
     // Fmainpll0_out = 528MHz
     CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
     // F(PFDx) = Fmainpll0_out * (18 / PFDx)
@@ -112,7 +136,7 @@ void BOARD_BootClockRUN(void)
     //////////////////////////////////////////////////
     //CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
     CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
-*/
+
     /* Configure Audio PLL clock source. */
     //CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
     //CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
@@ -122,6 +146,7 @@ void BOARD_BootClockRUN(void)
 
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 }
+#endif
 #else
 /*******************************************************************************
  * Definitions

@@ -3224,7 +3224,7 @@
         </debuggerPlugins>
     </configuration>
     <configuration>
-        <name>flash_config</name>
+        <name>flash_debug</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>

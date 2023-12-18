@@ -15,6 +15,8 @@
 /apps/*/bsp/*/settings
 /apps/*/bsp/*/iar/Release
 /apps/*/bsp/*/iar/Debug
+/apps/*/bsp/*/iar/Flash_Release
+/apps/*/bsp/*/iar/Flash_Debug
 
 /apps/*/*/cm7_coremark.h
 /apps/*/*/cm7_dhrystone.h

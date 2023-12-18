@@ -197,8 +197,11 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 
     APP_CopyCore1Image();
     APP_BootCore1();
-
+#if defined(RUN_XIP)
+    ee_printf(".text section in XSPI0 Flash\n");
+#else
     ee_printf(".text section in SRAM P4\n");
+#endif
     ee_printf(".data section in SRAM P16\n");
     ee_printf("STACK section in SRAM P0\n");
     ee_printf("i.MXRT798 core0 clk freq: %dHz\r\n", CLOCK_GetFreq(kCLOCK_CoreSysClk));

@@ -2204,7 +2204,7 @@ _coremark_core1_image</state>
         </settings>
     </configuration>
     <configuration>
-        <name>flash_config</name>
+        <name>flash_debug</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -2218,19 +2218,19 @@ _coremark_core1_image</state>
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>flash_config\BrowseInfo</state>
+                    <state>flash_debug\BrowseInfo</state>
                 </option>
                 <option>
                     <name>ExePath</name>
-                    <state>flash_config\Exe</state>
+                    <state>flash_debug\Exe</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
-                    <state>flash_config\Obj</state>
+                    <state>flash_debug\Obj</state>
                 </option>
                 <option>
                     <name>ListPath</name>
-                    <state>flash_config\List</state>
+                    <state>flash_debug\List</state>
                 </option>
                 <option>
                     <name>GEndianMode</name>
@@ -2403,7 +2403,7 @@ _coremark_core1_image</state>
                 </option>
                 <option>
                     <name>BuildFilesPath</name>
-                    <state>flash_config\</state>
+                    <state>flash_debug\</state>
                 </option>
                 <option>
                     <name>PointerAuthentication</name>
@@ -2430,11 +2430,12 @@ _coremark_core1_image</state>
                 <option>
                     <name>CCDefines</name>
                     <state>DEBUG</state>
+                    <state>RUN_XIP</state>
                     <state>CPU_MIMXRT798SGFOA_cm33_core0</state>
                     <state>BOOT_HEADER_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
-                    <state>ITERATIONS=10000</state>
+                    <state>ITERATIONS=2000</state>
                     <state>COMPILER_VERSION="IAR EWARM v9.40.2"</state>
                 </option>
                 <option>

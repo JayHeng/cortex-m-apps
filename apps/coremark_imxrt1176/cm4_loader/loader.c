@@ -14,6 +14,9 @@
  ******************************************************************************/
 #define CM4_COREMARK_START 0x1FFE0000U
 
+uint32_t appStack = 0;
+uint32_t appEntry = 0;
+
 #define ITCM_START   0x1FFE0000
 #define ITCM_SIZE    (128*1024U)
 #define DTCM_START   0x20000000
@@ -112,8 +115,8 @@ int main(void)
     // Copy image to RAM.
     memcpy((void *)CM4_COREMARK_START, cm4_app_code, APP_LEN);
     
-    uint32_t appStack = *(uint32_t *)(CM4_COREMARK_START);
-    uint32_t appEntry = *(uint32_t *)(CM4_COREMARK_START + 4);
+    appStack = *(uint32_t *)(CM4_COREMARK_START);
+    appEntry = *(uint32_t *)(CM4_COREMARK_START + 4);
 
     // Turn off interrupts.
     __disable_irq();

@@ -27,6 +27,8 @@
  * Variables
  ******************************************************************************/
 
+uint32_t appStack = 0;
+uint32_t appEntry = 0;
 
 /*******************************************************************************
  * Code
@@ -87,8 +89,8 @@ int main(void)
     // Copy image to RAM.
     memcpy((void *)APP_START, cm7_app_code, APP_LEN);
     
-    uint32_t appStack = *(uint32_t *)(APP_START);
-    uint32_t appEntry = *(uint32_t *)(APP_START + 4);
+    appStack = *(uint32_t *)(APP_START);
+    appEntry = *(uint32_t *)(APP_START + 4);
 
     // Turn off interrupts.
     __disable_irq();

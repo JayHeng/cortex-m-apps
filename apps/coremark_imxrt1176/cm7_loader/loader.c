@@ -14,8 +14,11 @@
  ******************************************************************************/
 #define CM7_COREMARK_START 0U
 
-uint32_t appStack = 0;
-uint32_t appEntry = 0;
+uint32_t s_appStack = 0;
+uint32_t s_appEntry = 0;
+
+typedef void (*call_function_t)(void);
+call_function_t s_callFunction = 0;
 
 #define ITCM_START   0x00000000
 #define ITCM_SIZE    (256*1024U)
@@ -115,8 +118,8 @@ int main(void)
     // Copy image to RAM.
     memcpy((void *)CM7_COREMARK_START, cm7_app_code, APP_LEN);
     
-    appStack = *(uint32_t *)(CM7_COREMARK_START);
-    appEntry = *(uint32_t *)(CM7_COREMARK_START + 4);
+    s_appStack = *(uint32_t *)(CM7_COREMARK_START);
+    s_appEntry = *(uint32_t *)(CM7_COREMARK_START + 4);
 
     // Turn off interrupts.
     __disable_irq();
@@ -129,11 +132,12 @@ int main(void)
     __DSB();
 
     // Set main stack pointer and process stack pointer.
-    __set_MSP(appStack);
-    __set_PSP(appStack);
+    __set_MSP(s_appStack);
+    __set_PSP(s_appStack);
 
     // Jump to app entry point, does not return.
-    ((void (*)(void))appEntry)();
+    s_callFunction = (call_function_t)s_appEntry;
+    s_callFunction();
 
     while (1)
     {

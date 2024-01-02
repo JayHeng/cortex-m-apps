@@ -133,8 +133,7 @@ int main(void)
     __set_PSP(appStack);
 
     // Jump to app entry point, does not return.
-    void (*entry)(void) = (void (*)(void))appEntry;
-    entry();
+    ((void (*)(void))appEntry)();
 
     while (1)
     {

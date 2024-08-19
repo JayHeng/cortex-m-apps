@@ -70,7 +70,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.40.2.67586</state>
+                    <state>9.50.1.69462</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -3442,6 +3442,12 @@ _coremark_core1_image</state>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_cache.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_cache64.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_cache64.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT798S\drivers\fsl_clock.c</name>

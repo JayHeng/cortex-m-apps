@@ -66,6 +66,32 @@ void BOARD_InitBootClocks(void)
 /*******************************************************************************
  * Code for BOARD_BootClockRUN configuration
  ******************************************************************************/
+#if defined(XIP_FLASH)
+void BOARD_BootClockRUN(void)
+{
+    /* Power up OSC */
+    POWER_DisablePD(kPDRUNCFG_PD_SYSXTAL);
+    CLOCK_EnableSysOscClk(true, true, BOARD_SYSOSC_SETTLING_US); /* Enable system OSC */
+    CLOCK_SetXtalFreq(BOARD_XTAL_SYS_CLK_HZ);                    /* Sets external XTAL OSC freq */
+
+    CLOCK_AttachClk(kOSC_CLK_to_FCCLK0);
+
+    /* Ungate FRO2 clock. */
+    POWER_DisablePD(kPDRUNCFG_GATE_FRO2);
+    CLOCK_EnableFroClkFreq(FRO2, 300000000U, kCLOCK_FroAllOutEn);    
+
+    // Fmainpll0_out = 528MHz
+    CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
+    // F(PFDx) = Fmainpll0_out * (18 / PFDx)
+    // PFDx (12 - 35)
+    CLOCK_InitMainPfd(kCLOCK_Pfd0, 24U);
+    CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
+    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 1U);      
+    CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); 
+
+    SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
+}
+#else
 void BOARD_BootClockRUN(void)
 {
     const clock_fro_config_t froAutotrimCfg = {
@@ -122,6 +148,7 @@ void BOARD_BootClockRUN(void)
 
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 }
+#endif
 #else
 /*******************************************************************************
  * Definitions

@@ -88,7 +88,7 @@
                 </option>
                 <option>
                     <name>OCLastSavedByProductVersion</name>
-                    <state>9.40.2.67586</state>
+                    <state>9.50.1.69462</state>
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
@@ -556,6 +556,27 @@
                 <option>
                     <name>CCJTagUpdateBreakpoints</name>
                     <state>_call_main</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>GPLINK_ID</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OCDriverInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>DoLogfile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>LogFile</name>
+                    <state>$PROJ_DIR$\cspycomm.log</state>
                 </option>
             </data>
         </settings>
@@ -1547,6 +1568,10 @@
         </settings>
         <debuggerPlugins>
             <plugin>
+                <file>$TOOLKIT_DIR$\plugins\rtos\Azure\AzureArmPlugin.ENU.ewplugin</file>
+                <loadFlag>0</loadFlag>
+            </plugin>
+            <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\CMX\CmxArmPlugin.ENU.ewplugin</file>
                 <loadFlag>0</loadFlag>
             </plugin>
@@ -2167,6 +2192,27 @@
                 <option>
                     <name>CCJTagUpdateBreakpoints</name>
                     <state>_call_main</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>GPLINK_ID</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>0</debug>
+                <option>
+                    <name>OCDriverInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>DoLogfile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>LogFile</name>
+                    <state>$PROJ_DIR$\cspycomm.log</state>
                 </option>
             </data>
         </settings>
@@ -3158,6 +3204,10 @@
         </settings>
         <debuggerPlugins>
             <plugin>
+                <file>$TOOLKIT_DIR$\plugins\rtos\Azure\AzureArmPlugin.ENU.ewplugin</file>
+                <loadFlag>0</loadFlag>
+            </plugin>
+            <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\CMX\CmxArmPlugin.ENU.ewplugin</file>
                 <loadFlag>0</loadFlag>
             </plugin>
@@ -3778,6 +3828,27 @@
                 <option>
                     <name>CCJTagUpdateBreakpoints</name>
                     <state>_call_main</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>GPLINK_ID</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OCDriverInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>DoLogfile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>LogFile</name>
+                    <state>$PROJ_DIR$\cspycomm.log</state>
                 </option>
             </data>
         </settings>
@@ -4768,6 +4839,10 @@
             </data>
         </settings>
         <debuggerPlugins>
+            <plugin>
+                <file>$TOOLKIT_DIR$\plugins\rtos\Azure\AzureArmPlugin.ENU.ewplugin</file>
+                <loadFlag>0</loadFlag>
+            </plugin>
             <plugin>
                 <file>$TOOLKIT_DIR$\plugins\rtos\CMX\CmxArmPlugin.ENU.ewplugin</file>
                 <loadFlag>0</loadFlag>

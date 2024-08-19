@@ -14,6 +14,7 @@
 #include "fsl_mrt.h"
 #include "fsl_gpio.h"
 #if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+#include "fsl_cache64.h"
 #define MRT             MRT0             /* Timer 0 */
 #define MRT_CHANNEL     kMRT_Channel_0
 #define MRT_IRQ         MRT0_IRQn
@@ -195,6 +196,11 @@ void portable_init(core_portable *p, int *argc, char *argv[])
     BOARD_InitDebugConsole();
 
 #if (defined(CPU_MIMXRT798SGFOA_cm33_core0))
+    //cache64_config_t cacheConfig;
+    //CACHE64_GetDefaultConfig(&cacheConfig);
+    //CACHE64_Init(CACHE64_POLSEL0, &cacheConfig);
+    //CACHE64_EnableCache(CACHE64_CTRL0);
+
     set_power();
     
     SYSCON0->COMP_AUTOGATE_EN = 0x7;
@@ -214,8 +220,10 @@ void portable_init(core_portable *p, int *argc, char *argv[])
 
     ee_printf("--------------------------------\n");
 #if defined(RUN_XIP)
+    ee_printf("CACHE64_CTRL0 is disabled\n");
     ee_printf(".text section in XSPI0 Flash\n");
 #else
+    ee_printf("XCACHE0&1 is enabled\n");
     ee_printf(".text section in SRAM P4\n");
 #endif
     ee_printf(".data section in SRAM P16\n");

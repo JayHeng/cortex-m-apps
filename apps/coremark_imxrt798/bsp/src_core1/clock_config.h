@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -46,8 +46,11 @@ void BOARD_InitBootClocks(void);
 /*******************************************************************************
  * Definitions for BOARD_BootClockRUN configuration
  ******************************************************************************/
-#define BOARD_BOOTCLOCKRUN_CORE_CLOCK 192000000U /*!< Core clock frequency: 192000000Hz */
-
+#if (defined(MIMXRT798S_cm33_core0_SERIES) || defined(MIMXRT798S_hifi4_SERIES))
+#define BOARD_BOOTCLOCKRUN_CORE_CLOCK 237500000U /*!< Core clock frequency: 237500000Hz */
+#else
+#define BOARD_BOOTCLOCKRUN_CORE_CLOCK 100000000U /*!< Core clock frequency: 100000000Hz */
+#endif
 /*******************************************************************************
  * API for BOARD_BootClockRUN configuration
  ******************************************************************************/

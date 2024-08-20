@@ -22,7 +22,6 @@
 #include "clock_config.h"
 #include "fsl_power.h"
 
-#if defined(MIMXRT798S_cm33_core0_SERIES)
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -30,23 +29,6 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-/* System clock frequency. */
-extern uint32_t SystemCoreClock;
-
-/*PLL 528MHZ*/
-const clock_main_pll_config_t g_mainPllConfig_BOARD_BootClockRUN = {
-    .main_pll_src  = kCLOCK_MainPllOscClk, /* OSC clock */
-    .numerator     = 0,                    /* Numerator of the SYSPLL0 fractional loop divider is 0 */
-    .denominator   = 1,                    /* Denominator of the SYSPLL0 fractional loop divider is 1 */
-    .main_pll_mult = kCLOCK_MainPllMult22  /* Divide by 22 */
-};
-
-const clock_audio_pll_config_t g_audioPllConfig_BOARD_BootClockRUN = {
-    .audio_pll_src  = kCLOCK_AudioPllFro1Div8, /* OSC clock */
-    .numerator      = 5040,                    /* Numerator of the Audio PLL fractional loop divider is 0 */
-    .denominator    = 27000,                   /* Denominator of the Audio PLL fractional loop divider is 1 */
-    .audio_pll_mult = kCLOCK_AudioPllMult22    /* Divide by 22 */
-};
 /*******************************************************************************
  ************************ BOARD_InitBootClocks function ************************
  ******************************************************************************/
@@ -68,78 +50,23 @@ void BOARD_InitBootClocks(void)
  ******************************************************************************/
 void BOARD_BootClockRUN(void)
 {
-    const clock_fro_config_t froAutotrimCfg = {
-        .targetFreq   = 300000000U,
-        .range        = 5U,
-        .trim1DelayUs = 50U,
-        .trim2DelayUs = 50U,
-        .refDiv       = 0U,
-        .enableInt    = 0U,
-        .coarseTrimEn = true,
-    };
-
-    /* Ungate all FRO clock. */
-    POWER_DisablePD(kPDRUNCFG_GATE_FRO0);
-    POWER_DisablePD(kPDRUNCFG_GATE_FRO2);
-
-    /* Power up OSC */
+    /* Power up OSC in case it's not enabled. */
     POWER_DisablePD(kPDRUNCFG_PD_SYSXTAL);
     CLOCK_EnableSysOscClk(true, true, BOARD_SYSOSC_SETTLING_US); /* Enable system OSC */
     CLOCK_SetXtalFreq(BOARD_XTAL_SYS_CLK_HZ);                    /* Sets external XTAL OSC freq */
 
-//    CLOCK_EnableFroClkFreq(FRO0, 150000000U, kCLOCK_FroAllOutEn);
-//    CLOCK_EnableFroClkFreqCloseLoop(FRO2, &froAutotrimCfg, kCLOCK_FroAllOutEn);
+    CLOCK_AttachClk(kFRO1_DIV3_to_SENSE_BASE);
+    CLOCK_SetClkDiv(kCLOCK_DivSenseMainClk, 1);
+    CLOCK_AttachClk(kSENSE_BASE_to_SENSE_MAIN);
 
-    CLOCK_EnableFro0ClkForDomain(kCLOCK_AllDomainEnable); /* Enable FRO0 MAX clock for all domains. */
-//    CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
+    POWER_DisablePD(kPDRUNCFG_GATE_FRO2);
+    CLOCK_EnableFroClkFreq(FRO2, 300000000U, kCLOCK_FroAllOutEn);
 
-    CLOCK_InitMainPll(&g_mainPllConfig_BOARD_BootClockRUN);
-    CLOCK_InitMainPfd(kCLOCK_Pfd0, 18U); /* 528MHz */
-    CLOCK_EnableMainPllPfdClkForDomain(kCLOCK_Pfd0, kCLOCK_AllDomainEnable);
+    CLOCK_EnableFro2ClkForDomain(kCLOCK_AllDomainEnable);
 
-    CLOCK_SetClkDiv(kCLOCK_DivCmptMainClk, 2U);
-    CLOCK_AttachClk(kMAIN_PLL_PFD0_to_COMPUTE_MAIN); /* Switch to PLL 528/2=264MHZ */
-
-    /* Configure Audio PLL clock source. */
-    CLOCK_InitAudioPll(&g_audioPllConfig_BOARD_BootClockRUN); /* 532.48MHZ */
-    CLOCK_InitAudioPfd(kCLOCK_Pfd3, 26);                      /* Enable Audio PLL PFD3 clock to 368.64MHZ */
-
-    CLOCK_AttachClk(kFRO0_DIV1_to_VDD2_CLKOUT);
-    CLOCK_SetClkDiv(kCLOCK_DivClockOut, 10U);
-
-    SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
-}
-#else
-/*******************************************************************************
- * Definitions
- ******************************************************************************/
-
-/*******************************************************************************
- * Variables
- ******************************************************************************/
-/*******************************************************************************
- ************************ BOARD_InitBootClocks function ************************
- ******************************************************************************/
-void BOARD_InitBootClocks(void)
-{
-    BOARD_BootClockRUN();
-}
-
-/*******************************************************************************
- ********************** Configuration BOARD_BootClockRUN ***********************
- ******************************************************************************/
-
-/*******************************************************************************
- * Variables for BOARD_BootClockRUN configuration
- ******************************************************************************/
-
-/*******************************************************************************
- * Code for BOARD_BootClockRUN configuration
- ******************************************************************************/
-void BOARD_BootClockRUN(void)
-{
     CLOCK_AttachClk(kFRO2_DIV3_to_SENSE_BASE);
     CLOCK_SetClkDiv(kCLOCK_DivSenseMainClk, 1);
     CLOCK_AttachClk(kSENSE_BASE_to_SENSE_MAIN);
+
+    SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 }
-#endif

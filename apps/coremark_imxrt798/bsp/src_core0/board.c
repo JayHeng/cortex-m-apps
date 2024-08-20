@@ -16,6 +16,7 @@
 #endif /* SDK_I2C_BASED_COMPONENT_USED */
 #include "clock_config.h"
 #include "board.h"
+#include "env_pmc_drv.h"
 
 /*******************************************************************************
  * Definitions
@@ -713,3 +714,57 @@ status_t BOARD_MIPIPanelTouch_I2C_Receive(
 }
 #endif
 #endif
+
+void set_power(void)
+{
+    if(targetMode == OD_RUN)
+
+    {
+
+        pmc_dcdc_active_cfg = pmc_dcdc_od_cfg;
+
+        pmc_ldo1_active_cfg = pmc_ldo1_od_cfg;
+
+        pmc_ldo2_active_cfg = pmc_ldo2_od_cfg;
+
+    }
+
+    else if(targetMode == SD_RUN)
+
+    {
+
+        pmc_dcdc_active_cfg = pmc_dcdc_sd_cfg;
+
+        pmc_ldo1_active_cfg = pmc_ldo1_sd_cfg;
+
+        pmc_ldo2_active_cfg = pmc_ldo2_sd_cfg;
+
+    }
+
+    else if(targetMode == MD_RUN)
+
+    {
+
+        pmc_dcdc_active_cfg = pmc_dcdc_md_cfg;
+
+        pmc_ldo1_active_cfg = pmc_ldo1_md_cfg;
+
+        pmc_ldo2_active_cfg = pmc_ldo2_md_cfg;
+
+    }
+
+    //!Rules: increase voltage before increase frequency; decrease frequency before decrease voltage
+
+    if(curMode != (uint32_t)targetMode)
+
+    {
+
+        ENV_PMC_ConfigActivePowerSupply();
+
+        curMode = targetMode;
+
+    }
+    /*enable all power domain*/    
+    ENV_PMC_ConfigDomainAndMemoryPower();   
+}
+

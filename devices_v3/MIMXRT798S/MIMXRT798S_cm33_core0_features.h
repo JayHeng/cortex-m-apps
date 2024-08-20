@@ -33,6 +33,8 @@
 #define FSL_FEATURE_SOC_AIPS_COUNT (7)
 /* @brief AXBS availability on the SoC. */
 #define FSL_FEATURE_SOC_AXBS_COUNT (6)
+/* @brief CACHE64_CTRL availability on the SoC. */
+#define FSL_FEATURE_SOC_CACHE64_CTRL_COUNT (2)
 /* @brief CACHE64_POLSEL availability on the SoC. */
 #define FSL_FEATURE_SOC_CACHE64_POLSEL_COUNT (2)
 /* @brief CDOG availability on the SoC. */
@@ -235,7 +237,9 @@
 /* CACHE64 module features */
 
 /* @brief Cache Line size in byte. */
-#define FSL_FEATURE_CACHE64_LINESIZE_BYTE (32)
+#define FSL_FEATURE_CACHE64_CTRL_LINESIZE_BYTE (32)
+/* @brief CACHE64. */
+#define FSL_FEATURE_CACHE64_CTRL_HAS_NO_WRITE_BUF (1)
 
 /* CDOG module features */
 

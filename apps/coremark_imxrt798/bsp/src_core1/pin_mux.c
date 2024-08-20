@@ -93,6 +93,28 @@ void BOARD_InitPins(void)
                                          IOPCTL_PIO_INV_DI);
     /* PORT8 PIN15 (coords: T10) is configured as LP_FLEXCOMM19_P1 */
     IOPCTL_PinMuxSet(8U, 15U, port8_pin15_config);
+
+
+    const uint32_t port8_pin6_config = (/* Pin is configured as GPIO */
+                                        IOPCTL_PIO_FUNC0 |
+                                        /* Disable pull-up / pull-down function */
+                                        IOPCTL_PIO_PUPD_DI |
+                                        /* Enable pull-down function */
+                                        IOPCTL_PIO_PULLDOWN_EN |
+                                        /* Enables input buffer function */
+                                        IOPCTL_PIO_INBUF_DI |
+                                        /* Normal mode */
+                                        IOPCTL_PIO_SLEW_RATE_NORMAL |
+                                        /* Normal drive */
+                                        IOPCTL_PIO_DRIVE_100OHM |
+                                        /* Analog mux is disabled */
+                                        IOPCTL_PIO_ANAMUX_DI |
+                                        /* Pseudo Output Drain is disabled */
+                                        IOPCTL_PIO_PSEDRAIN_DI |
+                                        /* Input function is not inverted */
+                                        IOPCTL_PIO_INV_DI);
+    /* PORT0 PIN2 (coords: H16)  */
+    IOPCTL_PinMuxSet(8U, 6U, port8_pin6_config);
 }
 /***********************************************************************************************************************
  * EOF

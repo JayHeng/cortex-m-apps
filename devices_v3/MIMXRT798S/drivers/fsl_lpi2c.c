@@ -130,7 +130,7 @@ uint32_t LPI2C_GetInstance(LPI2C_Type *base)
     uint32_t instance;
     for (instance = 0U; instance < ARRAY_SIZE(kLpi2cBases); ++instance)
     {
-        if (kLpi2cBases[instance] == base)
+        if (MSDK_REG_SECURE_ADDR(kLpi2cBases[instance]) == MSDK_REG_SECURE_ADDR(base))
         {
             break;
         }
@@ -489,7 +489,9 @@ void LPI2C_MasterDeinit(LPI2C_Type *base)
     LPI2C_MasterReset(base);
     if(LP_FLEXCOMM_GetBaseAddress(instance) != 0U)
     {
+#if !(defined(LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER) && LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER)
         LP_FLEXCOMM_Deinit(instance);
+#endif
     }
     else
     {
@@ -503,9 +505,6 @@ void LPI2C_MasterDeinit(LPI2C_Type *base)
 
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
     }
-#if !(defined(LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER) && LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER)
-    LP_FLEXCOMM_Deinit(LPI2C_GetInstance(base));
-#endif
 }
 
 /*!
@@ -1776,7 +1775,9 @@ void LPI2C_SlaveDeinit(LPI2C_Type *base)
     LPI2C_SlaveReset(base);
     if(LP_FLEXCOMM_GetBaseAddress(instance) != 0U)
     {
+#if !(defined(LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER) && LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER)
         LP_FLEXCOMM_Deinit(instance);
+#endif
     }
     else
     {
@@ -1790,9 +1791,6 @@ void LPI2C_SlaveDeinit(LPI2C_Type *base)
 
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
     }
-#if !(defined(LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER) && LPFLEXCOMM_INIT_NOT_USED_IN_DRIVER)
-    LP_FLEXCOMM_Deinit(LPI2C_GetInstance(base));
-#endif
 }
 
 /*!
@@ -2393,6 +2391,7 @@ void LPI2C_SlaveTransferHandleIRQ(uint32_t instance, void *lpi2cSlaveHandle)
  * @param base The LPI2C peripheral base address.
  * @param instance The LPI2C peripheral instance number.
  */
+void LPI2C_CommonIRQHandler(LPI2C_Type *base, uint32_t instance);
 void LPI2C_CommonIRQHandler(LPI2C_Type *base, uint32_t instance)
 {
     /* Check for master IRQ. */

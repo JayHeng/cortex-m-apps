@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -83,13 +83,14 @@ static void XSPI_TransferEDMACallback(edma_handle_t *handle, void *param, bool t
         while (!XSPI_GetBusIdleStatus(xspiPrivateHandle->base))
         {
         }
+        XSPI_EnableTxDMA(xspiPrivateHandle->base, false);
+        XSPI_EnableRxDMA(xspiPrivateHandle->base, false);
         /* Disable transfer. */
         XSPI_TransferAbortEDMA(xspiPrivateHandle->base, xspiPrivateHandle->handle);
-
         if (xspiPrivateHandle->handle->completionCallback != NULL)
         {
             xspiPrivateHandle->handle->completionCallback(xspiPrivateHandle->base, xspiPrivateHandle->handle,
-                                                             kStatus_Success, xspiPrivateHandle->handle->userData);
+                                                          kStatus_Success, xspiPrivateHandle->handle->userData);
         }
     }
 }
@@ -105,11 +106,11 @@ static void XSPI_TransferEDMACallback(edma_handle_t *handle, void *param, bool t
  * param rxDmaHandle User requested DMA handle for RX DMA transfer.
  */
 void XSPI_TransferCreateHandleEDMA(XSPI_Type *base,
-                                      xspi_edma_handle_t *handle,
-                                      xspi_edma_callback_t callback,
-                                      void *userData,
-                                      edma_handle_t *txDmaHandle,
-                                      edma_handle_t *rxDmaHandle)
+                                   xspi_edma_handle_t *handle,
+                                   xspi_edma_callback_t callback,
+                                   void *userData,
+                                   edma_handle_t *txDmaHandle,
+                                   edma_handle_t *rxDmaHandle)
 {
     assert(handle);
 
@@ -138,9 +139,7 @@ void XSPI_TransferCreateHandleEDMA(XSPI_Type *base,
  * kXSPI_EDMAnSize1Bytes(one byte).
  * see xspi_edma_transfer_nsize_t               .
  */
-void XSPI_TransferUpdateSizeEDMA(XSPI_Type *base,
-                                    xspi_edma_handle_t *handle,
-                                    xspi_edma_transfer_nsize_t nsize)
+void XSPI_TransferUpdateSizeEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_edma_transfer_nsize_t nsize)
 {
     handle->nsize = nsize;
 }
@@ -159,8 +158,8 @@ void XSPI_TransferUpdateSizeEDMA(XSPI_Type *base,
  */
 status_t XSPI_TransferEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_transfer_t *xfer)
 {
-    uint32_t configValue = 0;
-    status_t result      = kStatus_Success;
+    //    uint32_t configValue = 0;
+    status_t status = kStatus_Success;
     edma_transfer_config_t xferConfig;
     uint32_t instance = XSPI_GetInstance(base);
     uint8_t power     = 0;
@@ -171,68 +170,19 @@ status_t XSPI_TransferEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_tra
     /* Check if the XSPI bus is idle - if not return busy status. */
     if (handle->state != (uint32_t)kXSPI_Idle)
     {
-        result = kStatus_XSPI_Busy;
+        status = kStatus_XSPI_Busy;
+        return status;
     }
     else
     {
         handle->transferSize = xfer->dataSize;
         handle->state        = kXSPI_Busy;
-
-        if (xfer->targetGroup == kXSPI_TargetGroup1)
-        {
-                /*check the target groupe 1 is empty*/
-                while (0U != ((base->SUB_REG_MDAM_ARRAY[0].TGSFARS_SUB & XSPI_TGSFARS_SUB_VLD_MASK) >> XSPI_TGSFARS_SUB_VLD_SHIFT))
-                {
-                }
-
-                /* Set target groupe 1 Serial Flash Address register*/
-                base->SUB_REG_MDAM_ARRAY[0].SFP_TG_SUB_SFAR = xfer->deviceAddress;
-
-                /* Configure target groupe 1 data size. */
-                if ((xfer->cmdType == kXSPI_Read) || (xfer->cmdType == kXSPI_Write) || (xfer->cmdType == kXSPI_Config))
-                {
-                        configValue = XSPI_SFP_TG_SUB_IPCR_IDATSZ(xfer->dataSize);
-                }
-
-                /*config target groupe 1 data size sequence ID.*/
-                configValue |= XSPI_SFP_TG_SUB_IPCR_SEQID(xfer->seqIndex);
-                base->SUB_REG_MDAM_ARRAY[0].SFP_TG_SUB_IPCR = configValue;
-        }
-        else
-        {
-                 /*check the target groupe 0 is empty*/
-                while (0U != ((base->TGSFARS & XSPI_TGSFARS_VLD_MASK) >> XSPI_TGSFARS_VLD_SHIFT))
-                {
-                }
-
-                /* Set target groupe 0 Serial Flash Address register*/
-                base->SFP_TG_SFAR = xfer->deviceAddress;
-
-                /* Configure target groupe 0 data size. */
-                if ((xfer->cmdType == kXSPI_Read) || (xfer->cmdType == kXSPI_Write) || (xfer->cmdType == kXSPI_Config))
-                {
-                        configValue = XSPI_SFP_TG_IPCR_IDATSZ(xfer->dataSize);
-                }
-
-                /*config target groupe 0 data size sequence ID.*/
-                configValue |= XSPI_SFP_TG_IPCR_SEQID(xfer->seqIndex);
-                base->SFP_TG_IPCR = configValue;
-        }
-
-        /* Just Clear RX  TX FIFO PT*/
-        base->MCR |= XSPI_MCR_CLR_RXF_MASK;
-        base->MCR |= XSPI_MCR_CLR_TXF_MASK;
-
     }
 
     if ((xfer->cmdType == kXSPI_Write) || (xfer->cmdType == kXSPI_Config))
     {
-        base->TBCT = 256 - (xfer->dataSize/4 - 1);
-
+        power          = XSPI_CalculatePower(4U * handle->count);
         handle->nbytes = xfer->dataSize;
-
-        power = XSPI_CalculatePower(4U * handle->count);
-
         /* Prepare transfer. */
         EDMA_PrepareTransfer(&xferConfig, xfer->data, (uint32_t)handle->nsize,
                              (void *)(uint32_t *)XSPI_GetTxFifoAddress(base), (uint32_t)handle->nsize,
@@ -242,15 +192,38 @@ status_t XSPI_TransferEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_tra
         (void)EDMA_SubmitTransfer(handle->txDmaHandle, &xferConfig);
         EDMA_SetModulo(handle->txDmaHandle->base, handle->txDmaHandle->channel, kEDMA_ModuloDisable,
                        (edma_modulo_t)power);
-        EDMA_SetCallback(handle->txDmaHandle, XSPI_TransferEDMACallback,
-                         &s_edmaPrivateHandle[XSPI_GetInstance(base)]);
-        EDMA_StartTransfer(handle->txDmaHandle);
+        EDMA_SetCallback(handle->txDmaHandle, XSPI_TransferEDMACallback, &s_edmaPrivateHandle[XSPI_GetInstance(base)]);
 
+        /* Clear TX buffer pointer. */
+        XSPI_ClearTxBuffer(base);
+        /* Blocking until TX buffer is unlocked. */
+        base->TBCT = 256UL - (xfer->dataSize / 4UL - 1UL);
+        status     = XSPI_StartIpAccess(base, xfer->deviceAddress, xfer->seqIndex, xfer->dataSize, xfer->targetGroup,
+                                        xfer->lockArbitration);
+        if (status != kStatus_Success)
+        {
+            return status;
+        }
+        while (XSPI_CheckTxBuffLockOpen(base) == false)
+        {
+        }
         /* Enable XSPI TX EDMA. */
         XSPI_EnableTxDMA(base, true);
+        EDMA_StartTransfer(handle->txDmaHandle);
+
+        while (XSPI_CheckIPAccessAsserted(base))
+        {
+        }
     }
     else if (xfer->cmdType == kXSPI_Read)
     {
+        status = XSPI_StartIpAccess(base, xfer->deviceAddress, xfer->seqIndex, xfer->dataSize, xfer->targetGroup,
+                                    xfer->lockArbitration);
+        if (status != kStatus_Success)
+        {
+            return status;
+        }
+        XSPI_ClearRxBuffer(base);
         handle->count = (uint8_t)(base->RBCT) + 1U;
 
         if (xfer->dataSize < 4U * (uint32_t)handle->count)
@@ -265,15 +238,14 @@ status_t XSPI_TransferEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_tra
                 return kStatus_InvalidArgument;
             }
             /* Store the initially configured eDMA minor byte transfer count into the XSPI handle */
-            handle->nbytes = (4U * handle->count);
+            handle->nbytes = (4UL * handle->count);
         }
 
         power = XSPI_CalculatePower(4U * handle->count);
 
         /* Prepare transfer. */
         EDMA_PrepareTransfer(&xferConfig, (void *)(uint32_t *)XSPI_GetRxFifoAddress(base), (uint32_t)handle->nsize,
-                             xfer->data, (uint32_t)handle->nsize, xfer->dataSize, xfer->dataSize,
-                             kEDMA_MemoryToMemory);
+                             xfer->data, (uint32_t)handle->nsize, xfer->dataSize, xfer->dataSize, kEDMA_MemoryToMemory);
 
         /* Submit transfer. */
         (void)EDMA_SubmitTransfer(handle->rxDmaHandle, &xferConfig);
@@ -284,25 +256,30 @@ status_t XSPI_TransferEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_tra
 
         /* Enable XSPI RX EDMA. */
         XSPI_EnableRxDMA(base, true);
-
     }
     else
     {
+        status = XSPI_StartIpAccess(base, xfer->deviceAddress, xfer->seqIndex, 0UL, xfer->targetGroup,
+                                    xfer->lockArbitration);
+        if (status != kStatus_Success)
+        {
+            return status;
+        }
         /* Wait for bus idle. */
         while (!XSPI_GetBusIdleStatus(base))
         {
         }
-        result = XSPI_CheckAndClearError(base, base->ERRSTAT);
+        status = XSPI_CheckAndClearError(base, base->ERRSTAT);
 
         handle->state = kXSPI_Idle;
 
         if (handle->completionCallback != NULL)
         {
-            handle->completionCallback(base, handle, result, handle->userData);
+            handle->completionCallback(base, handle, status, handle->userData);
         }
     }
 
-    return result;
+    return status;
 }
 
 /*!

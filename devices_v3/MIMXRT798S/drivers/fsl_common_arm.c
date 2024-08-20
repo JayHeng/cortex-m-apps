@@ -159,11 +159,11 @@ static void DelayLoop(uint32_t count)
 {
     __ASM volatile("    MOV    X0, %0" : : "r"(count));
     __ASM volatile(
-        "loop:                          \n"
+        "loop%=:                        \n"
         "    SUB    X0, X0, #1          \n"
         "    CMP    X0, #0              \n"
 
-        "    BNE    loop                \n"
+        "    BNE    loop%=              \n"
         :
         :
         : "r0");
@@ -176,7 +176,7 @@ static void DelayLoop(uint32_t count)
 {
     __ASM volatile("    MOV    R0, %0" : : "r"(count));
     __ASM volatile(
-        "loop:                          \n"
+        "loop%=:                        \n"
 #if defined(__GNUC__) && !defined(__ARMCC_VERSION)
         "    SUB    R0, R0, #1          \n"
 #else
@@ -184,7 +184,7 @@ static void DelayLoop(uint32_t count)
 #endif
         "    CMP    R0, #0              \n"
 
-        "    BNE    loop                \n"
+        "    BNE    loop%=              \n"
         :
         :
         : "r0");
@@ -232,7 +232,7 @@ void SDK_DelayAtLeastUs(uint32_t delayTime_us, uint32_t coreClock_Hz)
         {
         }
 #else
-#if (__CORTEX_Axx == 53) || (__CORTEX_Axx == 55)
+#if defined(__CORTEX_Axx) && ((__CORTEX_Axx == 53) || (__CORTEX_Axx == 55))
         /*
          * Cortex-A53/A55 execution throughput:
          *  - SUB/CMP: 2 instructions per cycle

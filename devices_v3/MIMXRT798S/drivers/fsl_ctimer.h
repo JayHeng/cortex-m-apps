@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 #define FSL_CTIMER_DRIVER_VERSION (MAKE_VERSION(2, 3, 1)) /*!< Version 2.3.1 */
-/*@}*/
+/*! @} */
 
 /*! @brief List of Timer capture channels */
 typedef enum _ctimer_capture_channel

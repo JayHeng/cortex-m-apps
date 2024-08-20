@@ -20,9 +20,9 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
-#define FSL_IRTC_DRIVER_VERSION (MAKE_VERSION(2, 3, 0))
-/*@}*/
+/*! @{ */
+#define FSL_IRTC_DRIVER_VERSION (MAKE_VERSION(2, 3, 1))
+/*! @} */
 
 #if !(defined(FSL_FEATURE_RTC_IS_SLAVE) && (FSL_FEATURE_RTC_IS_SLAVE != 0U))
 #define IRTC_STATUS_W1C_BITS ((uint16_t)(RTC_STATUS_BUS_ERR_MASK) | (uint16_t)(RTC_STATUS_CMP_DONE_MASK))
@@ -550,7 +550,7 @@ static inline void IRTC_Enable32kClkDuringRegisterWrite(RTC_Type *base, bool ena
  * RTC subsystem needs RTC to output 1HZ clock for sub-second counter.
  *
  * @param base IRTC peripheral base address
- * @param cloOut select clock to use for output,
+ * @param clkOut select clock to use for output,
  */
 void IRTC_ConfigClockOut(RTC_Type *base, irtc_clockout_sel_t clkOut);
 

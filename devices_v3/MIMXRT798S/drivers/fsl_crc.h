@@ -21,7 +21,7 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief CRC driver version. Version 2.0.4.
  *
  * Current version: 2.0.4
@@ -41,7 +41,7 @@
  *   - move DATA and DATALL macro definition from header file to source file
  */
 #define FSL_CRC_DRIVER_VERSION (MAKE_VERSION(2, 0, 4))
-/*@}*/
+/*! @} */
 
 #ifndef CRC_DRIVER_CUSTOM_DEFAULTS
 /*! @brief Default configuration structure filled by CRC_GetDefaultConfig(). Use CRC16-CCIT-FALSE as defeault. */

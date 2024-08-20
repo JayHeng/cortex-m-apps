@@ -22,10 +22,10 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief FlexIO MCULCD driver version. */
 #define FSL_FLEXIO_MCULCD_DRIVER_VERSION (MAKE_VERSION(2, 1, 0))
-/*@}*/
+/*! @} */
 
 #ifndef FLEXIO_MCULCD_WAIT_COMPLETE_TIME
 /*!
@@ -230,7 +230,7 @@ void FLEXIO_MCULCD_Deinit(FLEXIO_MCULCD_Type *base);
  */
 void FLEXIO_MCULCD_GetDefaultConfig(flexio_mculcd_config_t *config);
 
-/*@}*/
+/*! @} */
 
 /*!
  * @name Status
@@ -258,7 +258,7 @@ uint32_t FLEXIO_MCULCD_GetStatusFlags(FLEXIO_MCULCD_Type *base);
  */
 void FLEXIO_MCULCD_ClearStatusFlags(FLEXIO_MCULCD_Type *base, uint32_t mask);
 
-/*@}*/
+/*! @} */
 
 /*!
  * @name Interrupts
@@ -287,7 +287,7 @@ void FLEXIO_MCULCD_EnableInterrupts(FLEXIO_MCULCD_Type *base, uint32_t mask);
  */
 void FLEXIO_MCULCD_DisableInterrupts(FLEXIO_MCULCD_Type *base, uint32_t mask);
 
-/*@}*/
+/*! @} */
 
 /*!
  * @name DMA Control
@@ -344,7 +344,7 @@ static inline uint32_t FLEXIO_MCULCD_GetRxDataRegisterAddress(FLEXIO_MCULCD_Type
     return (uint32_t) & (base->flexioBase->SHIFTBUF[base->rxShifterStartIndex]);
 }
 
-/*@}*/
+/*! @} */
 
 /*!
  * @name Bus Operations
@@ -603,7 +603,7 @@ void FLEXIO_MCULCD_WriteSameValueBlocking(FLEXIO_MCULCD_Type *base, uint32_t sam
  * @param xfer pointer to flexio_mculcd_transfer_t structure.
  */
 void FLEXIO_MCULCD_TransferBlocking(FLEXIO_MCULCD_Type *base, flexio_mculcd_transfer_t *xfer);
-/*@}*/
+/*! @} */
 
 /*!
  * @name Transactional
@@ -676,11 +676,11 @@ status_t FLEXIO_MCULCD_TransferGetCount(FLEXIO_MCULCD_Type *base, flexio_mculcd_
  */
 void FLEXIO_MCULCD_TransferHandleIRQ(void *base, void *handle);
 
-/*@}*/
+/*! @} */
 
 #if defined(__cplusplus)
 }
 #endif /*_cplusplus*/
-/*@}*/
+/*! @} */
 
 #endif /*FSL_FLEXIO_MCULCD_H_*/

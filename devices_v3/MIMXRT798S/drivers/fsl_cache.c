@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 NXP
+ * Copyright 2022 - 2023 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -114,7 +114,8 @@ void XCACHE_InvalidateCache(XCACHE_Type *base)
  * brief Invalidates cache by range.
  *
  * param address The physical address of cache.
- * param size_byte size of the memory to be invalidated.
+ * param size_byte size of the memory to be invalidated, should be larger than 0,
+ * better to align to size of cache line.
  * note Address and size should be aligned to "L1CODCACHE_LINESIZE_BYTE".
  * The startAddr here will be forced to align to XCACHE_LINESIZE_BYTE if
  * startAddr is not aligned. For the size_byte, application should make sure the
@@ -122,36 +123,39 @@ void XCACHE_InvalidateCache(XCACHE_Type *base)
  */
 void XCACHE_InvalidateCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    uint32_t endAddr = address + size_byte - 0x01U;
-    uint32_t pccReg  = 0;
-    /* Align address to cache line size. */
-    uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
-    uint32_t instance  = XCACHE_GetInstanceByAddr(address);
-    uint32_t endLim;
-    XCACHE_Type *base;
-
-    if (instance >= ARRAY_SIZE(s_xcachectrlBases))
+    if (size_byte > 0UL)
     {
-        return;
-    }
-    base    = s_xcachectrlBases[instance];
-    endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
-    endAddr = endAddr > endLim ? endLim : endAddr;
+        uint32_t endAddr = address + size_byte - 0x01U;
+        uint32_t pccReg  = 0;
+        /* Align address to cache line size. */
+        uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
+        uint32_t instance  = XCACHE_GetInstanceByAddr(address);
+        uint32_t endLim;
+        XCACHE_Type *base;
 
-    /* Set the invalidate by line command and use the physical address. */
-    pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(1) | XCACHE_CLCR_LADSEL_MASK;
-    base->CLCR = pccReg;
-
-    while (startAddr < endAddr)
-    {
-        /* Set the address and initiate the command. */
-        base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
-
-        /* Wait until the cache command completes. */
-        while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+        if (instance >= ARRAY_SIZE(s_xcachectrlBases))
         {
+            return;
         }
-        startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        base    = s_xcachectrlBases[instance];
+        endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
+        endAddr = endAddr > endLim ? endLim : endAddr;
+
+        /* Set the invalidate by line command and use the physical address. */
+        pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(1) | XCACHE_CLCR_LADSEL_MASK;
+        base->CLCR = pccReg;
+
+        while (startAddr < endAddr)
+        {
+            /* Set the address and initiate the command. */
+            base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
+
+            /* Wait until the cache command completes. */
+            while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+            {
+            }
+            startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        }
     }
 }
 
@@ -177,7 +181,8 @@ void XCACHE_CleanCache(XCACHE_Type *base)
  * brief Cleans cache by range.
  *
  * param address The physical address of cache.
- * param size_byte size of the memory to be cleaned.
+ * param size_byte size of the memory to be cleaned, should be larger than 0,
+ * better to align to size of cache line.
  * note Address and size should be aligned to "XCACHE_LINESIZE_BYTE".
  * The startAddr here will be forced to align to XCACHE_LINESIZE_BYTE if
  * startAddr is not aligned. For the size_byte, application should make sure the
@@ -185,36 +190,39 @@ void XCACHE_CleanCache(XCACHE_Type *base)
  */
 void XCACHE_CleanCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    uint32_t endAddr = address + size_byte - 0x01U;
-    uint32_t pccReg  = 0;
-    /* Align address to cache line size. */
-    uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
-    uint32_t instance  = XCACHE_GetInstanceByAddr(address);
-    uint32_t endLim;
-    XCACHE_Type *base;
-
-    if (instance >= ARRAY_SIZE(s_xcachectrlBases))
+    if (size_byte > 0UL)
     {
-        return;
-    }
-    base    = s_xcachectrlBases[instance];
-    endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
-    endAddr = endAddr > endLim ? endLim : endAddr;
+        uint32_t endAddr = address + size_byte - 0x01U;
+        uint32_t pccReg  = 0;
+        /* Align address to cache line size. */
+        uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
+        uint32_t instance  = XCACHE_GetInstanceByAddr(address);
+        uint32_t endLim;
+        XCACHE_Type *base;
 
-    /* Set the push by line command. */
-    pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(2) | XCACHE_CLCR_LADSEL_MASK;
-    base->CLCR = pccReg;
-
-    while (startAddr < endAddr)
-    {
-        /* Set the address and initiate the command. */
-        base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
-
-        /* Wait until the cache command completes. */
-        while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+        if (instance >= ARRAY_SIZE(s_xcachectrlBases))
         {
+            return;
         }
-        startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        base    = s_xcachectrlBases[instance];
+        endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
+        endAddr = endAddr > endLim ? endLim : endAddr;
+
+        /* Set the push by line command. */
+        pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(2) | XCACHE_CLCR_LADSEL_MASK;
+        base->CLCR = pccReg;
+
+        while (startAddr < endAddr)
+        {
+            /* Set the address and initiate the command. */
+            base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
+
+            /* Wait until the cache command completes. */
+            while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+            {
+            }
+            startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        }
     }
 }
 
@@ -241,7 +249,8 @@ void XCACHE_CleanInvalidateCache(XCACHE_Type *base)
  * brief Cleans and invalidate cache by range.
  *
  * param address The physical address of cache.
- * param size_byte size of the memory to be Cleaned and Invalidated.
+ * param size_byte size of the memory to be Cleaned and Invalidated, should larger than 0,
+ * better to align to size of cache line.
  * note Address and size should be aligned to "XCACHE_LINESIZE_BYTE".
  * The startAddr here will be forced to align to XCACHE_LINESIZE_BYTE if
  * startAddr is not aligned. For the size_byte, application should make sure the
@@ -249,36 +258,39 @@ void XCACHE_CleanInvalidateCache(XCACHE_Type *base)
  */
 void XCACHE_CleanInvalidateCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    uint32_t endAddr = address + size_byte - 0x01U;
-    uint32_t pccReg  = 0;
-    /* Align address to cache line size. */
-    uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
-    uint32_t instance  = XCACHE_GetInstanceByAddr(address);
-    uint32_t endLim;
-    XCACHE_Type *base;
-
-    if (instance >= ARRAY_SIZE(s_xcachectrlBases))
+    if (size_byte > 0UL)
     {
-        return;
-    }
-    base    = s_xcachectrlBases[instance];
-    endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
-    endAddr = endAddr > endLim ? endLim : endAddr;
+        uint32_t endAddr = address + size_byte - 0x01U;
+        uint32_t pccReg  = 0;
+        /* Align address to cache line size. */
+        uint32_t startAddr = address & ~((uint32_t)XCACHE_LINESIZE_BYTE - 1U);
+        uint32_t instance  = XCACHE_GetInstanceByAddr(address);
+        uint32_t endLim;
+        XCACHE_Type *base;
 
-    /* Set the push by line command. */
-    pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(3) | XCACHE_CLCR_LADSEL_MASK;
-    base->CLCR = pccReg;
-
-    while (startAddr < endAddr)
-    {
-        /* Set the address and initiate the command. */
-        base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
-
-        /* Wait until the cache command completes. */
-        while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+        if (instance >= ARRAY_SIZE(s_xcachectrlBases))
         {
+            return;
         }
-        startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        base    = s_xcachectrlBases[instance];
+        endLim  = s_xcachePhymemBases[instance] + s_xcachePhymemSizes[instance] - 0x01U;
+        endAddr = endAddr > endLim ? endLim : endAddr;
+
+        /* Set the push by line command. */
+        pccReg     = (base->CLCR & ~XCACHE_CLCR_LCMD_MASK) | XCACHE_CLCR_LCMD(3) | XCACHE_CLCR_LADSEL_MASK;
+        base->CLCR = pccReg;
+
+        while (startAddr < endAddr)
+        {
+            /* Set the address and initiate the command. */
+            base->CSAR = (startAddr & XCACHE_CSAR_PHYADDR_MASK) | XCACHE_CSAR_LGO_MASK;
+
+            /* Wait until the cache command completes. */
+            while ((base->CSAR & XCACHE_CSAR_LGO_MASK) != 0x00U)
+            {
+            }
+            startAddr += (uint32_t)XCACHE_LINESIZE_BYTE;
+        }
     }
 }
 

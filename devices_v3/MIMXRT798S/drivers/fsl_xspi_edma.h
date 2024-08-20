@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -22,17 +22,14 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief XSPI EDMA driver version 2.0.0. */
-#define FSL_XSPI_EDMA_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+/*! @brief XSPI EDMA driver version 2.0.2. */
+#define FSL_XSPI_EDMA_DRIVER_VERSION (MAKE_VERSION(2, 0, 2))
 /*@}*/
 
 typedef struct _xspi_edma_handle xspi_edma_handle_t;
 
 /*! @brief XSPI eDMA transfer callback function for finish and error */
-typedef void (*xspi_edma_callback_t)(XSPI_Type *base,
-                                        xspi_edma_handle_t *handle,
-                                        status_t status,
-                                        void *userData);
+typedef void (*xspi_edma_callback_t)(XSPI_Type *base, xspi_edma_handle_t *handle, status_t status, void *userData);
 
 /*! @brief eDMA transfer configuration */
 typedef enum _xspi_edma_ntransfer_size
@@ -47,15 +44,15 @@ typedef enum _xspi_edma_ntransfer_size
 /*! @brief XSPI DMA transfer handle, users should not touch the content of the handle.*/
 struct _xspi_edma_handle
 {
-    edma_handle_t *txDmaHandle;                 /*!< eDMA handler for XSPI Tx. */
-    edma_handle_t *rxDmaHandle;                 /*!< eDMA handler for XSPI Rx. */
-    size_t transferSize;                        /*!< Bytes need to transfer. */
+    edma_handle_t *txDmaHandle;              /*!< eDMA handler for XSPI Tx. */
+    edma_handle_t *rxDmaHandle;              /*!< eDMA handler for XSPI Rx. */
+    size_t transferSize;                     /*!< Bytes need to transfer. */
     xspi_edma_transfer_nsize_t nsize;        /*!< eDMA SSIZE/DSIZE in each transfer. */
-    uint32_t nbytes;                             /*!< eDMA minor byte transfer count initially configured. */
-    uint8_t count;                              /*!< The transfer data count in a DMA request. */
-    uint32_t state;                             /*!< Internal state for XSPI eDMA transfer. */
+    uint32_t nbytes;                         /*!< eDMA minor byte transfer count initially configured. */
+    uint8_t count;                           /*!< The transfer data count in a DMA request. */
+    uint32_t state;                          /*!< Internal state for XSPI eDMA transfer. */
     xspi_edma_callback_t completionCallback; /*!< A callback function called after the eDMA transfer is finished. */
-    void *userData;                             /*!< User callback parameter */
+    void *userData;                          /*!< User callback parameter */
 };
 
 /*******************************************************************************
@@ -81,11 +78,11 @@ extern "C" {
  * @param rxDmaHandle User requested DMA handle for RX DMA transfer.
  */
 void XSPI_TransferCreateHandleEDMA(XSPI_Type *base,
-                                      xspi_edma_handle_t *handle,
-                                      xspi_edma_callback_t callback,
-                                      void *userData,
-                                      edma_handle_t *txDmaHandle,
-                                      edma_handle_t *rxDmaHandle);
+                                   xspi_edma_handle_t *handle,
+                                   xspi_edma_callback_t callback,
+                                   void *userData,
+                                   edma_handle_t *txDmaHandle,
+                                   edma_handle_t *rxDmaHandle);
 
 /*!
  * @brief Update XSPI EDMA transfer source data transfer size(SSIZE) and destination data transfer size(DSIZE).
@@ -96,9 +93,7 @@ void XSPI_TransferCreateHandleEDMA(XSPI_Type *base,
  * kFLEXPSI_EDMAnSize1Bytes(one byte).
  * @see xspi_edma_transfer_nsize_t               .
  */
-void XSPI_TransferUpdateSizeEDMA(XSPI_Type *base,
-                                    xspi_edma_handle_t *handle,
-                                    xspi_edma_transfer_nsize_t nsize);
+void XSPI_TransferUpdateSizeEDMA(XSPI_Type *base, xspi_edma_handle_t *handle, xspi_edma_transfer_nsize_t nsize);
 
 /*!
  * @brief Transfers XSPI data using an eDMA non-blocking method.

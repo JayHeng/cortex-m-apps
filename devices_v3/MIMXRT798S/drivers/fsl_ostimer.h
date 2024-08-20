@@ -21,10 +21,10 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief OSTIMER driver version. */
 #define FSL_OSTIMER_DRIVER_VERSION (MAKE_VERSION(2, 2, 2))
-/*@}*/
+/*! @} */
 
 /*!
  * @brief OSTIMER status flags.
@@ -149,7 +149,7 @@ status_t OSTIMER_SetMatchValue(OSTIMER_Type *base, uint64_t count, ostimer_callb
  * value to gray code.
  *
  * @param base   OSTIMER peripheral base address.
- * @param count  OSTIMER timer match value (Value is gray-code format).
+ * @param value  OSTIMER timer match value (Value is gray-code format).
  */
 static inline void OSTIMER_SetMatchRegister(OSTIMER_Type *base, uint64_t value)
 {
@@ -262,7 +262,7 @@ uint64_t OSTIMER_GetCaptureValue(OSTIMER_Type *base);
  * @return       none
  */
 void OSTIMER_HandleIRQ(OSTIMER_Type *base, ostimer_callback_t cb);
-/* @} */
+/*! @} */
 
 #if defined(__cplusplus)
 }

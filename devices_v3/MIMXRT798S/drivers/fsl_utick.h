@@ -21,10 +21,10 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief UTICK driver version 2.0.5. */
 #define FSL_UTICK_DRIVER_VERSION (MAKE_VERSION(2, 0, 5))
-/*@}*/
+/*! @} */
 
 /*! @brief UTICK timer operational mode. */
 typedef enum _utick_mode
@@ -107,7 +107,7 @@ void UTICK_SetTick(UTICK_Type *base, utick_mode_t mode, uint32_t count, utick_ca
  */
 void UTICK_HandleIRQ(UTICK_Type *base, utick_callback_t cb);
 
-/* @} */
+/*! @} */
 
 #if defined(__cplusplus)
 }

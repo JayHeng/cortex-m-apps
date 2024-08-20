@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 #define FSL_MRT_DRIVER_VERSION (MAKE_VERSION(2, 0, 3)) /*!< Version 2.0.3 */
-/*@}*/
+/*! @} */
 
 /*! @brief List of MRT channels */
 typedef enum _mrt_chnl

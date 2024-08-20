@@ -104,15 +104,15 @@ static int32_t IRTC_GetInstance(RTC_Type *base)
 {
     int32_t instance;
 
-    for (instance = 0; instance < ARRAY_SIZE(kIrtcBases); ++instance)
+    for (instance = 0; instance < (int32_t)ARRAY_SIZE(kIrtcBases); ++instance)
     {
-        if (kIrtcBases[instance] == base)
+        if (MSDK_REG_SECURE_ADDR(kIrtcBases[instance]) == MSDK_REG_SECURE_ADDR(base))
         {
             break;
         }
     }
 
-    if (instance >= ARRAY_SIZE(kIrtcBases))
+    if (instance >= (int32_t)ARRAY_SIZE(kIrtcBases))
     {
         instance = -1;
     }

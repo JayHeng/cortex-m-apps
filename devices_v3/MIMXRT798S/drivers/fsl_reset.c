@@ -45,7 +45,7 @@ void RESET_SetPeripheralReset(reset_ip_name_t peripheral)
 
     switch (regIndex)
     {
-#if defined(FSL_RESET_DRIVER_COMPUTE)
+#if defined(FSL_RESET_DRIVER_COMPUTE) || defined(FSL_RESET_DRIVER_MEDIA)
         case RST_CTL0_PSCCTL0:
             RSTCTL0->PRSTCTL0_SET = bitMask;
             while (0u == (RSTCTL0->PRSTCTL0 & bitMask))
@@ -83,7 +83,7 @@ void RESET_SetPeripheralReset(reset_ip_name_t peripheral)
             }
             break;
 #endif
-#if defined(FSL_RESET_DRIVER_SENSE)
+#if defined(FSL_RESET_DRIVER_SENSE) || defined(FSL_RESET_DRIVER_MEDIA)
         case RST_CTL1_PSCCTL0:
             RSTCTL1->PRSTCTL0_SET = bitMask;
             while (0u == (RSTCTL1->PRSTCTL0 & bitMask))
@@ -145,7 +145,7 @@ void RESET_ClearPeripheralReset(reset_ip_name_t peripheral)
 
     switch (regIndex)
     {
-#if defined(FSL_RESET_DRIVER_COMPUTE)
+#if defined(FSL_RESET_DRIVER_COMPUTE) || defined(FSL_RESET_DRIVER_MEDIA)
         case RST_CTL0_PSCCTL0:
             RSTCTL0->PRSTCTL0_CLR = bitMask;
             while (bitMask == (RSTCTL0->PRSTCTL0 & bitMask))
@@ -183,7 +183,7 @@ void RESET_ClearPeripheralReset(reset_ip_name_t peripheral)
             }
             break;
 #endif
-#if defined(FSL_RESET_DRIVER_SENSE)
+#if defined(FSL_RESET_DRIVER_SENSE) || defined(FSL_RESET_DRIVER_MEDIA)
         case RST_CTL1_PSCCTL0:
             RSTCTL1->PRSTCTL0_CLR = bitMask;
             while (bitMask == (RSTCTL1->PRSTCTL0 & bitMask))

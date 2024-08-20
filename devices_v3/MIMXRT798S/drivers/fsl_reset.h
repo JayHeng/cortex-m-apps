@@ -1,6 +1,5 @@
 /*
- * Copyright 2023 NXP
- * All rights reserved.
+ * Copyright 2023-2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -25,8 +24,8 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief reset driver version 2.0.0. */
-#define FSL_RESET_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+/*! @brief reset driver version 2.0.1. */
+#define FSL_RESET_DRIVER_VERSION (MAKE_VERSION(2, 0, 1))
 /*@}*/
 
 #if defined(MIMXRT798S_hifi1_SERIES) || defined(MIMXRT798S_cm33_core1_SERIES) || \
@@ -35,6 +34,8 @@
 #elif defined(MIMXRT798S_hifi4_SERIES) || defined(MIMXRT798S_cm33_core0_SERIES) || \
     defined(MIMXRT758S_cm33_core0_SERIES) || defined(MIMXRT735S_cm33_core0_SERIES)
 #define FSL_RESET_DRIVER_COMPUTE
+#elif defined(MIMXRT798S_ezhv_SERIES)
+#define FSL_RESET_DRIVER_MEDIA
 #else
 #error "Unsupported core!"
 #endif
@@ -60,7 +61,6 @@
 #define RST_CTL4_PSCCTL0 10
 #define RST_CTL4_PSCCTL1 11
 
-
 /*!
  * @brief Enumeration for system reset status bits
  *
@@ -69,22 +69,22 @@
 typedef enum _rstctl_reset_source
 {
     kRSTCTL_SourceVddPor = RSTCTL3_SYSRSTSTAT_VDD_POR_MASK,       /*!< VDD Power-On Reset(POR) */
-    kRSTCTL_SourcePad    = RSTCTL3_SYSRSTSTAT_RESETN_RESET_MASK,     /*!< PPAD Reset */
+    kRSTCTL_SourcePad    = RSTCTL3_SYSRSTSTAT_RESETN_RESET_MASK,  /*!< PPAD Reset */
     kRSTCTL_SourceIspAp  = RSTCTL3_SYSRSTSTAT_ISP_AP_RESET_MASK,  /*!< ISP_AP reset Reset */
     kRSTCTL_SourceItrcSw = RSTCTL3_SYSRSTSTAT_ITRC_SW_RESET_MASK, /*!< ITRC_SW (Intrusion and Tamper Response
                                                                              Controller SW) Reset */
-    kRSTCTL_SourceCpu0   = RSTCTL3_SYSRSTSTAT_CPU0_RESET_MASK,  /*!< VDD2_COMP Core Reset */
-    kRSTCTL_SourceCpu1   = RSTCTL3_SYSRSTSTAT_CPU1_RESET_MASK, /*!< VDD1_SENSE Core Reset */
-    kRSTCTL_SourceWwdt0         = RSTCTL3_SYSRSTSTAT_WWDT0_RESET_MASK,           /*!< WatchDog Timer 0 Reset */
-    kRSTCTL_SourceWwdt1         = RSTCTL3_SYSRSTSTAT_WWDT1_RESET_MASK,           /*!< WatchDog Timer 1 Reset*/
-    kRSTCTL_SourceWwdt2         = RSTCTL3_SYSRSTSTAT_WWDT2_RESET_MASK,           /*!< WatchDog Timer 2 Reset */
-    kRSTCTL_SourceWwdt3         = RSTCTL3_SYSRSTSTAT_WWDT3_RESET_MASK,           /*!< WatchDog Timer 3 Reset*/
-    kRSTCTL_SourceCdog0         = RSTCTL3_SYSRSTSTAT_CDOG0_RESET_MASK, /*!< Code WatchDog Timer 0 Reset */
-    kRSTCTL_SourceCdog1         = RSTCTL3_SYSRSTSTAT_CDOG1_RESET_MASK, /*!< Code WatchDog Timer 1 Reset */
-    kRSTCTL_SourceCdog2         = RSTCTL3_SYSRSTSTAT_CDOG2_RESET_MASK, /*!< Code WatchDog Timer 2 Reset */
-    kRSTCTL_SourceCdog3         = RSTCTL3_SYSRSTSTAT_CDOG3_RESET_MASK, /*!< Code WatchDog Timer 3 Reset */
-    kRSTCTL_SourceCdog4         = RSTCTL3_SYSRSTSTAT_CDOG4_RESET_MASK, /*!< Code WatchDog Timer 4 Reset */
-    kRSTCTL_SourceAll           = (int)0xffffffffU,
+    kRSTCTL_SourceCpu0  = RSTCTL3_SYSRSTSTAT_CPU0_RESET_MASK,     /*!< VDD2_COMP Core Reset */
+    kRSTCTL_SourceCpu1  = RSTCTL3_SYSRSTSTAT_CPU1_RESET_MASK,     /*!< VDD1_SENSE Core Reset */
+    kRSTCTL_SourceWwdt0 = RSTCTL3_SYSRSTSTAT_WWDT0_RESET_MASK,    /*!< WatchDog Timer 0 Reset */
+    kRSTCTL_SourceWwdt1 = RSTCTL3_SYSRSTSTAT_WWDT1_RESET_MASK,    /*!< WatchDog Timer 1 Reset*/
+    kRSTCTL_SourceWwdt2 = RSTCTL3_SYSRSTSTAT_WWDT2_RESET_MASK,    /*!< WatchDog Timer 2 Reset */
+    kRSTCTL_SourceWwdt3 = RSTCTL3_SYSRSTSTAT_WWDT3_RESET_MASK,    /*!< WatchDog Timer 3 Reset*/
+    kRSTCTL_SourceCdog0 = RSTCTL3_SYSRSTSTAT_CDOG0_RESET_MASK,    /*!< Code WatchDog Timer 0 Reset */
+    kRSTCTL_SourceCdog1 = RSTCTL3_SYSRSTSTAT_CDOG1_RESET_MASK,    /*!< Code WatchDog Timer 1 Reset */
+    kRSTCTL_SourceCdog2 = RSTCTL3_SYSRSTSTAT_CDOG2_RESET_MASK,    /*!< Code WatchDog Timer 2 Reset */
+    kRSTCTL_SourceCdog3 = RSTCTL3_SYSRSTSTAT_CDOG3_RESET_MASK,    /*!< Code WatchDog Timer 3 Reset */
+    kRSTCTL_SourceCdog4 = RSTCTL3_SYSRSTSTAT_CDOG4_RESET_MASK,    /*!< Code WatchDog Timer 4 Reset */
+    kRSTCTL_SourceAll   = (int)0xffffffffU,
 } rstctl_reset_source_t;
 
 /*!
@@ -153,11 +153,11 @@ typedef enum _RSTCTL_RSTn
     kFREQME0_RST_SHIFT_RSTn   = (RST_CTL0_PSCCTL4 << 8) | 8U,      /*!< FREQME0 reset control */
     kSYSPM0_RST_SHIFT_RSTn    = (RST_CTL0_PSCCTL4 << 8) | 10U,     /*!< SYSPM_PC reset control */
     kSYSPM1_RST_SHIFT_RSTn    = (RST_CTL0_PSCCTL4 << 8) | 11U,     /*!< SYSPM_PS reset control */
-    kNPU0_RST_SHIFT_RSTn      = (RST_CTL0_PSCCTL4 << 8) | 12U,    /*!< NPU0 reset control */
+    kNPU0_RST_SHIFT_RSTn      = (RST_CTL0_PSCCTL4 << 8) | 12U,     /*!< NPU0 reset control */
 
     kHIFI4_RST_SHIFT_RSTn       = (RST_CTL0_PSCCTL5 << 8) | 0U,    /*!< HiFi4 reset control */
     kHIFI4_DEBUG_RST_SHIFT_RSTn = (RST_CTL0_PSCCTL5 << 8) | 2U,    /*!< HiFi4 Debug reset control */
-    
+
     kHIFI1_RST_SHIFT_RSTn       = (RST_CTL1_PSCCTL0 << 8) | 1U,    /*!< HiFi1 reset control */
     kHIFI1_DEBUG_RST_SHIFT_RSTn = (RST_CTL1_PSCCTL0 << 8) | 2U,    /*!< HiFi1 Debug reset control */
     kDMA2_RST_SHIFT_RSTn        = (RST_CTL1_PSCCTL0 << 8) | 4U,    /*!< eDMA2 reset control */
@@ -183,10 +183,10 @@ typedef enum _RSTCTL_RSTn
     kMU3_RST_SHIFT_RSTn     = (RST_CTL1_PSCCTL0 << 8) | 24U,       /*!< MU3 reset control */
     kSEMA423_RST_SHIFT_RSTn = (RST_CTL1_PSCCTL0 << 8) | 25U,       /*!< SEMA42_3 reset control */
     kPVT1_RST_SHIFT_RSTn    = (RST_CTL1_PSCCTL0 << 8) | 28U,       /*!< PVT1 reset control */
-       
+
     kIOPCTL2_RST_SHIFT_RSTn = (RST_CTL2_PSCCTL0 << 8) | 1U,        /*!< IOPCTL2 reset control */
-    
-    kIOPCTL1_RST_SHIFT_RSTn    = (RST_CTL3_PSCCTL0 << 8) | 0U,     /*!< IOPCTL1 reset control */
+
+    kIOPCTL1_RST_SHIFT_RSTn   = (RST_CTL3_PSCCTL0 << 8) | 0U,      /*!< IOPCTL1 reset control */
     kCPU1_RST_SHIFT_RSTn      = (RST_CTL3_PSCCTL0 << 8) | 31U,     /*!< CPU1 reset control */
     kMU0_RST_SHIFT_RSTn       = (RST_CTL3_PSCCTL1 << 8) | 1U,      /*!< MU0 reset control */
     kMU1_RST_SHIFT_RSTn       = (RST_CTL3_PSCCTL1 << 8) | 2U,      /*!< MU1 reset control */
@@ -222,6 +222,10 @@ typedef enum _RSTCTL_RSTn
     {                        \
         kADC0_RST_SHIFT_RSTn \
     } /* Reset bits for ADC peripheral */
+#define SDADC_RSTS             \
+    {                          \
+        kSDADC0_RST_SHIFT_RSTn \
+    } /* Reset bits for SDADC peripheral */
 #define CRC_RSTS             \
     {                        \
         kCRC0_RST_SHIFT_RSTn \
@@ -234,11 +238,11 @@ typedef enum _RSTCTL_RSTn
 #define MIPI_DSI_RSTS                 \
     {                                 \
         kMIPI_DSI_CTRL_RST_SHIFT_RSTn \
-    } /* Reset bits for CRC peripheral */
-#define DMA_RSTS_N                                                                             \
-    {                                                                                          \
-        kDMA0_RST_SHIFT_RSTn, kDMA1_RST_SHIFT_RSTn, kDMA2_RST_SHIFT_RSTn, kDMA3_RST_SHIFT_RSTn \
-    } /* Reset bits for DMA peripheral */
+    } /* Reset bits for MIPI_DSI peripheral */
+#define LCDIF_RSTS            \
+    {                         \
+        kLCDIF_RST_SHIFT_RSTn \
+    } /* Reset bits for LCDIF peripheral */
 #define LP_FLEXCOMM_RSTS                                                                                               \
     {                                                                                                                  \
         kFC0_RST_SHIFT_RSTn, kFC1_RST_SHIFT_RSTn, kFC2_RST_SHIFT_RSTn, kFC3_RST_SHIFT_RSTn, kFC4_RST_SHIFT_RSTn,       \
@@ -255,11 +259,14 @@ typedef enum _RSTCTL_RSTn
     {                                                                       \
         kXSPI0_RST_SHIFT_RSTn, kXSPI1_RST_SHIFT_RSTn, kXSPI2_RST_SHIFT_RSTn \
     } /* Resets bits for FLEXSPI peripheral */
-#define GPIO_RSTS_N                                                                                     \
-    {                                                                                                   \
-        kGPIO0_RST_SHIFT_RSTn, kGPIO1_RST_SHIFT_RSTn, kGPIO2_RST_SHIFT_RSTn, kGPIO3_RST_SHIFT_RSTn,     \
-            kGPIO4_RST_SHIFT_RSTn, kGPIO5_RST_SHIFT_RSTn, kGPIO6_RST_SHIFT_RSTn, kGPIO7_RST_SHIFT_RSTn, \
-            kGPIO8_RST_SHIFT_RSTn, kGPIO9_RST_SHIFT_RSTn, kGPIO10_RST_SHIFT_RSTn                        \
+#define GPIO_RSTS                                                                                        \
+    {                                                                                                    \
+        kGPIO0_RST_SHIFT_RSTn, kGPIO1_RST_SHIFT_RSTn, kGPIO2_RST_SHIFT_RSTn, kGPIO3_RST_SHIFT_RSTn,      \
+            kGPIO4_RST_SHIFT_RSTn, kGPIO5_RST_SHIFT_RSTn, kGPIO6_RST_SHIFT_RSTn, kGPIO7_RST_SHIFT_RSTn,  \
+            kGPIO8_RST_SHIFT_RSTn, kGPIO9_RST_SHIFT_RSTn, kGPIO10_RST_SHIFT_RSTn, kGPIO0_RST_SHIFT_RSTn, \
+            kGPIO1_RST_SHIFT_RSTn, kGPIO2_RST_SHIFT_RSTn, kGPIO3_RST_SHIFT_RSTn, kGPIO4_RST_SHIFT_RSTn,  \
+            kGPIO5_RST_SHIFT_RSTn, kGPIO6_RST_SHIFT_RSTn, kGPIO7_RST_SHIFT_RSTn, kGPIO8_RST_SHIFT_RSTn,  \
+            kGPIO9_RST_SHIFT_RSTn, kGPIO10_RST_SHIFT_RSTn                                                \
     } /* Reset bits for GPIO peripheral */
 #define I3C_RSTS                                                                               \
     {                                                                                          \
@@ -271,37 +278,48 @@ typedef enum _RSTCTL_RSTn
     {                             \
         kINPUTMUX1_RST_SHIFT_RSTn \
     } /* Reset bits for INPUTMUX peripheral */
+#define DMA_RSTS_N                                 \
+    {                                              \
+        kDMA2_RST_SHIFT_RSTn, kDMA3_RST_SHIFT_RSTn \
+    } /* Reset bits for DMA peripheral */
 #endif
 #if defined(FSL_RESET_DRIVER_COMPUTE)
 #define INPUTMUX_RSTS             \
     {                             \
         kINPUTMUX0_RST_SHIFT_RSTn \
     } /* Reset bits for INPUTMUX peripheral */
+#define DMA_RSTS_N                                 \
+    {                                              \
+        kDMA0_RST_SHIFT_RSTn, kDMA1_RST_SHIFT_RSTn \
+    } /* Reset bits for DMA peripheral */
 #endif
 #define MRT_RSTS                                   \
     {                                              \
         kMRT0_RST_SHIFT_RSTn, kMRT1_RST_SHIFT_RSTn \
     } /* Reset bits for MRT peripheral */
-#if (defined(MIMXRT798S_cm33_core0_SERIES) || defined(MIMXRT758S_cm33_core0_SERIES) || defined(MIMXRT735S_cm33_core0_SERIES))
-#define MU_RSTS            \
-    {                      \
+#if (defined(MIMXRT798S_cm33_core0_SERIES) || defined(MIMXRT758S_cm33_core0_SERIES) || \
+     defined(MIMXRT735S_cm33_core0_SERIES))
+#define MU_RSTS                                                       \
+    {                                                                 \
         kMU0_RST_SHIFT_RSTn, kMU1_RST_SHIFT_RSTn, kMU4_RST_SHIFT_RSTn \
     } /* Reset bits for MU peripheral */
-#elif (defined(MIMXRT798S_cm33_core1_SERIES) || defined(MIMXRT758S_cm33_core1_SERIES) || defined(MIMXRT735S_cm33_core1_SERIES))
-#define MU_RSTS            \
-    {                      \
+#elif (defined(MIMXRT798S_cm33_core1_SERIES) || defined(MIMXRT758S_cm33_core1_SERIES) || \
+       defined(MIMXRT735S_cm33_core1_SERIES))
+#define MU_RSTS                                                       \
+    {                                                                 \
         kMU1_RST_SHIFT_RSTn, kMU2_RST_SHIFT_RSTn, kMU3_RST_SHIFT_RSTn \
     } /* Reset bits for MU peripheral */
 #elif defined(MIMXRT798S_hifi4_SERIES)
-#define MU_RSTS            \
-    {                      \
+#define MU_RSTS                                  \
+    {                                            \
         kMU2_RST_SHIFT_RSTn, kMU4_RST_SHIFT_RSTn \
     } /* Reset bits for MU peripheral */
 #elif defined(MIMXRT798S_hifi1_SERIES)
-#define MU_RSTS            \
-    {                      \
+#define MU_RSTS                                  \
+    {                                            \
         kMU0_RST_SHIFT_RSTn, kMU3_RST_SHIFT_RSTn \
     } /* Reset bits for MU peripheral */
+#elif defined(MIMXRT798S_ezhv_SERIES)
 #else
 #error "Unsupported core!"
 #endif
@@ -310,6 +328,16 @@ typedef enum _RSTCTL_RSTn
     {                        \
         kPINT_RST_SHIFT_RSTn \
     } /* Reset bits for PINT peripheral */
+
+#define PNGDEC_RSTS            \
+    {                          \
+        kPNGDEC_RST_SHIFT_RSTn \
+    } /* Reset bits for PNGDEC peripheral */
+
+#define JPEGDEC_RSTS            \
+    {                           \
+        kJPEGDEC_RST_SHIFT_RSTn \
+    } /* Reset bits for JPEGDEC peripheral */
 
 #define SCT_RSTS             \
     {                        \
@@ -320,10 +348,10 @@ typedef enum _RSTCTL_RSTn
         kSEMA420_RST_SHIFT_RSTn, (RSTCTL_RSTn_t)0U, (RSTCTL_RSTn_t)0U, kSEMA423_RST_SHIFT_RSTn, \
             kSEMA424_RST_SHIFT_RSTn                                                             \
     } /* Reset bits for SEMA42 peripheral */
-#define TRNG_RSTS           \
-    {                       \
-        kRNG_RST_SHIFT_RSTn \
-    } /* Reset bits for TRNG peripheral */
+#define SAI_RSTS                                                                               \
+    {                                                                                          \
+        kSAI0_RST_SHIFT_RSTn, kSAI1_RST_SHIFT_RSTn, kSAI2_RST_SHIFT_RSTn, kSAI3_RST_SHIFT_RSTn \
+    } /* Reset bits for SAI peripheral */
 #define USDHC_RSTS                                     \
     {                                                  \
         kUSDHC0_RST_SHIFT_RSTn, kUSDHC1_RST_SHIFT_RSTn \

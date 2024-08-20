@@ -22,9 +22,9 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 #define FSL_PINT_DRIVER_VERSION (MAKE_VERSION(2, 1, 13))
-/*@}*/
+/*! @} */
 
 /* PININT Bit slice source register bits */
 #define PININT_BITSLICE_SRC_START 8U
@@ -566,6 +566,6 @@ void PINT_DisableCallbackByIndex(PINT_Type *base, pint_pin_int_t pintIdx);
 }
 #endif
 
-/*@}*/
+/*! @} */
 
 #endif /* FSL_PINT_H_ */

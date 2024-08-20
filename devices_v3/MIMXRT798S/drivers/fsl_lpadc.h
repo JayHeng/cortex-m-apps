@@ -22,10 +22,10 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
-/*! @brief LPADC driver version 2.8.3. */
-#define FSL_LPADC_DRIVER_VERSION (MAKE_VERSION(2, 8, 3))
-/*@}*/
+/*! @{ */
+/*! @brief LPADC driver version 2.8.4. */
+#define FSL_LPADC_DRIVER_VERSION (MAKE_VERSION(2, 8, 4))
+/*! @} */
 
 #if (defined(FSL_FEATURE_LPADC_OFSTRIM_COUNT) && (FSL_FEATURE_LPADC_OFSTRIM_COUNT == 1))
 #define ADC_OFSTRIM_OFSTRIM_MAX  (ADC_OFSTRIM_OFSTRIM_MASK >> ADC_OFSTRIM_OFSTRIM_SHIFT)
@@ -816,7 +816,7 @@ static inline void LPADC_DoResetConfig(ADC_Type *base)
     base->CTRL &= ~ADC_CTRL_RST_MASK;
 }
 
-/* @} */
+/*! @} */
 
 /*!
  * @name Status
@@ -876,7 +876,7 @@ static inline void LPADC_ClearTriggerStatusFlags(ADC_Type *base, uint32_t mask)
 }
 #endif /* (defined(FSL_FEATURE_LPADC_HAS_TSTAT) && FSL_FEATURE_LPADC_HAS_TSTAT) */
 
-/* @} */
+/*! @} */
 
 /*!
  * @name Interrupts
@@ -976,7 +976,7 @@ static inline void LPADC_EnableFIFOWatermarkDMA(ADC_Type *base, bool enable)
     }
 }
 #endif /* (defined(FSL_FEATURE_LPADC_FIFO_COUNT) && (FSL_FEATURE_LPADC_FIFO_COUNT == 2)) */
-/* @} */
+/*! @} */
 
 /*!
  * @name Trigger and conversion with FIFO.
@@ -1206,8 +1206,6 @@ void LPADC_DoAutoCalibration(ADC_Type *base);
  */
 static inline void LPADC_SetOffsetValue(ADC_Type *base, int16_t value)
 {
-    assert((value >= -512) && (value <= 511));
-
     base->OFSTRIM = ADC_OFSTRIM_OFSTRIM(value);
 }
 
@@ -1244,9 +1242,6 @@ static inline void LPADC_GetOffsetValue(ADC_Type *base, int16_t *pValue)
  */
 static inline void LPADC_SetOffsetValue(ADC_Type *base, int32_t valueA, int32_t valueB)
 {
-    assert((valueA >= -16) && (valueA <= 15));
-    assert((valueB >= -16) && (valueB <= 15));
-
     base->OFSTRIM = ADC_OFSTRIM_OFSTRIM_A(valueA) | ADC_OFSTRIM_OFSTRIM_B(valueB);
 }
 
@@ -1523,7 +1518,7 @@ static inline void LPADC_EnableJustifiedLeft(ADC_Type *base, bool enable)
 }
 #endif /* (defined(FSL_FEATURE_LPADC_HAS_CFG2_JLEFT) && FSL_FEATURE_LPADC_HAS_CFG2_JLEFT) */
 
-/* @} */
+/*! @} */
 
 #if defined(__cplusplus)
 }

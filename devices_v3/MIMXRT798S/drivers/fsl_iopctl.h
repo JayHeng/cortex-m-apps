@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  * All rights reserved.
  *
  *
@@ -29,8 +29,8 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief IOPCTL driver version 2.0.0. */
-#define LPC_IOPCTL_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+/*! @brief IOPCTL driver version 2.0.2. */
+#define LPC_IOPCTL_DRIVER_VERSION (MAKE_VERSION(2, 0, 2))
 /*@}*/
 
 /**
@@ -68,7 +68,6 @@ typedef struct _iopctl_group
 #define IOPCTL_PULLUP_EN    (0x1 << 5)  /*!< Selects pull-up function */
 #define IOPCTL_INBUF_EN     (0x1 << 6)  /*!< Enables buffer function  on input */
 #define IOPCTL_SLEW_RATE    (0x0 << 7)  /*!< Slew Rate Control */
-#define IOPCTL_FULLDRIVE_EN (0x1 << 8)  /*!< Selects full drive */
 #define IOPCTL_ANAMUX_EN    (0x1 << 9)  /*!< Enables analog mux function by setting 0 to bit 7 */
 #define IOPCTL_PSEDRAIN_EN  (0x1 << 10) /*!< Enables pseudo output drain function */
 #define IOPCTL_INV_EN       (0x1 << 11) /*!< Enables invert function on input */
@@ -90,15 +89,15 @@ extern "C" {
  */
 __STATIC_INLINE void IOPCTL_PinMuxSet(uint8_t port, uint8_t pin, uint32_t modefunc)
 {
-    uint32_t pioBase;
+    uint32_t pioBase = 0U;
 
     if (port >= 8U) /* IOPCTL_VDD1 */
     {
-        pioBase = (uint32_t)IOPCTL1 + ((port - 8U) * 32U + pin) * 4U;
+        pioBase = (uint32_t)IOPCTL1 + (uint32_t)((port - 8U) * 32U + pin) * 4UL;
     }
     else if (port >= 4U) /* IOPCTL_VDDN */
     {
-        pioBase = (uint32_t)IOPCTL2 + ((port - 4U) * 32U + pin) * 4U;
+        pioBase = (uint32_t)IOPCTL2 + (uint32_t)((port - 4U) * 32U + pin) * 4UL;
     }
     else /* IOPCTL_VDD2 */
     {
@@ -106,7 +105,7 @@ __STATIC_INLINE void IOPCTL_PinMuxSet(uint8_t port, uint8_t pin, uint32_t modefu
     defined(MIMXRT758S_cm33_core1_SERIES) || defined(MIMXRT735S_hifi1_SERIES) || defined(MIMXRT735S_cm33_core1_SERIES)
         assert(false);
 #else
-        pioBase = (uint32_t)IOPCTL0 + (port * 32U + pin) * 4U;
+        pioBase = (uint32_t)IOPCTL0 + (uint32_t)(port * 32U + pin) * 4UL;
 #endif
     }
 

@@ -2,13 +2,13 @@
 ;  @file:    startup_MIMXRT798S_cm33_core0.s
 ;  @purpose: CMSIS Cortex-M33 Core Device Startup File
 ;            MIMXRT798S_cm33_core0
-;  @version: 1.0
-;  @date:    2022-8-1
-;  @build:   b231026
+;  @version: 2.0
+;  @date:    2024-5-28
+;  @build:   b240528
 ; -------------------------------------------------------------------------
 ;
 ; Copyright 1997-2016 Freescale Semiconductor, Inc.
-; Copyright 2016-2023 NXP
+; Copyright 2016-2024 NXP
 ; SPDX-License-Identifier: BSD-3-Clause
 ;
 ; The modules in this file are included in the libraries, and may be replaced
@@ -72,7 +72,7 @@ __vector_table_0x1c
         DCD     SysTick_Handler                               ;SysTick Handler
 
                                                               ;External Interrupts
-        DCD     Reserved16_IRQHandler                         ;Reserved interrupt
+        DCD     Reserved16_IRQHandler                         ;Reserved interrupt 16
         DCD     UTICK0_IRQHandler                             ;Micro-tick Timer
         DCD     MRT0_IRQHandler                               ;MRT: Ored Interrupt request
         DCD     CTIMER0_IRQHandler                            ;CTIMER: Interrupt request
@@ -129,7 +129,7 @@ __vector_table_0x1c
         DCD     I3C1_IRQHandler                               ;I3C: Interrupt Request
         DCD     FLEXIO_IRQHandler                             ;FLEXIO: Interrupt request
         DCD     LCDIF_IRQHandler                              ;LCDIF: Interrupt request
-        DCD     VGPU_IRQHandler                               ;VGPU interrupt from graphics core
+        DCD     VGPU_IRQHandler                               ;VGPU: Interrupt from graphics core (Domain HCLK)
         DCD     MIPI_IRQHandler                               ;DSI: Interrupt request
         DCD     EDMA0_CH0_IRQHandler                          ;EDMA: Channel 0 interrupt
         DCD     EDMA0_CH1_IRQHandler                          ;EDMA: Channel 1 interrupt
@@ -213,7 +213,7 @@ __vector_table_0x1c
         DCD     PMC_IRQHandler                                ;PMC: Compute domain Interrupt
         DCD     JPEGDEC_IRQHandler                            ;JPEGDEC: Ored Context 0-3 interrupt request
         DCD     PNGDEC_IRQHandler                             ;PGNDEC: Interrut request
-        DCD     NEUTRON_IRQHandler                            ;NEUTRON: Interrupt request
+        DCD     NPU_IRQHandler                                ;NPU: Interrupt request
         DCD     TRNG_IRQHandler                               ;TRNG: interrupt
         DCD     TEMPDET0_IRQHandler                           ;TEMPDET0: Interrupt request 0
         DCD     TEMPDET1_IRQHandler                           ;TEMPDET1: Interrupt request 1
@@ -222,10 +222,10 @@ __vector_table_0x1c
         DCD     GLIKEY2_IRQHandler                            ;GLIKEY: Interrupt
         DCD     GLIKEY3_IRQHandler                            ;GLIKEY: Interrupt
         DCD     GLIKEY5_IRQHandler                            ;GLIKEY: Interrupt
-        DCD     PVT0_AMBER0_IRQHandler                        ;PVT0 AMBER0 interrupt
-        DCD     PVT0_RED0_IRQHandler                          ;PVT0 RED0 interrupt
-        DCD     PVT0_AMBER1_IRQHandler                        ;PVT0 AMBER1 interrupt
-        DCD     PVT0_RED1_IRQHandler                          ;PVT0 RED1 interrupt
+        DCD     PVTS0_CPU0_IRQHandler                         ;PVTS0 CPU0 interrupt
+        DCD     Reserved167_IRQHandler                        ;Reserved interrupt 167
+        DCD     PVTS0_HIFI4_IRQHandler                        ;PVTS0 HIFI4 interrupt
+        DCD     Reserved169_IRQHandler                        ;Reserved interrupt 169
         DCD     FRO0_IRQHandler                               ;FRO: 300MHz FRO in VDD2 domain Async interrupt
         DCD     FRO1_IRQHandler                               ;FRO: 192MHz FRO in VDD2 domain Async interrupt
         DCD     FRO2_IRQHandler                               ;FRO: 300MHz FRO in VDD1 domain Async interrupt
@@ -1296,11 +1296,11 @@ PNGDEC_IRQHandler
         LDR     R0, =PNGDEC_DriverIRQHandler
         BX      R0
 
-        PUBWEAK NEUTRON_IRQHandler
-        PUBWEAK NEUTRON_DriverIRQHandler
+        PUBWEAK NPU_IRQHandler
+        PUBWEAK NPU_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-NEUTRON_IRQHandler
-        LDR     R0, =NEUTRON_DriverIRQHandler
+NPU_IRQHandler
+        LDR     R0, =NPU_DriverIRQHandler
         BX      R0
 
         PUBWEAK TRNG_IRQHandler
@@ -1359,32 +1359,32 @@ GLIKEY5_IRQHandler
         LDR     R0, =GLIKEY5_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT0_AMBER0_IRQHandler
-        PUBWEAK PVT0_AMBER0_DriverIRQHandler
+        PUBWEAK PVTS0_CPU0_IRQHandler
+        PUBWEAK PVTS0_CPU0_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT0_AMBER0_IRQHandler
-        LDR     R0, =PVT0_AMBER0_DriverIRQHandler
+PVTS0_CPU0_IRQHandler
+        LDR     R0, =PVTS0_CPU0_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT0_RED0_IRQHandler
-        PUBWEAK PVT0_RED0_DriverIRQHandler
+        PUBWEAK Reserved167_IRQHandler
+        PUBWEAK Reserved167_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT0_RED0_IRQHandler
-        LDR     R0, =PVT0_RED0_DriverIRQHandler
+Reserved167_IRQHandler
+        LDR     R0, =Reserved167_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT0_AMBER1_IRQHandler
-        PUBWEAK PVT0_AMBER1_DriverIRQHandler
+        PUBWEAK PVTS0_HIFI4_IRQHandler
+        PUBWEAK PVTS0_HIFI4_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT0_AMBER1_IRQHandler
-        LDR     R0, =PVT0_AMBER1_DriverIRQHandler
+PVTS0_HIFI4_IRQHandler
+        LDR     R0, =PVTS0_HIFI4_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT0_RED1_IRQHandler
-        PUBWEAK PVT0_RED1_DriverIRQHandler
+        PUBWEAK Reserved169_IRQHandler
+        PUBWEAK Reserved169_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT0_RED1_IRQHandler
-        LDR     R0, =PVT0_RED1_DriverIRQHandler
+Reserved169_IRQHandler
+        LDR     R0, =Reserved169_DriverIRQHandler
         BX      R0
 
         PUBWEAK FRO0_IRQHandler
@@ -1556,7 +1556,7 @@ CPU0_DriverIRQHandler
 PMC_DriverIRQHandler
 JPEGDEC_DriverIRQHandler
 PNGDEC_DriverIRQHandler
-NEUTRON_DriverIRQHandler
+NPU_DriverIRQHandler
 TRNG_DriverIRQHandler
 TEMPDET0_DriverIRQHandler
 TEMPDET1_DriverIRQHandler
@@ -1565,10 +1565,10 @@ GLIKEY0_DriverIRQHandler
 GLIKEY2_DriverIRQHandler
 GLIKEY3_DriverIRQHandler
 GLIKEY5_DriverIRQHandler
-PVT0_AMBER0_DriverIRQHandler
-PVT0_RED0_DriverIRQHandler
-PVT0_AMBER1_DriverIRQHandler
-PVT0_RED1_DriverIRQHandler
+PVTS0_CPU0_DriverIRQHandler
+Reserved167_DriverIRQHandler
+PVTS0_HIFI4_DriverIRQHandler
+Reserved169_DriverIRQHandler
 FRO0_DriverIRQHandler
 FRO1_DriverIRQHandler
 FRO2_DriverIRQHandler

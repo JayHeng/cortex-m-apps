@@ -3,7 +3,5 @@
 include_guard(GLOBAL)
 message("${CMAKE_CURRENT_LIST_FILE} component is included.")
 
-target_include_directories(${MCUX_SDK_PROJECT_NAME} PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}/.
-)
+add_config_file(${CMAKE_CURRENT_LIST_DIR}/RTE_Device.h ${CMAKE_CURRENT_LIST_DIR}/. RTE_Device.MIMXRT798S)
 

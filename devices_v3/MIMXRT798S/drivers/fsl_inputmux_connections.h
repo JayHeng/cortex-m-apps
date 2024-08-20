@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 NXP
+ * Copyright 2023-2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -26,8 +26,7 @@
 #define PINTSEL_PMUX_ID 0x100U
 #define DSP_INT_PMUX_ID 0x140U
 
-#if defined(MIMXRT798S_hifi4_SERIES) || defined(MIMXRT798S_cm33_core0_SERIES) || \
-    defined(MIMXRT758S_cm33_core0_SERIES) || defined(MIMXRT735S_cm33_core0_SERIES)
+#if defined(INPUTMUX0)
 #define SCT0_PMUX_ID             0x00U
 #define FLEXCOMM0_ITRIG_PMUX_ID  0x200U
 #define FLEXCOMM1_ITRIG_PMUX_ID  0x220U
@@ -48,11 +47,16 @@
 #define CT32BIT2_CAP_PMUX_ID     0x640U
 #define CT32BIT3_CAP_PMUX_ID     0x660U
 #define CT32BIT4_CAP_PMUX_ID     0x680U
-#define FREQME_PMUX_ID           0x700U
+#define CT32BIT0_TRIG_PMUX_ID    0x610U
+#define CT32BIT1_TRIG_PMUX_ID    0x630U
+#define CT32BIT2_TRIG_PMUX_ID    0x650U
+#define CT32BIT3_TRIG_PMUX_ID    0x670U
+#define CT32BIT4_TRIG_PMUX_ID    0x690U
+#define FREQME_REF_PMUX_ID       0x700U
+#define FREQME_TAR_PMUX_ID       0x704U
 #define EZHV_PMUX_ID             0x720U
 #define FLEXIO_PMUX_ID           0x760U
-#elif defined(MIMXRT798S_hifi1_SERIES) || defined(MIMXRT798S_cm33_core1_SERIES) || \
-    defined(MIMXRT758S_cm33_core1_SERIES) || defined(MIMXRT735S_cm33_core1_SERIES)
+#elif defined(INPUTMUX1)
 #define FLEXCOMM17_ITRIG_PMUX_ID 0x200U
 #define FLEXCOMM18_ITRIG_PMUX_ID 0x220U
 #define FLEXCOMM19_ITRIG_PMUX_ID 0x240U
@@ -61,6 +65,9 @@
 #define CT32BIT5_CAP_PMUX_ID     0x600U
 #define CT32BIT6_CAP_PMUX_ID     0x620U
 #define CT32BIT7_CAP_PMUX_ID     0x640U
+#define CT32BIT5_TRIG_PMUX_ID    0x610U
+#define CT32BIT6_TRIG_PMUX_ID    0x630U
+#define CT32BIT7_TRIG_PMUX_ID    0x650U
 
 #else
 #error "Unsupported core!"
@@ -71,8 +78,7 @@
 /*! @brief INPUTMUX connections type */
 typedef enum _inputmux_connection_t
 {
-#if defined(MIMXRT798S_hifi4_SERIES) || defined(MIMXRT798S_cm33_core0_SERIES) || \
-    defined(MIMXRT758S_cm33_core0_SERIES) || defined(MIMXRT735S_cm33_core0_SERIES)
+#if defined(INPUTMUX0)
     /*!< SCT INMUX. */
     kINPUTMUX_Sct0PinInp0ToSct0   = 0U + (SCT0_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Sct0PinInp1ToSct0   = 1U + (SCT0_PMUX_ID << PMUX_SHIFT),
@@ -173,7 +179,7 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_Flexcomm12ToDspInterrupt   = 12U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Flexcomm13ToDspInterrupt   = 13U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Mu2AToDspInterrupt         = 14U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Mu4AToDspInterrupt         = 15U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Mu4BToDspInterrupt         = 15U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Wdt0ToDspInterrupt         = 16U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Wdt1ToDspInterrupt         = 17U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Utick0ToDspInterrupt       = 18U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
@@ -189,7 +195,7 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_Rtc0WakeupToDspInterrupt   = 28U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_I3c0ToDspInterrupt         = 29U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_I3c1ToDspInterrupt         = 30U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Dmic0ToDspInterrupt        = 31U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_MicfilToDspInterrupt       = 31U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_HwvadToDspInterrupt        = 32U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_LcdifToDspInterrupt        = 33U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_GpuToDspInterrupt          = 34U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
@@ -657,17 +663,182 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_TmprOut0ToTimer4CaptureChannels   = 27U + (CT32BIT4_CAP_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_TmprOut1ToTimer4CaptureChannels   = 28U + (CT32BIT4_CAP_PMUX_ID << PMUX_SHIFT),
 
-    /*!< Frequency measure. */
-    kINPUTMUX_OscClkToFreqmeas         = 0U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Fro24mToFreqmeas         = 1U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Fro192mToFreqmeas        = 2U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_LposcToFreqmeas          = 3U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_32KhzOscToFreqmeas       = 4U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_MainSysClkToFreqmeas     = 5U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Fro300m0ToFreqmeas       = 6U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Fro300m1ToFreqmeas       = 7U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_FreqmeGpioAClkToFreqmeas = 8U + (FREQME_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_FreqmeGpioBClkToFreqmeas = 9U + (FREQME_PMUX_ID << PMUX_SHIFT),
+    /*!< CTmier0 Input trigger mux. */
+    kINPUTMUX_CtInp0ToTimer0Trigger     = 0U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer0Trigger     = 1U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer0Trigger     = 2U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer0Trigger     = 3U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer0Trigger     = 4U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer0Trigger     = 5U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer0Trigger     = 6U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer0Trigger     = 7U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer0Trigger     = 8U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer0Trigger     = 9U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp10ToTimer0Trigger    = 10U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp11ToTimer0Trigger    = 11U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp12ToTimer0Trigger    = 12U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp13ToTimer0Trigger    = 13U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp14ToTimer0Trigger    = 14U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp15ToTimer0Trigger    = 15U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0TxSyncToTimer0Trigger = 16U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0RxSyncToTimer0Trigger = 17U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1TxSyncToTimer0Trigger = 18U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1RxSyncToTimer0Trigger = 19U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2TxSyncToTimer0Trigger = 20U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2RxSyncToTimer0Trigger = 21U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb0SofToTimer0Trigger    = 22U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb1SofToTimer0Trigger    = 23U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer0Trigger    = 24U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer0Trigger = 25U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer0Trigger = 26U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut0ToTimer0Trigger   = 27U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut1ToTimer0Trigger   = 28U + (CT32BIT0_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier1 Input trigger mux. */
+    kINPUTMUX_CtInp0ToTimer1Trigger     = 0U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer1Trigger     = 1U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer1Trigger     = 2U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer1Trigger     = 3U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer1Trigger     = 4U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer1Trigger     = 5U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer1Trigger     = 6U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer1Trigger     = 7U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer1Trigger     = 8U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer1Trigger     = 9U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp10ToTimer1Trigger    = 10U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp11ToTimer1Trigger    = 11U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp12ToTimer1Trigger    = 12U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp13ToTimer1Trigger    = 13U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp14ToTimer1Trigger    = 14U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp15ToTimer1Trigger    = 15U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0TxSyncToTimer1Trigger = 16U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0RxSyncToTimer1Trigger = 17U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1TxSyncToTimer1Trigger = 18U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1RxSyncToTimer1Trigger = 19U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2TxSyncToTimer1Trigger = 20U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2RxSyncToTimer1Trigger = 21U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb0SofToTimer1Trigger    = 22U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb1SofToTimer1Trigger    = 23U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer1Trigger    = 24U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer1Trigger = 25U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer1Trigger = 26U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut0ToTimer1Trigger   = 27U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut1ToTimer1Trigger   = 28U + (CT32BIT1_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier2 Input trigger mux. */
+    kINPUTMUX_CtInp0ToTimer2Trigger     = 0U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer2Trigger     = 1U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer2Trigger     = 2U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer2Trigger     = 3U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer2Trigger     = 4U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer2Trigger     = 5U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer2Trigger     = 6U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer2Trigger     = 7U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer2Trigger     = 8U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer2Trigger     = 9U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp10ToTimer2Trigger    = 10U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp11ToTimer2Trigger    = 11U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp12ToTimer2Trigger    = 12U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp13ToTimer2Trigger    = 13U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp14ToTimer2Trigger    = 14U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp15ToTimer2Trigger    = 15U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0TxSyncToTimer2Trigger = 16U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0RxSyncToTimer2Trigger = 17U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1TxSyncToTimer2Trigger = 18U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1RxSyncToTimer2Trigger = 19U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2TxSyncToTimer2Trigger = 20U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2RxSyncToTimer2Trigger = 21U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb0SofToTimer2Trigger    = 22U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb1SofToTimer2Trigger    = 23U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer2Trigger    = 24U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer2Trigger = 25U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer2Trigger = 26U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut0ToTimer2Trigger   = 27U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut1ToTimer2Trigger   = 28U + (CT32BIT2_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier3 Input trigger mux. */
+    kINPUTMUX_CtInp0ToTimer3Trigger     = 0U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer3Trigger     = 1U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer3Trigger     = 2U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer3Trigger     = 3U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer3Trigger     = 4U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer3Trigger     = 5U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer3Trigger     = 6U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer3Trigger     = 7U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer3Trigger     = 8U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer3Trigger     = 9U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp10ToTimer3Trigger    = 10U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp11ToTimer3Trigger    = 11U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp12ToTimer3Trigger    = 12U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp13ToTimer3Trigger    = 13U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp14ToTimer3Trigger    = 14U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp15ToTimer3Trigger    = 15U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0TxSyncToTimer3Trigger = 16U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0RxSyncToTimer3Trigger = 17U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1TxSyncToTimer3Trigger = 18U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1RxSyncToTimer3Trigger = 19U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2TxSyncToTimer3Trigger = 20U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2RxSyncToTimer3Trigger = 21U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb0SofToTimer3Trigger    = 22U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb1SofToTimer3Trigger    = 23U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer3Trigger    = 24U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer3Trigger = 25U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer3Trigger = 26U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut0ToTimer3Trigger   = 27U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut1ToTimer3Trigger   = 28U + (CT32BIT3_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier4 Input trigger mux. */
+    kINPUTMUX_CtInp0ToTimer4Trigger     = 0U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer4Trigger     = 1U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer4Trigger     = 2U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer4Trigger     = 3U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer4Trigger     = 4U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer4Trigger     = 5U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer4Trigger     = 6U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer4Trigger     = 7U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer4Trigger     = 8U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer4Trigger     = 9U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp10ToTimer4Trigger    = 10U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp11ToTimer4Trigger    = 11U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp12ToTimer4Trigger    = 12U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp13ToTimer4Trigger    = 13U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp14ToTimer4Trigger    = 14U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp15ToTimer4Trigger    = 15U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0TxSyncToTimer4Trigger = 16U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai0RxSyncToTimer4Trigger = 17U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1TxSyncToTimer4Trigger = 18U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai1RxSyncToTimer4Trigger = 19U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2TxSyncToTimer4Trigger = 20U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai2RxSyncToTimer4Trigger = 21U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb0SofToTimer4Trigger    = 22U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Usb1SofToTimer4Trigger    = 23U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer4Trigger    = 24U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer4Trigger = 25U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer4Trigger = 26U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut0ToTimer4Trigger   = 27U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_TmprOut1ToTimer4Trigger   = 28U + (CT32BIT4_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< Frequency measurement reference clock. */
+    kINPUTMUX_OscClkToFreqmeasRef         = 0U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro1Div8ToFreqmeasRef       = 1U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro1ToFreqmeasRef           = 2U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_LposcToFreqmeasRef          = 3U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_32KhzOscToFreqmeasRef       = 4U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro0ToFreqmeasRef           = 6U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro2ToFreqmeasRef           = 7U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_FreqmeGpioAClkToFreqmeasRef = 8U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_FreqmeGpioBClkToFreqmeasRef = 9U + (FREQME_REF_PMUX_ID << PMUX_SHIFT),
+
+    /*!< Frequency measurement target clock. */
+    kINPUTMUX_OscClkToFreqmeasTar         = 0U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro1Div8ToFreqmeasTar       = 1U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro1ToFreqmeasTar           = 2U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_LposcToFreqmeasTar          = 3U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_32KhzOscToFreqmeasTar       = 4U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro0ToFreqmeasTar           = 6U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Fro2ToFreqmeasTar           = 7U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_FreqmeGpioAClkToFreqmeasTar = 8U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_FreqmeGpioBClkToFreqmeasTar = 9U + (FREQME_TAR_PMUX_ID << PMUX_SHIFT),
 
     /*!< EZHV input mux. */
     kINPUTMUX_GpioInt0Trig0ToEzhv    = 0U + (EZHV_PMUX_ID << PMUX_SHIFT),
@@ -729,7 +900,7 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_Wdt1IrqToEzhv          = 56U + (EZHV_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Adc0IrqToEzhv          = 57U + (EZHV_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_AcmpIrqToEzhv          = 58U + (EZHV_PMUX_ID << PMUX_SHIFT),
-    kINPUTMUX_Dmic0IrqToEzhv         = 59U + (EZHV_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_MicfilIrqToEzhv        = 59U + (EZHV_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_HwvadToEzhv            = 60U + (EZHV_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Sdio0IrqToEzhv         = 61U + (EZHV_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_Sdio1IrqToEzhv         = 62U + (EZHV_PMUX_ID << PMUX_SHIFT),
@@ -862,6 +1033,56 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_GpioPort10Pin16ToPintsel = 48U + (PINTSEL_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_GpioPort10Pin17ToPintsel = 49U + (PINTSEL_PMUX_ID << PMUX_SHIFT),
 
+    /*!< DSP Interrupt. */
+    kINPUTMUX_Flexcomm17ToDspInterrupt   = 0U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Flexcomm18ToDspInterrupt   = 1U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Flexcomm19ToDspInterrupt   = 2U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Flexcomm20ToDspInterrupt   = 3U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Pmc1ToDspInterrupt         = 4U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio8Irq0ToDspInterrupt    = 7U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio8Irq1ToDspInterrupt    = 8U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio9Irq0ToDspInterrupt    = 9U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio9Irq1ToDspInterrupt    = 10U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio10Irq0ToDspInterrupt   = 11U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Gpio10Irq1ToDspInterrupt   = 12U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Wdt2ToDspInterrupt         = 13U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Wdt3ToDspInterrupt         = 14U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Mu0BToDspInterrupt         = 15U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Mu3BToDspInterrupt         = 16U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Utick1ToDspInterrupt       = 17U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Mrt1ToDspInterrupt         = 18U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_OsEventTimerToDspInterrupt = 19U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Ctimer5ToDspInterrupt      = 20U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Ctimer6ToDspInterrupt      = 21U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Ctimer7ToDspInterrupt      = 22U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Rtc1AlarmToDspInterrupt    = 23U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Rtc1WakeupToDspInterrupt   = 24U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_I3c2ToDspInterrupt         = 25U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_I3c3ToDspInterrupt         = 26U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_MicfilToDspInterrupt       = 27U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_HwvadToDspInterrupt        = 28U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq0ToDspInterrupt     = 34U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq1ToDspInterrupt     = 35U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq2ToDspInterrupt     = 36U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq3ToDspInterrupt     = 37U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq4ToDspInterrupt     = 38U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq5ToDspInterrupt     = 39U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq6ToDspInterrupt     = 40U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma2Irq7ToDspInterrupt     = 41U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq0ToDspInterrupt     = 42U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq1ToDspInterrupt     = 43U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq2ToDspInterrupt     = 44U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq3ToDspInterrupt     = 45U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq4ToDspInterrupt     = 46U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq5ToDspInterrupt     = 47U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq6ToDspInterrupt     = 48U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Dma3Irq7ToDspInterrupt     = 49U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_GpioInt0ToDspInterrupt     = 50U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_GpioInt1ToDspInterrupt     = 51U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_GpioInt2ToDspInterrupt     = 52U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_GpioInt3ToDspInterrupt     = 53U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3ToDspInterrupt         = 54U + (DSP_INT_PMUX_ID << PMUX_SHIFT),
+
     /* FLEXCOMM17 TRIG input mux */
     kINPUTMUX_CtInp0ToFlexcomm17         = 0U + (FLEXCOMM17_ITRIG_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_CtInp1ToFlexcomm17         = 1U + (FLEXCOMM17_ITRIG_PMUX_ID << PMUX_SHIFT),
@@ -939,6 +1160,108 @@ typedef enum _inputmux_connection_t
     kINPUTMUX_EzhvOutToAdc0        = 25U + (ADC0_TRIG_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_GpioInt0BmatchToAdc0 = 26U + (ADC0_TRIG_PMUX_ID << PMUX_SHIFT),
     kINPUTMUX_GpioInt1BmatchToAdc0 = 27U + (ADC0_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier5 capture input mux. */
+    kINPUTMUX_CtInp0ToTimer5CaptureChannels     = 0U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer5CaptureChannels     = 1U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer5CaptureChannels     = 2U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer5CaptureChannels     = 3U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer5CaptureChannels     = 4U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer5CaptureChannels     = 5U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer5CaptureChannels     = 6U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer5CaptureChannels     = 7U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer5CaptureChannels     = 8U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer5CaptureChannels     = 9U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer5CaptureChannels = 16U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer5CaptureChannels = 17U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer5CaptureChannels    = 18U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer5CaptureChannels = 19U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer5CaptureChannels = 20U + (CT32BIT5_CAP_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier6 capture input mux. */
+    kINPUTMUX_CtInp0ToTimer6CaptureChannels     = 0U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer6CaptureChannels     = 1U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer6CaptureChannels     = 2U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer6CaptureChannels     = 3U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer6CaptureChannels     = 4U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer6CaptureChannels     = 5U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer6CaptureChannels     = 6U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer6CaptureChannels     = 7U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer6CaptureChannels     = 8U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer6CaptureChannels     = 9U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer6CaptureChannels = 16U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer6CaptureChannels = 17U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer6CaptureChannels    = 18U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer6CaptureChannels = 19U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer6CaptureChannels = 20U + (CT32BIT6_CAP_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier7 capture input mux. */
+    kINPUTMUX_CtInp0ToTimer7CaptureChannels     = 0U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer7CaptureChannels     = 1U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer7CaptureChannels     = 2U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer7CaptureChannels     = 3U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer7CaptureChannels     = 4U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer7CaptureChannels     = 5U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer7CaptureChannels     = 6U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer7CaptureChannels     = 7U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer7CaptureChannels     = 8U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer7CaptureChannels     = 9U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer7CaptureChannels = 16U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer7CaptureChannels = 17U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer7CaptureChannels    = 18U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer7CaptureChannels = 19U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer7CaptureChannels = 20U + (CT32BIT7_CAP_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier5 input trigger. */
+    kINPUTMUX_CtInp0ToTimer5Trigger     = 0U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer5Trigger     = 1U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer5Trigger     = 2U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer5Trigger     = 3U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer5Trigger     = 4U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer5Trigger     = 5U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer5Trigger     = 6U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer5Trigger     = 7U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer5Trigger     = 8U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer5Trigger     = 9U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer5Trigger = 16U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer5Trigger = 17U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer5Trigger    = 18U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer5Trigger = 19U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer5Trigger = 20U + (CT32BIT5_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier6 input trigger. */
+    kINPUTMUX_CtInp0ToTimer6Trigger     = 0U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer6Trigger     = 1U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer6Trigger     = 2U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer6Trigger     = 3U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer6Trigger     = 4U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer6Trigger     = 5U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer6Trigger     = 6U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer6Trigger     = 7U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer6Trigger     = 8U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer6Trigger     = 9U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer6Trigger = 16U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer6Trigger = 17U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer6Trigger    = 18U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer6Trigger = 19U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer6Trigger = 20U + (CT32BIT6_TRIG_PMUX_ID << PMUX_SHIFT),
+
+    /*!< CTmier7 input trigger. */
+    kINPUTMUX_CtInp0ToTimer7Trigger     = 0U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp1ToTimer7Trigger     = 1U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp2ToTimer7Trigger     = 2U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp3ToTimer7Trigger     = 3U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp4ToTimer7Trigger     = 4U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp5ToTimer7Trigger     = 5U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp6ToTimer7Trigger     = 6U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp7ToTimer7Trigger     = 7U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp8ToTimer7Trigger     = 8U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_CtInp9ToTimer7Trigger     = 9U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3TxSyncToTimer7Trigger = 16U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Sai3RxSyncToTimer7Trigger = 17U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Cmp0OutToTimer7Trigger    = 18U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp0ToTimer7Trigger = 19U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
+    kINPUTMUX_Adc0Tcomp1ToTimer7Trigger = 20U + (CT32BIT7_TRIG_PMUX_ID << PMUX_SHIFT),
 #endif
 
 } inputmux_connection_t;

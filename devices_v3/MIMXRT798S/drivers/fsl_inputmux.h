@@ -25,10 +25,10 @@
  ******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief Group interrupt driver version for SDK */
 #define FSL_INPUTMUX_DRIVER_VERSION (MAKE_VERSION(2, 0, 7))
-/*@}*/
+/*! @} */
 
 /*******************************************************************************
  * API
@@ -98,6 +98,6 @@ void INPUTMUX_Deinit(INPUTMUX_Type *base);
 }
 #endif
 
-/*@}*/
+/*! @} */
 
 #endif /* FSL_INPUTMUX_H_ */

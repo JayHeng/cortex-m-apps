@@ -76,7 +76,7 @@ static uint32_t CTIMER_GetInstance(CTIMER_Type *base)
     /* Find the instance index from base address mappings. */
     for (instance = 0; instance < ctimerArrayCount; instance++)
     {
-        if (s_ctimerBases[instance] == base)
+        if (MSDK_REG_SECURE_ADDR(s_ctimerBases[instance]) == MSDK_REG_SECURE_ADDR(base))
         {
             break;
         }
@@ -572,6 +572,33 @@ void CTIMER4_DriverIRQHandler(void);
 void CTIMER4_DriverIRQHandler(void)
 {
     CTIMER_GenericIRQHandler(4);
+    SDK_ISR_EXIT_BARRIER;
+}
+#endif
+
+#if defined(CTIMER5)
+void CTIMER5_DriverIRQHandler(void);
+void CTIMER5_DriverIRQHandler(void)
+{
+    CTIMER_GenericIRQHandler(5);
+    SDK_ISR_EXIT_BARRIER;
+}
+#endif
+
+#if defined(CTIMER6)
+void CTIMER6_DriverIRQHandler(void);
+void CTIMER6_DriverIRQHandler(void)
+{
+    CTIMER_GenericIRQHandler(6);
+    SDK_ISR_EXIT_BARRIER;
+}
+#endif
+
+#if defined(CTIMER7)
+void CTIMER7_DriverIRQHandler(void);
+void CTIMER7_DriverIRQHandler(void)
+{
+    CTIMER_GenericIRQHandler(7);
     SDK_ISR_EXIT_BARRIER;
 }
 #endif

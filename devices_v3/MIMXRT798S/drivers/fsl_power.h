@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -20,9 +20,23 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief power driver version 2.0.0. */
-#define FSL_POWER_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+/*! @brief power driver version 2.3.0. */
+#define FSL_POWER_DRIVER_VERSION (MAKE_VERSION(2, 3, 0))
 /*@}*/
+
+/* Define the default PMIC modes for power modes. */
+#ifndef POWER_DEFAULT_PMICMODE_DS
+#define POWER_DEFAULT_PMICMODE_DS 1U
+#endif
+#ifndef POWER_DEFAULT_PMICMODE_DSR
+#define POWER_DEFAULT_PMICMODE_DSR 1U
+#endif
+#ifndef POWER_DEFAULT_PMICMODE_DPD
+#define POWER_DEFAULT_PMICMODE_DPD 2U
+#endif
+#ifndef POWER_DEFAULT_PMICMODE_FDPD
+#define POWER_DEFAULT_PMICMODE_FDPD 3U
+#endif
 
 #define MAKE_PD_BITS(reg, slot)   (((reg) << 8) | (slot))
 #define GET_PD_REG_FROM_BITS(bit) (((uint32_t)(bit) >> 8U) & 0xFFU)
@@ -211,6 +225,215 @@ typedef enum pd_bits
     kPDRUNCFG_ForceUnsigned = (int)0x80000000U,
 } pd_bit_t;
 
+#define SHA_MED_CCTRL0_OFFSET 0U
+#define SHA_MED_TCTRL0_OFFSET 1U
+#define SHA_SEN_TCTRL0_OFFSET 3U
+#define PRIVATE_CCTRL0_OFFSET 4U
+#define PRIVATE_TCTRL0_OFFSET 5U
+#define PRIVATE_TCTRL1_OFFSET 6U
+#define PRIVATE_TCTRL2_OFFSET 7U
+
+#define SHA_MED_CSTAT0_OFFSET    0U /*0x1D0 */
+#define SHA_MEDSEN_TSTAT0_OFFSET 1U /* 0x1D4 */
+#define PRIVATE_CSTAT0_OFFSET    4U /* 0x1E0 */
+#define PRIVATE_TSTAT0_OFFSET    5U /* 0x1E4 */
+#define PRIVATE_TSTAT1_OFFSET    6U /* 0x1E8 */
+
+#define POWER_LP_REQ_CTRL_REG_OFFSET  (5U)
+#define POWER_LP_REQ_STATE_REG_OFFSET (13U)
+#define POWER_LP_REQ_STATE_BIT_OFFSET (8U)
+#define POWER_MAKE_LP_BITS(ctrl_reg, ctrl_bit, state_reg, state_bit)                                              \
+    (((ctrl_reg) << POWER_LP_REQ_CTRL_REG_OFFSET) | (ctrl_bit) | ((state_bit) << POWER_LP_REQ_STATE_BIT_OFFSET) | \
+     ((state_reg) << POWER_LP_REQ_STATE_REG_OFFSET))
+#define GET_LP_CTRL_REG_FROM_BITS(bit)  (((uint32_t)(bit) >> POWER_LP_REQ_CTRL_REG_OFFSET) & 0x7U)
+#define GET_LP_CTRL_BIT_FROM_BITS(bit)  (((uint32_t)(bit)) & 0x1FU)
+#define GET_LP_STATE_REG_FROM_BITS(bit) (((uint32_t)(bit) >> POWER_LP_REQ_STATE_REG_OFFSET) & 0x7U)
+#define GET_LP_STATE_BIT_FROM_BITS(bit) ((((uint32_t)(bit)) >> POWER_LP_REQ_STATE_BIT_OFFSET) & 0x1FU)
+
+/*! @brief low power control bits for modules. Bits used for modules to requesting low-power. */
+typedef enum lp_bits
+{
+    kPower_VGPU_LPREQ =
+        POWER_MAKE_LP_BITS(SHA_MED_CCTRL0_OFFSET, 0U, SHA_MED_CSTAT0_OFFSET, 0U), /*!< VGPU low power request. */
+    kPower_EZHV_STOP =
+        POWER_MAKE_LP_BITS(SHA_MED_CCTRL0_OFFSET, 1U, SHA_MED_CSTAT0_OFFSET, 2U), /*!< EZHV stop request. */
+    kPower_EZHV_HALT =
+        POWER_MAKE_LP_BITS(SHA_MED_CCTRL0_OFFSET, 2U, SHA_MED_CSTAT0_OFFSET, 3U), /*!< EZHV halt request. */
+    kPower_EZHV_EXIT_WAIT =
+        POWER_MAKE_LP_BITS(SHA_MED_CCTRL0_OFFSET, 3U, SHA_MED_CSTAT0_OFFSET, 4U), /*!< EZHV exit wait request. */
+
+    kPower_XSPI2_STOP =
+        POWER_MAKE_LP_BITS(SHA_MED_TCTRL0_OFFSET, 0U, SHA_MEDSEN_TSTAT0_OFFSET, 0U), /*!< XSPI2 stop request. */
+    kPower_LPSPI14_B_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 3U, SHA_MEDSEN_TSTAT0_OFFSET, 1U),  /*!< LPSPI14 bus low power request. */
+    kPower_LPSPI14_F_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 4U, SHA_MEDSEN_TSTAT0_OFFSET, 2U),  /*!< LPSPI14 function low power request.*/
+    kPower_LPSPI16_B_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 6U, SHA_MEDSEN_TSTAT0_OFFSET, 3U),  /*!< LPSPI16 bus low power request. */
+    kPower_LPSPI16_F_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 7U, SHA_MEDSEN_TSTAT0_OFFSET, 4U),  /*!< LPSPI16 function low power request. */
+    kPower_FLEXIO_B_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 9U, SHA_MEDSEN_TSTAT0_OFFSET, 5U),  /*!< FLEXIO bus low power request. */
+    kPower_FLEXIO_F_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_MED_TCTRL0_OFFSET, 10U, SHA_MEDSEN_TSTAT0_OFFSET, 6U), /*!< FLEXIO function low power request. */
+    kPower_NIC0_LPREQ =
+        POWER_MAKE_LP_BITS(SHA_MED_TCTRL0_OFFSET, 11U, SHA_MEDSEN_TSTAT0_OFFSET, 7U), /*!< NIC0 low power request. */
+    kPower_NIC1_LPREQ =
+        POWER_MAKE_LP_BITS(SHA_MED_TCTRL0_OFFSET, 12U, SHA_MEDSEN_TSTAT0_OFFSET, 8U), /*!< NIC1 low power request. */
+
+    kPower_ADC0_STOP =
+        POWER_MAKE_LP_BITS(SHA_SEN_TCTRL0_OFFSET, 0U, SHA_MEDSEN_TSTAT0_OFFSET, 16U), /*!< ADC0 stop request. */
+    kPower_ACMP0_STOP =
+        POWER_MAKE_LP_BITS(SHA_SEN_TCTRL0_OFFSET, 2U, SHA_MEDSEN_TSTAT0_OFFSET, 17U), /*!< ACMP0 stop request. */
+    kPower_MICFIL_STOP =
+        POWER_MAKE_LP_BITS(SHA_SEN_TCTRL0_OFFSET, 3U, SHA_MEDSEN_TSTAT0_OFFSET, 18U), /*!< MICFIL stop request. */
+    kPower_LPI2C15_B_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_SEN_TCTRL0_OFFSET, 5U, SHA_MEDSEN_TSTAT0_OFFSET, 19U), /*!< LPI2C15 bus low power request. */
+    kPower_LPI2C15_F_LPREQ = POWER_MAKE_LP_BITS(
+        SHA_SEN_TCTRL0_OFFSET, 7U, SHA_MEDSEN_TSTAT0_OFFSET, 20U), /*!< LPI2C15 function low power request. */
+    kPower_GDET2_LPREQ =
+        POWER_MAKE_LP_BITS(SHA_SEN_TCTRL0_OFFSET, 8U, SHA_MEDSEN_TSTAT0_OFFSET, 21U), /*!< GDET2 low power request. */
+    kPower_GDET3_LPREQ =
+        POWER_MAKE_LP_BITS(SHA_SEN_TCTRL0_OFFSET, 9U, SHA_MEDSEN_TSTAT0_OFFSET, 22U), /*!< GDET3 low power request. */
+    kPower_RTC_STOP = POWER_MAKE_LP_BITS(
+        SHA_SEN_TCTRL0_OFFSET, 31U, SHA_MEDSEN_TSTAT0_OFFSET, 31U), /*!< RTC0 and RTC1 stop request. */
+
+#if defined(PMC0)
+    kPower_EDMA0_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_CCTRL0_OFFSET, 0U, PRIVATE_CSTAT0_OFFSET, 0U), /*!< EDMA0 stop request. */
+    kPower_EDMA1_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_CCTRL0_OFFSET, 1U, PRIVATE_CSTAT0_OFFSET, 1U), /*!< EDMA1 stop request. */
+
+    kPower_FC0_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 0U, PRIVATE_TSTAT0_OFFSET, 0U),   /*!< LP_FLEXCOMM0 bus low power request. */
+    kPower_FC1_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 1U, PRIVATE_TSTAT0_OFFSET, 1U),   /*!< LP_FLEXCOMM1 bus low power request. */
+    kPower_FC2_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 2U, PRIVATE_TSTAT0_OFFSET, 2U),   /*!< LP_FLEXCOMM2 bus low power request. */
+    kPower_FC3_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 3U, PRIVATE_TSTAT0_OFFSET, 3U),   /*!< LP_FLEXCOMM3 bus low power request. */
+    kPower_FC4_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 4U, PRIVATE_TSTAT0_OFFSET, 4U),   /*!< LP_FLEXCOMM4 bus low power request. */
+    kPower_FC5_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 5U, PRIVATE_TSTAT0_OFFSET, 5U),   /*!< LP_FLEXCOMM5 bus low power request. */
+    kPower_FC6_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 6U, PRIVATE_TSTAT0_OFFSET, 6U),   /*!< LP_FLEXCOMM6 bus low power request. */
+    kPower_FC7_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 7U, PRIVATE_TSTAT0_OFFSET, 7U),   /*!< LP_FLEXCOMM7 bus low power request. */
+    kPower_FC8_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 8U, PRIVATE_TSTAT0_OFFSET, 8U),   /*!< LP_FLEXCOMM8 bus low power request. */
+    kPower_FC9_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 9U, PRIVATE_TSTAT0_OFFSET, 9U),   /*!< LP_FLEXCOMM9 bus low power request. */
+    kPower_FC10_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 10U, PRIVATE_TSTAT0_OFFSET, 10U), /*!< LP_FLEXCOMM10 bus low power request. */
+    kPower_FC11_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 11U, PRIVATE_TSTAT0_OFFSET, 11U), /*!< LP_FLEXCOMM11 bus low power request. */
+    kPower_FC12_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 12U, PRIVATE_TSTAT0_OFFSET, 12U), /*!< LP_FLEXCOMM12 bus low power request. */
+    kPower_FC13_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 13U, PRIVATE_TSTAT0_OFFSET, 13U), /*!< LP_FLEXCOMM13 bus low power request. */
+    kPower_FC0_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 0U, PRIVATE_TSTAT0_OFFSET, 16U),  /*!< LP_FLEXCOMM0 function low power request. */
+    kPower_FC1_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 1U, PRIVATE_TSTAT0_OFFSET, 17U),  /*!< LP_FLEXCOMM1 function low power request. */
+    kPower_FC2_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 2U, PRIVATE_TSTAT0_OFFSET, 18U),  /*!< LP_FLEXCOMM2 function low power request. */
+    kPower_FC3_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 3U, PRIVATE_TSTAT0_OFFSET, 19U),  /*!< LP_FLEXCOMM3 function low power request. */
+    kPower_FC4_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 4U, PRIVATE_TSTAT0_OFFSET, 20U),  /*!< LP_FLEXCOMM4 function low power request. */
+    kPower_FC5_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 5U, PRIVATE_TSTAT0_OFFSET, 21U),  /*!< LP_FLEXCOMM5 function low power request. */
+    kPower_FC6_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 6U, PRIVATE_TSTAT0_OFFSET, 22U),  /*!< LP_FLEXCOMM6 function low power request. */
+    kPower_FC7_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 7U, PRIVATE_TSTAT0_OFFSET, 23U),  /*!< LP_FLEXCOMM7 function low power request. */
+    kPower_FC8_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 8U, PRIVATE_TSTAT0_OFFSET, 24U),  /*!< LP_FLEXCOMM8 function low power request. */
+    kPower_FC9_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 9U, PRIVATE_TSTAT0_OFFSET, 25U),  /*!< LP_FLEXCOMM9 function low power request. */
+    kPower_FC10_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 10U, PRIVATE_TSTAT0_OFFSET, 26U), /*!< LP_FLEXCOMM10 function low power request. */
+    kPower_FC11_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 11U, PRIVATE_TSTAT0_OFFSET, 27U), /*!< LP_FLEXCOMM11 function low power request. */
+    kPower_FC12_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 12U, PRIVATE_TSTAT0_OFFSET, 28U), /*!< LP_FLEXCOMM12 function low power request. */
+    kPower_FC13_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL1_OFFSET, 13U, PRIVATE_TSTAT0_OFFSET, 29U), /*!< LP_FLEXCOMM13 function low power request. */
+
+    kPower_GPIO0_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 0U, PRIVATE_TSTAT1_OFFSET, 2U),   /*!< GPIO0 low power request. */
+    kPower_GPIO1_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 1U, PRIVATE_TSTAT1_OFFSET, 3U),   /*!< GPIO1 low power request. */
+    kPower_GPIO2_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 2U, PRIVATE_TSTAT1_OFFSET, 4U),   /*!< GPIO2 low power request. */
+    kPower_GPIO3_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 3U, PRIVATE_TSTAT1_OFFSET, 5U),   /*!< GPIO3 low power request. */
+    kPower_GPIO4_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 4U, PRIVATE_TSTAT1_OFFSET, 6U),   /*!< GPIO4 low power request. */
+    kPower_GPIO5_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 5U, PRIVATE_TSTAT1_OFFSET, 7U),   /*!< GPIO5 low power request. */
+    kPower_GPIO6_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 6U, PRIVATE_TSTAT1_OFFSET, 8U),   /*!< GPIO6 low power request. */
+    kPower_GPIO7_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 7U, PRIVATE_TSTAT1_OFFSET, 9U),   /*!< GPIO7 low power request. */
+    kPower_SAI0_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 8U, PRIVATE_TSTAT1_OFFSET, 10U),  /*!< SAI0 low power request. */
+    kPower_SAI1_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 9U, PRIVATE_TSTAT1_OFFSET, 11U),  /*!< SAI1 low power request. */
+    kPower_SAI2_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 10U, PRIVATE_TSTAT1_OFFSET, 12U), /*!< SAI2 low power request. */
+    kPower_TRNG_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 11U, PRIVATE_TSTAT1_OFFSET, 13U), /*!< TRNG stop request. */
+    kPower_XSPI0_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 12U, PRIVATE_TSTAT1_OFFSET, 14U), /*!< XSPI0 stop request. */
+    kPower_XSPI1_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 14U, PRIVATE_TSTAT1_OFFSET, 15U), /*!< XSPI1 stop request. */
+    kPower_I3C0_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 16U, PRIVATE_TSTAT1_OFFSET, 16U), /*!< I3C0 stop request. */
+    kPower_I3C1_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 17U, PRIVATE_TSTAT1_OFFSET, 17U), /*!< I3C1 stop request. */
+    kPower_GDET0_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 18U, PRIVATE_TSTAT1_OFFSET, 0U),  /*!< GDET0 low power request. */
+    kPower_GDET1_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL2_OFFSET, 19U, PRIVATE_TSTAT1_OFFSET, 1U),  /*!< GDET1 low power request. */
+#else
+    kPower_EDMA2_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_CCTRL0_OFFSET, 0U, PRIVATE_CSTAT0_OFFSET, 0U), /*!< EDMA2 stop request. */
+    kPower_EDMA3_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_CCTRL0_OFFSET, 1U, PRIVATE_CSTAT0_OFFSET, 1U), /*!< EDMA3 stop request. */
+
+    kPower_FC17_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 0U, PRIVATE_TSTAT0_OFFSET, 0U),  /*!< LP_FLEXCOMM17 bus low power request. */
+    kPower_FC18_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 1U, PRIVATE_TSTAT0_OFFSET, 1U),  /*!< LP_FLEXCOMM18 bus low power request. */
+    kPower_FC19_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 2U, PRIVATE_TSTAT0_OFFSET, 2U),  /*!< LP_FLEXCOMM19 bus low power request. */
+    kPower_FC20_B_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 3U, PRIVATE_TSTAT0_OFFSET, 3U),  /*!< LP_FLEXCOMM20 bus low power request. */
+    kPower_FC17_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 4U, PRIVATE_TSTAT0_OFFSET, 16U), /*!< LP_FLEXCOMM17 function low power request. */
+    kPower_FC18_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 5U, PRIVATE_TSTAT0_OFFSET, 17U), /*!< LP_FLEXCOMM18 function low power request. */
+    kPower_FC19_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 6U, PRIVATE_TSTAT0_OFFSET, 18U), /*!< LP_FLEXCOMM19 function low power request. */
+    kPower_FC20_F_LPREQ = POWER_MAKE_LP_BITS(
+        PRIVATE_TCTRL0_OFFSET, 7U, PRIVATE_TSTAT0_OFFSET, 19U), /*!< LP_FLEXCOMM20 function low power request. */
+    kPower_SAI3_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 8U, PRIVATE_TSTAT0_OFFSET, 4U),  /*!< SAI3 low power request. */
+    kPower_GPIO8_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 9U, PRIVATE_TSTAT0_OFFSET, 5U),  /*!< GPIO8 low power request. */
+    kPower_GPIO9_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 10U, PRIVATE_TSTAT0_OFFSET, 6U), /*!< GPIO9 low power request. */
+    kPower_GPIO10_LPREQ =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 11U, PRIVATE_TSTAT0_OFFSET, 7U), /*!< GPIO10 low power request. */
+    kPower_I3C2_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 20U, PRIVATE_TSTAT0_OFFSET, 8U), /*!< I3C2 low power request. */
+    kPower_I3C3_STOP =
+        POWER_MAKE_LP_BITS(PRIVATE_TCTRL0_OFFSET, 21U, PRIVATE_TSTAT0_OFFSET, 9U), /*!< I3C3 low power request. */
+#endif
+} lp_bit_t;
+
 /*! @brief PMIC mode pin configuration API parameter */
 typedef enum _pmic_mode_reg
 {
@@ -218,20 +441,30 @@ typedef enum _pmic_mode_reg
     kCfg_Sleep = 0xB8U, /*!< PDSLEEPCFG0 register offset. */
 } pmic_mode_reg_t;
 
+/*! @brief Power mode configuration API parameter */
+typedef enum _power_mode_config
+{
+    kPower_Sleep              = 0U, /*!< Sleep mode. */
+    kPower_DeepSleep          = 1U, /*!< Deep Sleep mode. */
+    kPower_DeepSleepRetention = 2U, /*!< Deep Sleep Retention(DSR) mode. */
+    kPower_DeepPowerDown      = 3U, /*!< Deep Power Down(DPD) mode. */
+    kPower_FullDeepPowerDown  = 4U, /*!< Full Deep Power Down(FDPD) mode. */
+} power_mode_cfg_t;
+
 /*!
  * @brief DMA Wakeup sources.
  *
  */
 enum _power_hwwake_src
 {
-    kPower_HWWakeSrcMicfil,     /*!< Enables DMA to wakeup by MICFIL DMA request.*/
-    kPower_HWWakeSrcFlexio,     /*!< Enables DMA to wakeup by FLEXIO DMA request.*/
-    kPower_HWWakeSrcLpFlexcomm, /*!< Enables DMA to wakeup by LP_FLEXCOMM0-13(CPU0), LP_FLEXCOMM17-20(CPU1) DMA
+    kPower_HWWakeSrcMicfil     = 0x1U, /*!< Enables DMA to wakeup by MICFIL DMA request.*/
+    kPower_HWWakeSrcFlexio     = 0x2U, /*!< Enables DMA to wakeup by FLEXIO DMA request.*/
+    kPower_HWWakeSrcLpFlexcomm = 0x4U, /*!< Enables DMA to wakeup by LP_FLEXCOMM0-13(CPU0), LP_FLEXCOMM17-20(CPU1) DMA
                                    request.*/
 #if defined(SLEEPCON_COMPT)
-    kPower_HWWakeSrcHsSpi,      /*!< Enables DMA to wakeup by LPSPI14 and LPSPI16 DMA request.*/
+    kPower_HWWakeSrcHsSpi = 0x8U,      /*!< Enables DMA to wakeup by LPSPI14 and LPSPI16 DMA request.*/
 #endif
-    kPower_HWWakeSrcSai,        /*!< Enables DMA to wakeup by SAI0-2(CPU0), SAI3(CPU1) request.*/
+    kPower_HWWakeSrcSai = 0x10U,       /*!< Enables DMA to wakeup by SAI0-2(CPU0), SAI3(CPU1) request.*/
 };
 
 /*!
@@ -280,7 +513,7 @@ enum _body_bias_domain
     kPower_BodyBiasVdd1     = PMC_PDRUNCFG0_RBB1_PD_MASK,   /*!< VDD1 domain. */
 };
 
-/*! @brief Regulator definition */
+/*! @brief Regulator definition for Regulator and LVD configuration. */
 typedef enum _power_regulator
 {
     kRegulator_DCDC    = 0U, /*!< DCDC used for VDDN. */
@@ -289,29 +522,23 @@ typedef enum _power_regulator
 } power_regulator_t;
 
 /*!
- * @brief Regulator voltage configuraton.
+ * @brief Regulator voltage configuraton. Configure the regulator voltage in uV.
  */
 typedef union _power_regulator_voltage
 {
     struct
     {
-        uint32_t vsel0 : 7; /*!< DCDC VSEL0. Voltage = 0.5 V + 6.25 mV * value of vsel0. Maximum value = 1.15 V. */
-        uint32_t : 1;
-        uint32_t vsel1 : 7; /*!< DCDC VSEL1. Voltage = 0.5 V + 6.25 mV * value of vsel1. Maximum value = 1.15 V. */
-        uint32_t : 17;
+        uint32_t vsel0; /*!< DCDC VSEL0. Voltage = 0.5 V + 6.25 mV * value of vsel0. Maximum value = 1150000uV. */
+        uint32_t vsel1; /*!< DCDC VSEL1. Voltage = 0.5 V + 6.25 mV * value of vsel1. Maximum value = 1150000uV. */
     } DCDC;
     struct
     {
-        uint32_t vsel0 : 6; /*!< LDO VSEL0. Voltage = 0.45 V + 12.5 mV * vsel0. Written value is clipped to 38h. */
-        uint32_t : 2;
-        uint32_t vsel1 : 6; /*!< LDO VSEL1. Voltage = 0.45 V + 12.5 mV * vsel1. Written value is clipped to 38h.*/
-        uint32_t : 2;
-        uint32_t vsel2 : 6; /*!< LDO VSEL2. Voltage = 0.45 V + 12.5 mV * vsel2. Written value is clipped to 38h. */
-        uint32_t : 2;
-        uint32_t vsel3 : 6; /*!< LDO VSEL3. Voltage = 0.45 V + 12.5 mV * vsel3. Written value is clipped to 38h. */
-        uint32_t : 2;
+        uint32_t vsel0; /*!< LDO VSEL0. Voltage = 0.45 V + 12.5 mV * vsel0. Maximum value = 1150000uV. */
+        uint32_t vsel1; /*!< LDO VSEL1. Voltage = 0.45 V + 12.5 mV * vsel1. Maximum value = 1150000uV.*/
+        uint32_t vsel2; /*!< LDO VSEL2. Voltage = 0.45 V + 12.5 mV * vsel2. Maximum value = 1150000uV. */
+        uint32_t vsel3; /*!< LDO VSEL3. Voltage = 0.45 V + 12.5 mV * vsel3. Maximum value = 1150000uV. */
     } LDO;
-    uint32_t value;
+    uint32_t vsel[4];
 } power_regulator_voltage_t;
 
 /*!
@@ -333,30 +560,31 @@ enum _power_dcdc_mode
     kPower_DCDCMode_LP = 1U, /*!< LDO Low Power mode. */
 };
 
+/*! @brief VDDN, VDD1 or VDD2 supply source. */
+typedef enum _power_vdd_src
+{
+    kVddSrc_PMC  = 0U, /*!< Supplied by onchip regulator in PMC, DCDC for VDDN, LDO1 for VDD1, LDO2 for VDD2. */
+    kVddSrc_PMIC = 1U, /*!< Supplied by external PMIC. */
+} power_vdd_src_t;
+
 /*!
- * @brief LVD voltage configuraton.
+ * @brief LVD voltage configuraton. Configure the LVD voltage in uV. Falling trip = 0.5V + 10 mV * bitfield value.
  */
 typedef union _power_lvd_voltage
 {
     struct
     {
-        uint32_t lvl0 : 6; /*!< VDDN LVD level0. Falling trip = 0.5 + 10 mV * lvl0. */
-        uint32_t : 2;
-        uint32_t lvl1 : 6; /*!< VDDN LVD level1. Falling trip = 0.5 + 10 mV * lvl1. */
-        uint32_t : 18;
+        uint32_t lvl0; /*!< VDDN LVD level0, uV. */
+        uint32_t lvl1; /*!< VDDN LVD level1, uV. */
     } VDDN;
     struct
     {
-        uint32_t lvl0 : 6; /*!< VDD1/2 LVD level0. Falling trip = 0.5 + 10 mV * lvl0. */
-        uint32_t : 2;
-        uint8_t lvl1 : 6;  /*!< VDD1/2 LVD level1. Falling trip = 0.5 + 10 mV * lvl1.*/
-        uint32_t : 2;
-        uint8_t lvl2 : 6;  /*!< VDD1/2 LVD level2. Falling trip = 0.5 + 10 mV * lvl2.*/
-        uint32_t : 2;
-        uint8_t lvl3 : 6;  /*!< VDD1/2 LVD level3. Falling trip = 0.5 + 10 mV * lvl3.*/
-        uint32_t : 2;
+        uint32_t lvl0; /*!< VDD1/2 LVD level0, uV. */
+        uint32_t lvl1; /*!< VDD1/2 LVD level1, uV. */
+        uint32_t lvl2; /*!< VDD1/2 LVD level2, uV. */
+        uint32_t lvl3; /*!< VDD1/2 LVD level3, uV. */
     } VDD12;
-    uint32_t value;
+    uint32_t lvl[4];
 } power_lvd_voltage_t;
 
 #if defined(PMC0)
@@ -392,7 +620,7 @@ typedef enum _body_bias_voltage
 } body_bias_voltage_t;
 
 /*!
- * @brief RBB Body Bias voltage.
+ * @brief RBB Body Bias voltage. 0b - Voltage is set to 1.0V, 1b - Voltage is set to 1.3V.
  */
 typedef struct _power_rbb_voltage
 {
@@ -405,7 +633,7 @@ typedef struct _power_rbb_voltage
 } power_rbb_voltage_t;
 
 /*!
- * @brief POR voltage.
+ * @brief POR voltage. Falling trip voltage = 0.4 + 10 mV * value.
  */
 typedef struct _power_por_voltage
 {
@@ -416,6 +644,18 @@ typedef struct _power_por_voltage
     uint32_t VddnLvl : 5; /*!< POR falling trip value in VDDN Domain, falling trip voltage = 0.4 + 10 mV * value. */
 } power_por_voltage_t;
 
+/*! @brief IO Banking bitmask.  */
+typedef enum _power_io_bank
+{
+    kPower_IOBank0 = 0x1U,  /*!< Port 0/1/3 in VDD2_COM domain. */
+    kPower_IOBank1 = 0x2U,  /*!< Port 2 in VDD2_COM domain. */
+    kPower_IOBank2 = 0x4U,  /*!< Port 4 in VDDN_COM domain. */
+    kPower_IOBank3 = 0x8U,  /*!< Port 5 in VDD2_COM domain. */
+    kPower_IOBank4 = 0x10U, /*!< Port 6 in VDD2_COM domain. */
+    kPower_IOBank5 = 0x20U, /*!< Port 7 in VDD2_COM domain. */
+    kPower_IOBank6 = 0x40U, /*!< Port 8/9/10 in VDD1_SENSE domain. */
+    kPower_IOBank7 = 0x80U, /*!< PMIC_I2C in VDD1_SENSE domain. */
+} power_io_bank_t;
 #endif
 
 /*******************************************************************************
@@ -439,6 +679,23 @@ void POWER_EnablePD(pd_bit_t en);
  * @param en    peripheral for which to disable the PDRUNCFG bit
  */
 void POWER_DisablePD(pd_bit_t en);
+
+/*!
+ * @brief API to request a module entering low power. This API send low power/stop requests to a module and wait the
+acknowledgement from the module. For peripherals that are being used by a domain, using this low power request handshake
+is recommended to make sure the module is fully stopped before the module is powered down or clock gated.
+ *
+ * @param en    peripheral for which to enable the low power request.
+ * @return  kStatus_Success for succeed, kStatus_Timeout for tiemout.
+ */
+status_t POWER_ModuleEnterLPRequest(lp_bit_t en);
+
+/*!
+ * @brief API to negate low power/stop requests to a module(module resume regular operation).
+ *
+ * @param en peripheral for which to disable the low power request.
+ */
+void POWER_ModuleExitLPRequest(lp_bit_t en);
 
 /*!
  * @brief   Set PMIC_MODE pins configure value.
@@ -567,11 +824,6 @@ void POWER_EnableDMAHWWake(uint32_t sources);
  */
 void POWER_DisableDMAHWWake(uint32_t sources);
 
-/**
- * @brief   Configures and enters in SLEEP low power mode
- */
-void POWER_EnterSleep(void);
-
 /*!
  * @brief   Configure PMC for auto wakeup.This feature allows PMC to wake up some amount of time after the domain enters
  * Deep Sleep. The timer is clocked by PMC's internal 16 MHz clock. If both timers in compute and sense are enabled at
@@ -629,6 +881,15 @@ void POWER_EnableRunRBB(uint32_t mask);
 void POWER_EnableSleepRBB(uint32_t mask);
 
 /*!
+ * @brief Enable NBB mode for various domains in active mode.
+ * NBB can be a lower power option than RBB if the domain enters and exits low-power modes frequently since the wells
+ * don't charge and discharge as much on every entry/exit.
+ * @param mask : A bitmask of domains to enable NBB mode, refer to @ref _body_bias_domain and PMC PDRUNCFG0 register
+ * descritpion in RM.
+ */
+void POWER_EnableRunNBB(uint32_t mask);
+
+/*!
  * @brief Enable NBB mode for various domains in deep sleep mode.
  * NBB can be a lower power option than RBB if the domain enters and exits low-power modes frequently since the wells
  * don't charge and discharge as much on every entry/exit.
@@ -650,7 +911,6 @@ void POWER_ConfigRBBVolt(const power_rbb_voltage_t *config);
  * @brief Disable the on-chip regulators.
  * This function should be used to disable the on-chip regulators for any supplies that will be powered externally
  * (regulators are enabled by default. If disabled the regulators will keep power down until next cold reset).
- * Note, need call POWER_ApplyPD() to make the change take effect.
  * @param mask A bitmask of regulators to be powered down, @ref _power_regulator_pd_control and PMC POWERCFG register
  * descripion in RM.
  */
@@ -677,6 +937,27 @@ void POWER_EnableSleepRegulators(uint32_t mask);
 void POWER_DisableSleepRegulators(uint32_t mask);
 
 /*!
+ * @brief Set VDDN supply source, PMIC or on-chip regulator. When PMIC selected the on-chip regulator will be powered
+ * down.
+ * @param   src : #power_vdd_src_t, VDDN supply source
+ */
+void POWER_SetVddnSupplySrc(power_vdd_src_t src);
+
+/*!
+ * @brief Set VDD1 supply source, PMIC or on-chip regulator. When PMIC selected the on-chip regulator will be powered
+ * down.
+ * @param   src : #power_vdd_src_t, VDDN supply source
+ */
+void POWER_SetVdd1SupplySrc(power_vdd_src_t src);
+
+/*!
+ * @brief Set VDD2 supply source, PMIC or on-chip regulator. When PMIC selected the on-chip regulator will be powered
+ * down.
+ * @param   src : #power_vdd_src_t, VDDN supply source
+ */
+void POWER_SetVdd2SupplySrc(power_vdd_src_t src);
+
+/*!
  * @brief API to configure the delay for PMIC mode changes.
  * Any time the PMIC_MODE pin values change the PMC will wait for the delay specified here to allow time for the
  * external voltages to settle. Delay time = 250ns * 2^value. Note, need call POWER_ApplyPD() to make the change take
@@ -688,16 +969,16 @@ void POWER_SetPMICModeDelay(uint8_t value);
 
 /*!
  * @brief Sets the POR falling trip voltages in VDD1, VDD2, and VDDN domains.
- * hen the supply voltage falls below the selected trip voltage, it triggers a cold reset.
+ * When the supply voltage falls below the selected trip voltage, it triggers a cold reset.
  * Falling trip = 0.4 + 10 mV * value
  *
  * @param porVolt A bitmask of values to control VDD1, VDD2, VDDN POR voltage.
  */
 void POWER_SetPORVoltage(const power_por_voltage_t *porVolt);
-#endif
+#endif /* PMC0 */
 
 /*!
- * @brief Configure the setpoint operation for on-chip regulators.
+ * @brief Configure the setpoint operation for on-chip regulators and LVD.
  * This function can configure both the target output voltages and LVD levels for each setpoint. The setpoint that is
  * actually selected is controlled by the aggregated value of PDRUNCFG[xxx_VSEL] and PDSLEEPCFG0[xxx_VSEL]. Use the
  * POWER_SelectRunSetpoint() or POWER_SelectSleepSetpoint() to configure the setpoint selections. The voltages selected
@@ -711,29 +992,69 @@ void POWER_SetPORVoltage(const power_por_voltage_t *porVolt);
  *
  * @code
  *   const power_regulator_voltage_t regulator = {
- *     .LDO.vsel0 = 20,
- *     .LDO.vsel1 = 28,
- *     .LDO.vsel2 = 36,
- *     .LDO.vsel3 = 44,
+ *     .LDO.vsel0 = 700000,
+ *     .LDO.vsel1 = 800000,
+ *     .LDO.vsel2 = 900000,
+ *     .LDO.vsel3 = 1000000,
  *   };
  *   const power_lvd_voltage_t lvd = {
- *     .VDD12.lvl0 = 10,
- *     .VDD12.lvl1 = 20,
- *     .VDD12.lvl2 = 30,
- *     .VDD12.lvl3 = 40,
+ *     .VDD12.lvl0 = 600000,
+ *     .VDD12.lvl1 = 700000,
+ *     .VDD12.lvl2 = 800000,
+ *     .VDD12.lvl3 = 900000,
  *   };
  *
  *   ret = POWER_ConfigRegulatorSetpoints(kRegulator_Vdd1LDO, &regulator, &lvd);
  * @endcode
  * @param regulator which regulator or power domain to configure, refer to @ref power_regulator_t.
- * @param voltage regulator configuration pointer, refer to @ref power_regulator_voltage_t. Note, only two setpoints are
+ * @param volt regulator configuration pointer, refer to @ref power_regulator_voltage_t. Note, only two setpoints are
  * available for DCDC.
  * @param lvd LVD voltage configuration, refer to @ref power_lvd_voltage_t.
  * @return kStatus_Success for succeed, kStatus_InvalidArgument for wrong arguments.
  */
 status_t POWER_ConfigRegulatorSetpoints(power_regulator_t regulator,
-                                        const power_regulator_voltage_t *voltage,
+                                        const power_regulator_voltage_t *volt,
                                         const power_lvd_voltage_t *lvd);
+
+/*!
+ * @brief Configure the setpoint operation for LVD.
+ * This function can configure LVD levels for each setpoint. The setpoint that is actually selected is controlled by
+ * the aggregated value of PDRUNCFG[xxx_VSEL] and PDSLEEPCFG0[xxx_VSEL]. Use the POWER_SelectRunSetpoint() or
+ * POWER_SelectSleepSetpoint() to configure the setpoint selections. The voltages selected for each LVD must be in
+ * ascending order (LVL0 <= LVL1 <= LVL2 <= LVL3).
+ *
+ * NOTE, Only valid regulator for sense domain is VDD1 LDO.
+ * Note, LDOVDD1VSEL and LVDVDD1CTRL are shared between the compute and sense domains. There is no aggregation to
+ * combine the values. Whichever domain wrote the register last determines the value. It is recommended that only one
+ * domain be used to configure VDD1 setpoints.
+ *
+ * @code
+ *   const power_lvd_voltage_t lvd = {
+ *     .VDD12.lvl0 = 600000,
+ *     .VDD12.lvl1 = 700000,
+ *     .VDD12.lvl2 = 800000,
+ *     .VDD12.lvl3 = 900000,
+ *   };
+ *
+ *   ret = POWER_ConfigLvdSetpoints(kRegulator_Vdd1LDO, &lvd);
+ * @endcode
+ * @param regulator which regulator or power domain to configure, refer to @ref power_regulator_t.
+ * @param lvd LVD voltage configuration, refer to @ref power_lvd_voltage_t.
+ * @return kStatus_Success for succeed, kStatus_InvalidArgument for wrong arguments.
+ */
+status_t POWER_ConfigLvdSetpoints(power_regulator_t regulator, const power_lvd_voltage_t *lvd);
+
+/*!
+ * @brief Get the LVD setpoints configurations.
+ * This function can get the LVD levels for each setpoint. The setpoint that is actually selected is controlled by
+ * the aggregated value of PDRUNCFG[xxx_VSEL] and PDSLEEPCFG0[xxx_VSEL].
+ *
+ * NOTE, Only valid regulator for sense domain is VDD1 LDO.
+ *
+ * @param regulator which regulator or power domain to get, refer to @ref power_regulator_t.
+ * @param lvd LVD voltage configuration, refer to @ref power_lvd_voltage_t.
+ */
+void POWER_GetLvdSetpoints(power_regulator_t regulator, power_lvd_voltage_t *lvd);
 
 /*!
  * @brief Select the setpoint(target voltage and LVD threshold) for active mode.
@@ -758,7 +1079,7 @@ void POWER_SelectRunSetpoint(power_regulator_t regulator, uint32_t setpoint);
 void POWER_SelectSleepSetpoint(power_regulator_t regulator, uint32_t setpoint);
 
 /*!
- * @brief Set the on-chip regulator mode in Run/Active mode..
+ * @brief Set the on-chip regulator mode in Run/Active mode.
  * The requests from the compute and sense domains are aggregated.
  *
  * @param regulator which regulator or power domain to configure, refer to @ref power_regulator_t.
@@ -776,6 +1097,124 @@ void POWER_SetRunRegulatorMode(power_regulator_t regulator, uint32_t mode);
  * for LDO available modes.
  */
 void POWER_SetSleepRegulatorMode(power_regulator_t regulator, uint32_t mode);
+
+/*!
+ * @brief Reset the IO bank.
+ * Sets the IO bank reset which tristates the ports. Intended to be used prior to powering off the VDDIO supplies.
+ *
+ * @param mask A bitmask of IO Banks to be reseted, @ref power_io_bank_t and PMC PADCFG register. The register reset by
+ * cold reset.
+ */
+void POWER_ResetIOBank(uint32_t mask);
+
+/*!
+ * @brief IO Bank Isolation Hold.
+ *  Maintains IO bank isolation state after wake-up from FDSR/DPD modes. If clear, the IO bank's state will be retained
+ * during FDSR & DPD modes, but will be controllable after wake-up. If set, the IO bank will remain in retain mode until
+ * ISOCTRL cleared by software.
+ *
+ * @param mask A bitmask of IO Banks to be set, @ref power_io_bank_t and PMC PADCFG register. The register reset by cold
+ * reset.
+ */
+void POWER_IOBankIsolationHold(uint32_t mask);
+
+/*!
+ * @brief Clear the IO bank Isolation Hold and regain state control.
+ * This bit cannot be cleared if associated domain is not powered.
+ *
+ * @param mask A bitmask of IO Banks to be clear, @ref power_io_bank_t and PMC PADCFG register. The register reset by
+ * cold reset.
+ */
+void POWER_IOBankClearIsolationHold(uint32_t mask);
+
+/**
+ * @brief   Configures and enters in SLEEP low power mode
+ */
+void POWER_EnterSleep(void);
+
+/*!
+ * @brief PMC Deep Sleep function call
+ *
+ * NOTE, the body bias and DCDC, LDO configurations in PMC_PDSLEECFG0 is not covered by this API, please use
+ * @ref POWER_EnableSleepRBB or @ref POWER_EnableSleepNBB and @ref POWER_SelectSleepSetpoint for those settings.
+ *
+ * NOTE, the MAINPLL and AUDIO PLL need special power up sequence, so it can't be power down/on automatically during the
+ * mode change. Application need turn off the PLL before the low power mode entry and re-initialize the PLL after
+ * wakeup.
+ * @param   exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on during Deep Sleep mode. The configuration for PMC from Compute domain and Sense domain are aggregated, and
+ * the higher power mode always wins.
+ */
+void POWER_EnterDeepSleep(const uint32_t exclude_from_pd[7]);
+
+#if defined(PMC0)
+/*!
+ * @brief Compute domain enter Deep Sleep Retention mode API.
+ * Deep Sleep Retention (DSR) mode is a deeper low power state than Deep Sleep mode.  DSR does not provide the option to
+ * keep selected module clocks on for wake-up. DSR mode allows significant portions of the chip to be powered-down while
+ * maintaining some level of state retention.
+ *
+ * NOTE, the body bias and DCDC, LDO configurations in PMC_PDSLEECFG0 is not covered by this API, please use
+ * @ref POWER_EnableSleepRBB or @ref POWER_EnableSleepNBB and @ref POWER_SelectSleepSetpoint for those settings.
+ *
+ * NOTE, the MAINPLL and AUDIO PLL need special power up sequence, so it can't be power down/on automatically during the
+ * mode change. Application need turn off the PLL before the low power mode entry and re-initialize the PLL after
+ * wakeup.
+ *
+ * @param   exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on(bits cleared) during the power mode. The configuration for PMC from Compute domain and Sense domain are
+ * aggregated, and the higher power mode always wins.
+ */
+void POWER_EnterDSR(const uint32_t exclude_from_pd[7]);
+#else
+/*!
+ * @brief Sense domain requests entering Deep Sleep Retention mode API. Deep Sleep Retention (DSR) mode is a deeper low
+ * power state than Deep Sleep mode. DSR mode allows significant portions of the chip to be powered-down while
+ * maintaining some level of state retention. The Sense domain can enter DSR mode only when all other domains are in DSR
+ * mode. If the condition is false, the sense domain will be in a shallower power mode(Deep sleep mode).
+ *
+ * NOTE, the body bias and DCDC, LDO configurations in PMC_PDSLEECFG0 is not covered by this API, please use
+ * @ref POWER_EnableSleepRBB or @ref POWER_EnableSleepNBB and @ref POWER_SelectSleepSetpoint for those settings.
+ *
+ * @param   exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on(bits cleared) during the power mode. The configuration for PMC from Compute domain and Sense domain are
+ * aggregated, and the higher power mode always wins.
+ */
+void POWER_RequestDSR(const uint32_t exclude_from_pd[7]);
+#endif
+/*!
+ * @brief The domain requests to enter Deep Power Down mode.
+ * The Deep Power Down and Full Deep Power Down can occur only when both domains signal their intent to enter these
+ * lower power modes. The configuration for PMC from Compute domain and Sense domain are aggregated, and the higher
+ * power mode always wins.
+ *
+ * @param exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on during Deep Power Down.
+ */
+void POWER_RequestDeepPowerDown(const uint32_t exclude_from_pd[7]);
+
+/*!
+ * @brief The domain requests to enter Full Deep Power Down mode.
+ * The Deep Power Down and Full Deep Power Down can occur only when both domains signal their intent to enter these
+ * lower power modes. The configuration for PMC from Compute domain and Sense domain are aggregated, and the higher
+ * power mode always wins.
+ *
+ * @param   exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on during Deep Power Down.
+ */
+void POWER_RequestFullDeepPowerDown(const uint32_t exclude_from_pd[7]);
+
+/*!
+ * @brief Power Library API to request entering different power mode. This API is used for requesting entering the
+ * target mode, the final SOC power mode depends on hardware aggregation. Note, the Sense domain can enter DSR mode only
+ * when Compute domain is in DSR. The SOC enters DPD or FDPD when both domain requested entering DPD or FDPD.
+ *
+ * @param mode  Power mode to enter.
+ * @param exclude_from_pd  Bit mask of the SLEEPCON_SLEEPCFG and PMC_PDSLEEPCFG0 ~ PMC_PDSLEEPCFG5 that needs to be
+ * powered on during power mode selected.
+ */
+void POWER_EnterPowerMode(power_mode_cfg_t mode, const uint32_t exclude_from_pd[7]);
+
 /*!
  * @brief Power Library API to return the library version.
  *

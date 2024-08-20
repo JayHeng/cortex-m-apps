@@ -2,13 +2,13 @@
 ;  @file:    startup_MIMXRT798S_cm33_core1.s
 ;  @purpose: CMSIS Cortex-M33 Core Device Startup File
 ;            MIMXRT798S_cm33_core1
-;  @version: 1.0
-;  @date:    2022-8-1
-;  @build:   b231026
+;  @version: 2.0
+;  @date:    2024-5-28
+;  @build:   b240528
 ; -------------------------------------------------------------------------
 ;
 ; Copyright 1997-2016 Freescale Semiconductor, Inc.
-; Copyright 2016-2023 NXP
+; Copyright 2016-2024 NXP
 ; SPDX-License-Identifier: BSD-3-Clause
 ;
 ; The modules in this file are included in the libraries, and may be replaced
@@ -72,9 +72,9 @@ __vector_table_0x1c
         DCD     SysTick_Handler                               ;SysTick Handler
 
                                                               ;External Interrupts
-        DCD     Reserved16_IRQHandler                         ;Reserved interrupt
-        DCD     Reserved17_IRQHandler                         ;Reserved interrupt
-        DCD     Reserved18_IRQHandler                         ;Reserved interrupt
+        DCD     Reserved16_IRQHandler                         ;Reserved interrupt 16
+        DCD     Reserved17_IRQHandler                         ;Reserved interrupt 17
+        DCD     Reserved18_IRQHandler                         ;Reserved interrupt 18
         DCD     FRO2_IRQHandler                               ;FRO: 300MHz FRO in VDD1 domain Async interrupt
         DCD     GLIKEY4_IRQHandler                            ;GLIKEY: Interrupt
         DCD     UTICK1_IRQHandler                             ;Micro-tick Timer
@@ -87,8 +87,8 @@ __vector_table_0x1c
         DCD     LP_FLEXCOMM18_IRQHandler                      ;FLEXCOMM: Interrupt request
         DCD     LP_FLEXCOMM19_IRQHandler                      ;FLEXCOMM: Interrupt request
         DCD     LP_FLEXCOMM20_IRQHandler                      ;FLEXCOMM: Interrupt request
-        DCD     ADC_IRQHandler                                ;ADC0 Interrupt request
-        DCD     SDADC_IRQHandler                              ;SDADC0 Interrupt request
+        DCD     ADC_IRQHandler                                ;ADC0: Interrupt request
+        DCD     SDADC_IRQHandler                              ;SDADC0: Interrupt request
         DCD     GLIKEY1_IRQHandler                            ;GLIKEY: Interrupt
         DCD     ACMP_IRQHandler                               ;ACMP: interrupt request
         DCD     PDM_EVENT_IRQHandler                          ;MIC: Interrupt request for read data or Error
@@ -139,8 +139,8 @@ __vector_table_0x1c
         DCD     GPIO91_IRQHandler                             ;rgpio9: Interupt request, channel 1
         DCD     GPIO100_IRQHandler                            ;rgpio10: Interupt request, channel 0
         DCD     GPIO101_IRQHandler                            ;rgpio10: Interupt request, channel 1
-        DCD     Reserved83_IRQHandler                         ;Reserved
-        DCD     Reserved84_IRQHandler                         ;Reserved
+        DCD     Reserved83_IRQHandler                         ;Reserved interrupt 83
+        DCD     Reserved84_IRQHandler                         ;Reserved interrupt 84
         DCD     PIN_INT0_IRQHandler                           ;pint1: Interupt request 0
         DCD     PIN_INT1_IRQHandler                           ;pint1: Interupt request 1
         DCD     PIN_INT2_IRQHandler                           ;pint1: Interupt request 2
@@ -152,19 +152,19 @@ __vector_table_0x1c
         DCD     GDET3_IRQHandler                              ;gdet3_wrapper: Interrupt request
         DCD     CDOG3_IRQHandler                              ;cdog3: Interrupt request
         DCD     CDOG4_IRQHandler                              ;cdog4: Interrupt request
-        DCD     Reserved96_IRQHandler                         ;Reserved
+        DCD     Reserved96_IRQHandler                         ;Reserved interrupt 96
         DCD     CPU1_IRQHandler                               ;CTI interrupt request
         DCD     JPEGDEC_IRQHandler                            ;JPEGDEC Ored context 0-3 interrupt request
         DCD     PNGDEC_IRQHandler                             ;PNGDEC interrupt request
-        DCD     Reserved100_IRQHandler                        ;Reserved
+        DCD     Reserved100_IRQHandler                        ;Reserved interrupt 100
         DCD     TEMPDET0_IRQHandler                           ;TEMPDET0: Temperature Detect Interrupt request 0
         DCD     TEMPDET1_IRQHandler                           ;TEMPDET1: Temperature Detect Interrupt request 1
         DCD     EZHV_IRQHandler                               ;ezhv: Interrupt request
         DCD     SLEEPCON1_IRQHandler                          ;SLEEPCON_SENSE CPU1 wakeup event
-        DCD     PVT1_AMBER0_IRQHandler                        ;pvt_monitor1: AMBER0 interrupt
-        DCD     PVT1_RED0_IRQHandler                          ;pvt_monitor1: RED0 interrupt
-        DCD     PVT1_AMBER1_IRQHandler                        ;pvt_monitor1: AMBER1 interrupt
-        DCD     PVT1_RED1_IRQHandler                          ;pvt_monitor1: RED1 interrupt
+        DCD     PVTS1_CPU1_IRQHandler                         ;PVTS1 CPU1 interrupt
+        DCD     Reserved106_IRQHandler                        ;Reserved interrupt 106
+        DCD     PVTS1_HIFI1_IRQHandler                        ;PVTS1 HIFI1 interrupt
+        DCD     Reserved108_IRQHandler                        ;Reserved interrupt 108
 __Vectors_End
 
 __Vectors       EQU   __vector_table
@@ -867,32 +867,32 @@ SLEEPCON1_IRQHandler
         LDR     R0, =SLEEPCON1_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT1_AMBER0_IRQHandler
-        PUBWEAK PVT1_AMBER0_DriverIRQHandler
+        PUBWEAK PVTS1_CPU1_IRQHandler
+        PUBWEAK PVTS1_CPU1_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT1_AMBER0_IRQHandler
-        LDR     R0, =PVT1_AMBER0_DriverIRQHandler
+PVTS1_CPU1_IRQHandler
+        LDR     R0, =PVTS1_CPU1_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT1_RED0_IRQHandler
-        PUBWEAK PVT1_RED0_DriverIRQHandler
+        PUBWEAK Reserved106_IRQHandler
+        PUBWEAK Reserved106_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT1_RED0_IRQHandler
-        LDR     R0, =PVT1_RED0_DriverIRQHandler
+Reserved106_IRQHandler
+        LDR     R0, =Reserved106_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT1_AMBER1_IRQHandler
-        PUBWEAK PVT1_AMBER1_DriverIRQHandler
+        PUBWEAK PVTS1_HIFI1_IRQHandler
+        PUBWEAK PVTS1_HIFI1_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT1_AMBER1_IRQHandler
-        LDR     R0, =PVT1_AMBER1_DriverIRQHandler
+PVTS1_HIFI1_IRQHandler
+        LDR     R0, =PVTS1_HIFI1_DriverIRQHandler
         BX      R0
 
-        PUBWEAK PVT1_RED1_IRQHandler
-        PUBWEAK PVT1_RED1_DriverIRQHandler
+        PUBWEAK Reserved108_IRQHandler
+        PUBWEAK Reserved108_DriverIRQHandler
         SECTION .text:CODE:REORDER:NOROOT(2)
-PVT1_RED1_IRQHandler
-        LDR     R0, =PVT1_RED1_DriverIRQHandler
+Reserved108_IRQHandler
+        LDR     R0, =Reserved108_DriverIRQHandler
         BX      R0
 
 Reserved16_DriverIRQHandler
@@ -984,10 +984,10 @@ TEMPDET0_DriverIRQHandler
 TEMPDET1_DriverIRQHandler
 EZHV_DriverIRQHandler
 SLEEPCON1_DriverIRQHandler
-PVT1_AMBER0_DriverIRQHandler
-PVT1_RED0_DriverIRQHandler
-PVT1_AMBER1_DriverIRQHandler
-PVT1_RED1_DriverIRQHandler
+PVTS1_CPU1_DriverIRQHandler
+Reserved106_DriverIRQHandler
+PVTS1_HIFI1_DriverIRQHandler
+Reserved108_DriverIRQHandler
 DefaultISR
         B .
 

@@ -22,16 +22,16 @@
  *******************************************************************************/
 
 /*! @name Driver version */
-/*@{*/
+/*! @{ */
 /*! @brief Defines WWDT driver version. */
 #define FSL_WWDT_DRIVER_VERSION (MAKE_VERSION(2, 1, 9))
-/*@}*/
+/*! @} */
 
 /*! @name Refresh sequence */
-/*@{*/
+/*! @{ */
 #define WWDT_FIRST_WORD_OF_REFRESH  (0xAAU) /*!< First word of refresh sequence */
 #define WWDT_SECOND_WORD_OF_REFRESH (0x55U) /*!< Second word of refresh sequence */
-/*@}*/
+/*! @} */
 
 /*! @brief Describes WWDT configuration structure. */
 typedef struct _wwdt_config
@@ -126,7 +126,7 @@ void WWDT_Init(WWDT_Type *base, const wwdt_config_t *config);
  */
 void WWDT_Deinit(WWDT_Type *base);
 
-/* @} */
+/*! @} */
 
 /*!
  * @name WWDT Functional Operation
@@ -265,7 +265,7 @@ static inline void WWDT_SetWindowValue(WWDT_Type *base, uint32_t windowValue)
  */
 void WWDT_Refresh(WWDT_Type *base);
 
-/*@}*/
+/*! @} */
 
 #if defined(__cplusplus)
 }

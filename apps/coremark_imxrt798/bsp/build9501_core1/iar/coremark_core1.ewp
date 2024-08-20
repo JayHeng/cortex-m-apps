@@ -233,7 +233,7 @@
                     <state>MCUXPRESSO_SDK</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>ITERATIONS=6000</state>
-                    <state>COMPILER_VERSION="IAR EWARM v9.40.2"</state>
+                    <state>COMPILER_VERSION="IAR EWARM v9.50.1"</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1170,7 +1170,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.40.2.67586</state>
+                    <state>9.50.1.69462</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -1333,7 +1333,7 @@
                     <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>MCUXPRESSO_SDK</state>
                     <state>ITERATIONS=20000</state>
-                    <state>COMPILER_VERSION="IAR EWARM v9.10.2"</state>
+                    <state>COMPILER_VERSION="IAR EWARM v9.50.1"</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

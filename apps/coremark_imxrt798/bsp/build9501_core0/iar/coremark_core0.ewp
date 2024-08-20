@@ -233,7 +233,7 @@
                     <state>MCUXPRESSO_SDK</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>ITERATIONS=25000</state>
-                    <state>COMPILER_VERSION="IAR EWARM v9.40.2"</state>
+                    <state>COMPILER_VERSION="IAR EWARM v9.50.1"</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -731,7 +731,7 @@ _coremark_core1_image</state>
                 </option>
                 <option>
                     <name>IlinkRawBinaryFile</name>
-                    <state>$PROJ_DIR$/../../build9402_core1/iar/debug/core1_image.bin</state>
+                    <state>$PROJ_DIR$/../../build9501_core1/iar/debug/core1_image.bin</state>
                 </option>
                 <option>
                     <name>IlinkRawBinarySymbol</name>
@@ -1172,7 +1172,7 @@ _coremark_core1_image</state>
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.40.2.67586</state>
+                    <state>9.50.1.69462</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -1335,7 +1335,7 @@ _coremark_core1_image</state>
                     <state>SERIAL_PORT_TYPE_UART=1</state>
                     <state>MCUXPRESSO_SDK</state>
                     <state>ITERATIONS=20000</state>
-                    <state>COMPILER_VERSION="IAR EWARM v9.10.2"</state>
+                    <state>COMPILER_VERSION="IAR EWARM v9.50.1"</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -2272,7 +2272,7 @@ _coremark_core1_image</state>
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.40.2.67586</state>
+                    <state>9.50.1.69462</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -2934,7 +2934,7 @@ _coremark_core1_image</state>
                 </option>
                 <option>
                     <name>IlinkRawBinaryFile</name>
-                    <state>$PROJ_DIR$/../../build9402_core1/iar/debug/core1_image.bin</state>
+                    <state>$PROJ_DIR$/../../build9501_core1/iar/debug/core1_image.bin</state>
                 </option>
                 <option>
                     <name>IlinkRawBinarySymbol</name>

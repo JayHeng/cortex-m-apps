@@ -45,7 +45,7 @@ void BOARD_InitBootPins(void)
 BOARD_InitPins:
 - options: {callFromInitBoot: 'true', coreID: cm33_core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: N4, peripheral: LP_FLEXCOMM0, signal: P0, pin_signal: PIO0_31, InputBufferEnable: enable}
+  - {pin_num: N4, peripheral: LP_FLEXCOMM0, signal: P0, pin_signal: PIO0_31, input_buffer: enable}
   - {pin_num: N5, peripheral: LP_FLEXCOMM0, signal: P1, pin_signal: PIO1_0}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */

@@ -11,6 +11,7 @@
 #include "pin_mux.h"
 #include "clock_config.h"
 #include "board.h"
+#include "mbw.h"
 
 #include "fsl_ele_base_api.h"
 /*******************************************************************************
@@ -21,6 +22,9 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
+
+extern int mbw_main(uint32_t testno, uint32_t showavg, uint32_t nr_loops, uint64_t block_size, uint32_t mem_start, uint32_t mem_size);
+
 
 /*******************************************************************************
  * Variables
@@ -54,13 +58,24 @@ void SysTick_Handler(void)
     }
 }
 
+static void print_rt_clocks(void)
+{
+    PRINTF("Clock roots frequency (MHz):\n");
+    for(uint32_t i=0; i<4; i++)
+    {
+        uint32_t freq = CLOCK_GetRootClockFreq((clock_root_t)i);
+        freq /= 1000000;
+        char name[5] = {0};
+        *(uint32_t *)name = *(uint32_t *)(CCM->CLOCK_ROOT[i].RESERVED_1);
+        PRINTF("%4s: %d\n", name, freq);
+    }
+}
+
 /*!
  * @brief Main function
  */
 int main(void)
 {
-    char ch;
-
     /* Init board hardware. */
     BOARD_ConfigMPU();
     BOARD_InitBootPins();
@@ -76,11 +91,12 @@ int main(void)
         }
     }
 
-    PRINTF("hello world.\r\n");
+    print_rt_clocks();
+    timer_init();
+    
+    mbw_main(0, 1, 0, 0x400, 0x20500000, 0x20000);
 
     while (1)
     {
-        ch = GETCHAR();
-        PUTCHAR(ch);
     }
 }

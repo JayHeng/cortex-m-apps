@@ -237,9 +237,9 @@
                     <name>CCDefines</name>
                     <state>DEBUG</state>
                     <state>CPU_MIMXRT1189CVM8B_cm33</state>
-                    <state>PRINTF_FLOAT_ENABLE=0</state>
+                    <state>PRINTF_FLOAT_ENABLE=1</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
-                    <state>PRINTF_ADVANCED_ENABLE=0</state>
+                    <state>PRINTF_ADVANCED_ENABLE=1</state>
                     <state>SCANF_ADVANCED_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
                 </option>
@@ -375,6 +375,7 @@
                     <state>$PROJ_DIR$/../../../../../components_v3/silicon_id</state>
                     <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT1189/utilities/str</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
+                    <state>$PROJ_DIR$/../../../../../middleware/mbw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1340,9 +1341,9 @@
                     <name>CCDefines</name>
                     <state>NDEBUG</state>
                     <state>CPU_MIMXRT1189CVM8B_cm33</state>
-                    <state>PRINTF_FLOAT_ENABLE=0</state>
+                    <state>PRINTF_FLOAT_ENABLE=1</state>
                     <state>SCANF_FLOAT_ENABLE=0</state>
-                    <state>PRINTF_ADVANCED_ENABLE=0</state>
+                    <state>PRINTF_ADVANCED_ENABLE=1</state>
                     <state>SCANF_ADVANCED_ENABLE=0</state>
                     <state>MCUXPRESSO_SDK</state>
                 </option>
@@ -1478,6 +1479,7 @@
                     <state>$PROJ_DIR$/../../../../../components_v3/silicon_id</state>
                     <state>$PROJ_DIR$/../../../../../devices_v3/MIMXRT1189/utilities/str</state>
                     <state>$PROJ_DIR$/../../../../../CMSIS/Include</state>
+                    <state>$PROJ_DIR$/../../../../../middleware/mbw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2120,7 +2122,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>mbw_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2270,6 +2272,21 @@
             </group>
         </group>
         <group>
+            <name>middleware</name>
+            <group>
+                <name>mbw</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\middleware\mbw\mbw_utils.c</name>
+                </file>
+            </group>
+        </group>
+        <group>
             <name>platform</name>
             <group>
                 <name>device</name>
@@ -2331,6 +2348,12 @@
                     <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT1189\drivers\fsl_iomuxc.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT1189\drivers\fsl_lpit.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT1189\drivers\fsl_lpit.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\devices_v3\MIMXRT1189\drivers\fsl_lpuart.c</name>
                 </file>
                 <file>
@@ -2389,5 +2412,8 @@
     </group>
     <file>
         <name>$PROJ_DIR$\..\..\..\src\main.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\..\..\..\src\mbw_port.c</name>
     </file>
 </project>

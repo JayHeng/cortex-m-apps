@@ -142,6 +142,9 @@ static void LPUART_TransferHandleTransmissionComplete(LPUART_Type *base, lpuart_
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+#if defined(LPUART_BASE_PTRS_NS)
+static LPUART_Type *const s_lpuartBases_ns[] = LPUART_BASE_PTRS_NS;
+#endif
 /* Array of LPUART peripheral base address. */
 static LPUART_Type *const s_lpuartBases[] = LPUART_BASE_PTRS;
 /* Array of LPUART handle. */
@@ -193,13 +196,24 @@ uint32_t LPUART_GetInstance(LPUART_Type *base)
     /* Find the instance index from base address mappings. */
     for (instance = 0U; instance < ARRAY_SIZE(s_lpuartBases); instance++)
     {
-        if (MSDK_REG_SECURE_ADDR(s_lpuartBases[instance]) == MSDK_REG_SECURE_ADDR(base))
+        if (s_lpuartBases[instance] == base)
         {
             return instance;
         }
     }
-
+#if defined(LPUART_BASE_PTRS_NS)
+    /* Find the instance index from base address mappings. */
+    for (instance = 0U; instance < ARRAY_SIZE(s_lpuartBases_ns); instance++)
+    {
+        if (s_lpuartBases_ns[instance] == base)
+        {
+            return instance;
+        }
+    }
+    assert(instance < ARRAY_SIZE(s_lpuartBases_ns));
+#else
     assert(instance < ARRAY_SIZE(s_lpuartBases));
+#endif
 
     return instance;
 }

@@ -56,7 +56,7 @@ static uint32_t AOI_GetInstance(AOI_Type *base)
     /* Find the instance index from base address mappings. */
     for (instance = 0; instance < ARRAY_SIZE(s_aoiBases); instance++)
     {
-        if (MSDK_REG_SECURE_ADDR(s_aoiBases[instance]) == MSDK_REG_SECURE_ADDR(base))
+        if (s_aoiBases[instance] == base)
         {
             break;
         }

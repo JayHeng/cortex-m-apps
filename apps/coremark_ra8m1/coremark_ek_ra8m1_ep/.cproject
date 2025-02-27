@@ -420,15 +420,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="lpm_ek_ra8m1_ep.com.renesas.cdt.managedbuild.gnuarm.target.elf.806776290" name="Executable" projectType="com.renesas.cdt.managedbuild.gnuarm.target.elf"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1478278409;com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1478278409.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1017932241;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.730280935">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.renesas.cdt.managedbuild.gnuarm.config.elf.release.990721965;com.renesas.cdt.managedbuild.gnuarm.config.elf.release.990721965.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1007688908;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1415147132">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
@@ -439,4 +430,13 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.renesas.cdt.managedbuild.gnuarm.config.elf.release.990721965;com.renesas.cdt.managedbuild.gnuarm.config.elf.release.990721965.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1007688908;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1415147132">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1478278409;com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1478278409.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1017932241;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.730280935">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 </cproject>

@@ -2,3 +2,8 @@
 
 /*/Debug/
 /*/Release/
+/*/.settings/
+
+/*/*.jlink
+/*/*.launch
+/*/*.log

@@ -20,7 +20,7 @@
  *
  * Copyright (C) 2023 Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
-#include "lpm_ep.h"
+#include "coremark_ep.h"
 #include "source_cancel_lpm.h"
 
 FSP_CPP_HEADER

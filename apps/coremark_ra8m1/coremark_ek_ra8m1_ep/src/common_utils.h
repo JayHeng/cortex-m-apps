@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include "hal_data.h"
 #include "uart_terminal.h"
-#include "lpm_ep.h"
+#include "coremark_ep.h"
 
 /* Type define */
 

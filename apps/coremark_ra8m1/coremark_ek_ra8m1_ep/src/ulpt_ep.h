@@ -43,17 +43,6 @@
 #define PERIOD_3S           (3U)
 #define TIMES_MAX           (3U)
 
-/* MACROs for RTT Viewer */
-#define SELECT_INDEX        (0U)
-#define SELECT_1S           ('1')
-#define SELECT_2S           ('2')
-#define SELECT_3S           ('3')
-#define NULL_CHAR           ('\0')
-#define MENU_SELECT         "\r\nSelect period values for both one-shot and periodic timers"\
-                            "\r\n1. Period value is 1 second"\
-                            "\r\n2. Period value is 2 seconds"\
-                            "\r\n3. Period value is 3 seconds\r\n"
-
 /* MACRO for select the LED to blink in ULPT periodic mode */
 #define LED_USE             (0U)
 
@@ -69,6 +58,5 @@ fsp_err_t ulpt_set_period(void);
 fsp_err_t ulpt_periodic_operation(void);
 fsp_err_t ulpt_one_shot_operation(void);
 void hw_module_deinit(void);
-void handle_error (fsp_err_t err, const char * err_func, const char * err_str);
 
 #endif /* ULPT_EP_H_ */

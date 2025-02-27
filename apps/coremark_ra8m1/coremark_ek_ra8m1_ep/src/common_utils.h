@@ -39,20 +39,15 @@
 
 #define RESET_VALUE     (0x00)
 
-#define EP_VERSION      "1.1"
-#define MODULE_NAME     "r_lpm"
+#define EP_VERSION      "1.0"
+#define MODULE_NAME     "sw_coremark"
 #define BANNER_VER      "\r\n********************************************************************************"\
 		                "\r\n*   Renesas FSP Example Project for "MODULE_NAME" Module                               *"\
 						"\r\n*   Example Project Version %s                                                *"\
 						"\r\n*   Flex Software Pack Version  %d.%d.%d                                          *"\
 						"\r\n********************************************************************************"
 
-#define BANNER_INFO		"\r\nRefer to readme.txt file for more details on Example Project and"\
-						"\r\nFSP User's Manual for more information about "MODULE_NAME" driver.\r\n"\
-                        "\r\nThe Example Project demonstrates the basic functionality of LPM driver on Renesas \r\n"\
-                        "RA MCUs based on FSP. On successful initialization of necessary hardware modules,\r\n"\
-                        "the MCU will automatically enter each LPM mode and then wait for a wake-up source\r\n"\
-                        "trigger, either manually by an external interrupt or automatically by timer.\r\n\n"
+#define BANNER_INFO		"\r\nRefer to readme.txt file for more details on Example Project\r\n\n"
 
 #define BANNER_RESET    "\r\n********************************************************************************"\
                         "\r\n*   MCU has been reset from Deep SW Standby mode by internal reset             *"\

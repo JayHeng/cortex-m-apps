@@ -21,8 +21,8 @@
  * Copyright (C) 2020-2023 Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 
-#ifndef LPM_EP_H_
-#define LPM_EP_H_
+#ifndef COREMARK_EP_H_
+#define COREMARK_EP_H_
 
 #include "common_utils.h"
 #include "uart_terminal.h"
@@ -108,6 +108,6 @@ typedef enum e_led_power
 /**********************************************************************************************************************
 * Public functions declarations
 **********************************************************************************************************************/
-void lpm_ep_entry(void);
+void coremark_ep_entry(void);
 
-#endif /* LPM_EP_H_ */
+#endif /* COREMARK_EP_H_ */

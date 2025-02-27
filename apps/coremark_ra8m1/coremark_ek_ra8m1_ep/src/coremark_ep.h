@@ -52,59 +52,6 @@
 #define APP_SSRAM_OFFSET        (0U)
 #endif
 
-/* Macro for define LED on board */
-#define LED_LPM_STATE                           (0U)
-#define LED_ERROR_STATE                         (2U)
-
-/* Macro for delay time in application */
-#define LPM_TIME_TRANSITION_VALUE               (500U)
-#define LPM_TIME_TRANSITION_UNIT                (BSP_DELAY_UNITS_MILLISECONDS)
-
-/* Macro for LPM cancel source name */
-#if defined(BOARD_RA8D1_EK) || defined(BOARD_RA8M1_EK)
-    #define NAME_LPM_CANCEL_SOURCE_TIMER            "\r\nLPM is canceled by ULPT0 module\r\n"
-#else
-    #define NAME_LPM_CANCEL_SOURCE_TIMER            "\r\nLPM is canceled by AGT1 module\r\n"
-#endif
-
-#define NAME_LPM_CANCEL_SOURCE_IRQ              "\r\nLPM is canceled by ICU External IRQ module\r\n"
-#define NAME_LPM_CANCEL_SOURCE_DTC              "\r\nLPM is canceled by DTC module\r\n"
-#define NAME_LPM_CANCEL_SOURCE_NOT_DETECTED     "\r\nLPM is canceled, but source has not been detected\r\n"
-
-/* Macro for LPM mode name */
-#define NAME_LPM_SLEEP_MODE                     "\r\nMCU enters Sleep mode\r\n"
-#define NAME_LPM_DEEP_SLEEP_MODE                "\r\nMCU enters Deep Sleep mode\r\n"
-#define NAME_LPM_SW_STANDBY_MODE                "\r\nMCU enters SW Standby mode\r\n"
-#define NAME_LPM_SW_STANDBY_MODE_WITH_SNOOZE    "\r\nMCU enters SW Standby mode with Snooze enable\r\n"
-#define NAME_LPM_DEEP_SW_STANDBY_MODE           "\r\nMCU enters Deep SW Standby mode\r\n"
-
-/**********************************************************************************************************************
- * Typedef definitions
- **********************************************************************************************************************/
-/* Enumeration for low power mode use in application */
-typedef enum e_app_lpm_state
-{
-    APP_LPM_SLEEP_STATE = 0,
-#if (BSP_FEATURE_LPM_HAS_DEEP_SLEEP)
-    APP_LPM_DEEP_SLEEP_STATE,
-#endif
-    APP_LPM_SW_STANDBY_STATE,
-#if (BSP_FEATURE_LPM_HAS_SNOOZE)
-    APP_LPM_SW_STANDBY_WITH_SNOOZE_STATE,
-#endif
-#if (BSP_FEATURE_LPM_HAS_DEEP_STANDBY)
-    APP_LPM_DEEP_SW_STANDBY_STATE,
-#endif
-    APP_LPM_MAX_STATE
-} app_lpm_states_t;
-
-/* Enumeration for led state use in application */
-typedef enum e_led_power
-{
-    LED_POWER_ON = BSP_IO_LEVEL_HIGH,
-    LED_POWER_OFF = BSP_IO_LEVEL_LOW,
-}led_power_t;
-
 /**********************************************************************************************************************
 * Public functions declarations
 **********************************************************************************************************************/

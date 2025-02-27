@@ -22,6 +22,7 @@
  ***********************************************************************************************************************/
 
 #include "coremark_ep.h"
+#include "ulpt_ep.h"
 
 /**********************************************************************************************************************
 * Private global variables declarations
@@ -86,6 +87,16 @@ static fsp_err_t coremark_ep_startup(void)
 #endif
     }
 
+    /* Initialize necessary hardware modules  */
+    err = hw_module_init();
+    if (err != FSP_SUCCESS)
+    {
+        return err;
+    }
+
+    /* The user selects the period for both timers */
+    err = ulpt_set_period();
+
     return err;
 }
 
@@ -97,6 +108,11 @@ static void coremark_ep_main_process(void)
     /* Example project loop*/
     while (true)
     {
+    	fsp_err_t err = ulpt_periodic_operation();
+        if (err != FSP_SUCCESS)
+        {
+            return;
+        }
     }
 }
 

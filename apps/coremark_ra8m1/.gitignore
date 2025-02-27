@@ -2,8 +2,11 @@
 
 /*/Debug/
 /*/Release/
+/*/ra_gen/
 /*/.settings/
 
 /*/*.jlink
 /*/*.launch
 /*/*.log
+
+/*/*.secure_xml

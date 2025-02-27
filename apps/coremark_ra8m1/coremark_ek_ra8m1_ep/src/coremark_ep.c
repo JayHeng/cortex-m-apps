@@ -105,6 +105,8 @@ static void coremark_ep_main_process(void)
     /* Prints LPM operation start message */
     TERMINAL_PRINT("\r\nCoremark operating is started\r\n");
 
+    printf("\r\nCoremark operating is started\r\n");
+
     /* Example project loop*/
     while (true)
     {

@@ -28,6 +28,36 @@
 **********************************************************************************************************************/
 static volatile uart_event_t g_uart_event = RESET_VALUE;
 
+volatile bool uart_send_complete_flag = false;
+
+#ifdef __GNUC__
+    #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+    #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif
+
+PUTCHAR_PROTOTYPE
+{
+#if (BSP_FEATURE_SCI_VERSION == 1U)
+	fsp_err_t err = R_SCI_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
+#else
+	fsp_err_t err = R_SCI_B_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
+#endif
+	if(FSP_SUCCESS != err) __BKPT();
+	while(uart_send_complete_flag == false){}
+	uart_send_complete_flag = false;
+	return ch;
+}
+
+int _write(int fd,char *pBuffer,int size)
+{
+    for(int i=0;i<size;i++)
+    {
+        __io_putchar(*pBuffer++);
+    }
+    return size;
+}
+
 /*******************************************************************************************************************//**
  *  @brief      SCI UART callback function
  *  @param[in]  p_args
@@ -49,6 +79,10 @@ void uart_callback (uart_callback_args_t *p_args)
 
     /* Get SCI UART event */
     g_uart_event = p_args->event;
+	if(g_uart_event == UART_EVENT_TX_COMPLETE)
+	{
+		uart_send_complete_flag = true;
+	}
 }
 
 /*******************************************************************************************************************//**

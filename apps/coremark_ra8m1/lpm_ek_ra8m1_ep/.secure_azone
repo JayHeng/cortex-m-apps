@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<azone>
+    <rzone name="R7FA8M1AHECBD.rzone"/>
+    <partition>
+        <peripheral name="PORT0" group="PORT">
+            <slot name="P009" secure="true"/>
+        </peripheral>
+        <peripheral name="ULPT0" group="ULPT" security=""/>
+        <peripheral name="ICU_EXT_IRQ">
+            <slot name="ICU_EXT_IRQ13" secure="true"/>
+        </peripheral>
+        <peripheral name="ICU">
+            <slot name="IRQ0" secure="true"/>
+            <slot name="IRQ1" secure="true"/>
+            <slot name="IRQ2" secure="true"/>
+            <slot name="IRQ3" secure="true"/>
+            <slot name="IRQ4" secure="true"/>
+            <slot name="IRQ5" secure="true"/>
+        </peripheral>
+    </partition>
+</azone>

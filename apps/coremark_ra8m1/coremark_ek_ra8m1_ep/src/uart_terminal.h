@@ -41,6 +41,7 @@
 fsp_err_t uart_init (void);
 void uart_deinit (void);
 fsp_err_t uart_print (uint8_t * p_buf);
+void uart_putchar(char ch);
 fsp_err_t uart_ep_info_print (void);
 fsp_err_t uart_error_info_print (uint8_t * p_func, uint8_t * p_info);
 fsp_err_t uart_error_code_print (fsp_err_t err);

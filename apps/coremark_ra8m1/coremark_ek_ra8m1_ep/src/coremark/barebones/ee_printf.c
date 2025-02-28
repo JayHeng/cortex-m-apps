@@ -582,9 +582,9 @@ void uart_send_char(char c) {
     if (c == '\n')
     {
         char tmp = '\r';
-        uart_print((const uint8_t *)&tmp);
+        uart_putchar(tmp);
     }
-    uart_print((const uint8_t *)&c);
+    uart_putchar(c);
 /*	Output of a char to a UART usually follows the following model:
 	Wait until UART is ready
 	Write char to UART

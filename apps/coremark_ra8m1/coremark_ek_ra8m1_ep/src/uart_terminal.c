@@ -174,6 +174,24 @@ fsp_err_t uart_print(uint8_t * p_buf)
 }
 
 /*******************************************************************************************************************//**
+ *  @brief      This function will transfer a message to the host PC
+ *  @param[in]  p_buf   pointer to message buffer
+ *  @retval     FSP_SUCCESS    Upon successful operation
+ *  @retval     Any Other Error code apart from FSP_SUCCES
+ **********************************************************************************************************************/
+void uart_putchar(char ch)
+{
+#if (BSP_FEATURE_SCI_VERSION == 1U)
+	fsp_err_t err = R_SCI_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
+#else
+	fsp_err_t err = R_SCI_B_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
+#endif
+	if(FSP_SUCCESS != err) __BKPT();
+	while(uart_send_complete_flag == false){}
+	uart_send_complete_flag = false;
+}
+
+/*******************************************************************************************************************//**
  *  @brief      This function will transfer the example project information to the host PC
  *  @param      None
  *  @retval     FSP_SUCCESS    Upon successful operation

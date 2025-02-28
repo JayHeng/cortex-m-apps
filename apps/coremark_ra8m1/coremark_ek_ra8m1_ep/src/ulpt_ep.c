@@ -96,6 +96,7 @@ fsp_err_t ulpt_set_period(void)
 
     /* Convert the period value in second to the raw value for a periodic timer*/
     period_in_raw = (uint32_t)((period_in_second * timer_info.clock_frequency ));
+    printf("\r\ntimer_info.clock_frequency = %dHz\r\n", timer_info.clock_frequency);
 
     /* Set a period value for the periodic timer */
     err = R_ULPT_PeriodSet(&g_timer_cancel_lpm_ctrl, period_in_raw);

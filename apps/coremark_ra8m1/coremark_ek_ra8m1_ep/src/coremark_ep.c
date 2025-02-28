@@ -55,10 +55,19 @@ void coremark_ep_entry(void)
         return;
     }
 
+    //coremark_ep_main_process();
+
     /* Perform EP main procedure */
+    static volatile uint32_t counter0, counter1;
+    counter0 = gpt_get_current_counter();
+    printf("\r\ncounter value before run = %d\r\n", counter0);
+    counter0 = gpt_get_current_counter();
+    printf("\r\ncounter value before run = %d\r\n", counter0);
+    coremark_main();
+    counter1 = gpt_get_current_counter();
+    printf("\r\ncounter value after run = %d\r\n", counter1);
     while (true)
     {
-    	coremark_main();
     }
 }
 
@@ -86,7 +95,7 @@ static fsp_err_t coremark_ep_startup(void)
         }
 
         /* Print stored successful message */
-        TERMINAL_PRINT("\r\nStored fixed data into standby SRAM\r\n");
+        TERMINAL_PRINT("Stored fixed data into standby SRAM\r\n");
 #endif
     }
 
@@ -98,10 +107,16 @@ static fsp_err_t coremark_ep_startup(void)
         return err;
     }
 
+    /* Start periodic timer */
+    err = start_gpt_timer(&g_timer_gpt_periodic_ctrl);
+    if (err != FSP_SUCCESS)
+    {
+        return err;
+    }
+
     /* The user selects the period for both timers */
     //err = ulpt_set_period();
     err = gpt_set_period();
-
     return err;
 }
 

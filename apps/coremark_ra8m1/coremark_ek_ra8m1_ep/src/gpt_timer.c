@@ -32,9 +32,6 @@
 
 extern bsp_leds_t g_bsp_leds;
 
-/* Store Timer open state*/
-uint8_t g_timer_open_state = RESET_VALUE;
-
 static volatile bool g_periodic_timer_gpt_flag = false;
 
 /*******************************************************************************************************************//**
@@ -58,20 +55,12 @@ void periodic_timer_gpt_callback(timer_callback_args_t *p_args)
  * @retval      FSP_SUCCESS     Upon successful open of timer.
  * @retval      Any Other Error code apart from FSP_SUCCES on Unsuccessful open .
  ****************************************************************************************************************/
-fsp_err_t init_gpt_timer(timer_ctrl_t * const p_timer_ctl, timer_cfg_t const * const p_timer_cfg, uint8_t timer_mode)
+fsp_err_t init_gpt_timer(timer_ctrl_t * const p_timer_ctl, timer_cfg_t const * const p_timer_cfg)
 {
     fsp_err_t err = FSP_SUCCESS;
 
     /* Initialize GPT Timer */
     err = R_GPT_Open(p_timer_ctl, p_timer_cfg);
-    if (FSP_SUCCESS != err)
-    {
-        return err;
-    }
-    if(PERIODIC_MODE_TIMER == timer_mode)
-    {
-        g_timer_open_state = PERIODIC_MODE;
-    }
     return err;
 }
 
@@ -92,16 +81,8 @@ fsp_err_t hw_module_gpt_init(void)
         return err;
     }
 
-	/* Check the status of GPT timer in Periodic mode */
-	if(PERIODIC_MODE != g_timer_open_state)
-	{
-		/*Initialize Periodic Timer */
-		err = init_gpt_timer(&g_timer_gpt_periodic_ctrl, &g_timer_gpt_periodic_cfg, PERIODIC_MODE_TIMER);
-		if(FSP_SUCCESS != err)
-		{
-			return err;
-		}
-	}
+	/*Initialize Periodic Timer */
+	err = init_gpt_timer(&g_timer_gpt_periodic_ctrl, &g_timer_gpt_periodic_cfg);
 
     return err;
 }
@@ -116,13 +97,13 @@ fsp_err_t gpt_set_period(void)
 {
     fsp_err_t err = FSP_SUCCESS;
 	uint32_t gpt_desired_period_ms          = 1000;
-	uint64_t period_counts                  = RESET_VALUE;
+	uint64_t period_counts                  = GPT_MAX_PERIOD_COUNT;
 	uint32_t pclkd_freq_hz                  = RESET_VALUE;
 
 	/* Get the source clock frequency (in Hz) */
 	pclkd_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKD);
 	pclkd_freq_hz >>= (uint32_t)(g_timer_gpt_periodic_cfg.source_div);
-    printf("\r\npclkd_freq_hz = %dHz\r\n", pclkd_freq_hz);
+    printf("\pclkd_freq_hz = %dHz\r\n", pclkd_freq_hz);
 
 	/* Convert period to PCLK counts so it can be set in hardware. */
 	period_counts = (uint64_t)((gpt_desired_period_ms * (pclkd_freq_hz * CLOCK_TYPE_SPECIFIER))  / TIMER_UNITS_MILLISECONDS);
@@ -155,15 +136,15 @@ fsp_err_t gpt_set_period(void)
  **********************************************************************************************************************/
 uint32_t gpt_get_current_counter(void)
 {
-    fsp_err_t       err                             = FSP_SUCCESS;
+	fsp_err_t err = FSP_SUCCESS;
     timer_status_t    timer_status;
 
     /* Get the clock frequency of the periodic timer */
-    err = R_GPT_StatusGet(&g_timer_ulpt_periodic_ctrl, &timer_status);
-    if (err != FSP_SUCCESS)
-    {
-        return 0;
-    }
+    R_GPT_StatusGet(&g_timer_gpt_periodic_ctrl, &timer_status);
+	if (FSP_SUCCESS != err)
+	{
+		return 0;
+	}
 
     return timer_status.counter;
 }
@@ -233,8 +214,6 @@ void deinit_gpt_timer(timer_ctrl_t * const p_timer_ctl)
 {
     R_GPT_Close(p_timer_ctl);
 
-    /* Reset open state of timer*/
-    g_timer_open_state = RESET_VALUE;
 }
 
 /*******************************************************************************************************************//**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>coremark_ek_ra8m1_ep</name>
+	<name>e2studio</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -27,6 +27,12 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.renesas.cdt.managedbuild.jsoncdb.compilationdatabase.compilationDatabaseBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.cdt.core.cnature</nature>
@@ -34,5 +40,6 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>com.renesas.cdt.ddsc.contentgen.ddscNature</nature>
 		<nature>com.renesas.cdt.ra.contentgen.raNature</nature>
+		<nature>com.renesas.cdt.managedbuild.jsoncdb.compilationdatabase.CompileCommandsNature</nature>
 	</natures>
 </projectDescription>

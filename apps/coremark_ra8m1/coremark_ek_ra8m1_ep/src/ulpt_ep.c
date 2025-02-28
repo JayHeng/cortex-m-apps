@@ -38,7 +38,7 @@ static volatile bool g_periodic_timer_flag = false;
  * @param[in]  p_args
  * @retval     None
  **********************************************************************************************************************/
-void timer_cancel_lpm_callback(timer_callback_args_t *p_args)
+void periodic_timer_ulpt_callback(timer_callback_args_t *p_args)
 {
     if(TIMER_EVENT_CYCLE_END == p_args->event)
     {
@@ -64,7 +64,7 @@ fsp_err_t hw_module_init(void)
     }
 
     /* Initialize ULPT1 in Periodic mode */
-    err = R_ULPT_Open(&g_timer_cancel_lpm_ctrl, &g_timer_cancel_lpm_cfg);
+    err = R_ULPT_Open(&g_timer_ulpt_periodic_ctrl, &g_timer_ulpt_periodic_cfg);
 
     return err;
 }
@@ -88,7 +88,7 @@ fsp_err_t ulpt_set_period(void)
                                                      };
 
     /* Get the clock frequency of the periodic timer */
-    err = R_ULPT_InfoGet(&g_timer_cancel_lpm_ctrl, &timer_info);
+    err = R_ULPT_InfoGet(&g_timer_ulpt_periodic_ctrl, &timer_info);
     if (err != FSP_SUCCESS)
     {
         return err;
@@ -99,7 +99,7 @@ fsp_err_t ulpt_set_period(void)
     printf("\r\ntimer_info.clock_frequency = %dHz\r\n", timer_info.clock_frequency);
 
     /* Set a period value for the periodic timer */
-    err = R_ULPT_PeriodSet(&g_timer_cancel_lpm_ctrl, period_in_raw);
+    err = R_ULPT_PeriodSet(&g_timer_ulpt_periodic_ctrl, period_in_raw);
 
     return err;
 }
@@ -117,7 +117,7 @@ fsp_err_t ulpt_periodic_operation(void)
     led_power_t led_state   = (led_power_t)RESET_VALUE;
 
     /* Start periodic timer */
-    err = R_ULPT_Start(&g_timer_cancel_lpm_ctrl);
+    err = R_ULPT_Start(&g_timer_ulpt_periodic_ctrl);
     if (err != FSP_SUCCESS)
     {
         return err;
@@ -140,7 +140,7 @@ fsp_err_t ulpt_periodic_operation(void)
     }
 
     /* Stop ULPT1 in periodic mode */
-    err = R_ULPT_Stop(&g_timer_cancel_lpm_ctrl);
+    err = R_ULPT_Stop(&g_timer_ulpt_periodic_ctrl);
 
     return err;
 }
@@ -153,9 +153,9 @@ fsp_err_t ulpt_periodic_operation(void)
 void hw_module_deinit(void)
 {
     /* Close ULPT1 module */
-    if (MODULE_CLOSED != g_timer_cancel_lpm_ctrl.open)
+    if (MODULE_CLOSED != g_timer_ulpt_periodic_ctrl.open)
     {
-        R_ULPT_Close(&g_timer_cancel_lpm_ctrl);
+        R_ULPT_Close(&g_timer_ulpt_periodic_ctrl);
     }
 
     /* Close LPM driver */

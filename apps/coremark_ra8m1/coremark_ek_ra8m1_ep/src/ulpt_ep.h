@@ -57,7 +57,6 @@ typedef enum e_led_power
 fsp_err_t hw_module_init(void);
 fsp_err_t ulpt_set_period(void);
 fsp_err_t ulpt_periodic_operation(void);
-fsp_err_t ulpt_one_shot_operation(void);
 void hw_module_deinit(void);
 
 #endif /* ULPT_EP_H_ */

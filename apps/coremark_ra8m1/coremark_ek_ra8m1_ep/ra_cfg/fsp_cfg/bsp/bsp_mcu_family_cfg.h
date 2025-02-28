@@ -185,11 +185,11 @@
 #endif
 /* Deep Standby Interrupt Factor Security Attribution Register. */
 #ifndef BSP_TZ_CFG_DPFSAR
-#define BSP_TZ_CFG_DPFSAR ((4 > 0) ? 0U : 0xAF1FFFFFU)
+#define BSP_TZ_CFG_DPFSAR ((1 > 0) ? 0U : 0xAF1FFFFFU)
 #endif
 /* RAM Standby Control Security Attribution Register. */
 #ifndef BSP_TZ_CFG_RSCSAR
-#define BSP_TZ_CFG_RSCSAR ((4 > 0) ? 0U : 0x00037FFFU)
+#define BSP_TZ_CFG_RSCSAR ((1 > 0) ? 0U : 0x00037FFFU)
 #endif
 
 /* Security attribution for CGC registers. */
@@ -249,12 +249,12 @@
 
 /* Security attribution registers for WUPEN0. */
 #ifndef BSP_TZ_CFG_ICUSARE
-#define BSP_TZ_CFG_ICUSARE ((4 > 0) ? 0U : 0xFF1D0000U)
+#define BSP_TZ_CFG_ICUSARE ((1 > 0) ? 0U : 0xFF1D0000U)
 #endif
 
 /* Security attribution registers for WUPEN1. */
 #ifndef BSP_TZ_CFG_ICUSARF
-#define BSP_TZ_CFG_ICUSARF ((4 > 0) ? 0U : 0x00007F08U)
+#define BSP_TZ_CFG_ICUSARF ((1 > 0) ? 0U : 0x00007F08U)
 #endif
 
 /* Trusted Event Route Control Register for IELSR, DMAC.DELSR and ELC.ELSR. Note that currently Trusted Event Route Control is not supported. */

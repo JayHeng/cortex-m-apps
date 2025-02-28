@@ -32,8 +32,21 @@
 	e.g. Read value from on board RTC, read value from cpu clock cycles performance counter etc. 
 	Sample implementation for standard time.h and windows.h definitions included.
 */
+
+extern volatile uint32_t s_timerGptHighCounter;
+
 CORETIMETYPE barebones_clock() {
-	return gpt_get_current_counter();
+    uint64_t retVal;
+    uint32_t high;
+    uint32_t low;
+    do
+    {
+        high = s_timerGptHighCounter;
+        low = gpt_get_current_counter();
+    } while (high != s_timerGptHighCounter);
+    retVal = ((uint64_t)high << 32U) + low;
+
+    return retVal;
 }
 /* Define : TIMER_RES_DIVIDER
 	Divider to trade off timer resolution and total time that can be measured.
@@ -41,7 +54,7 @@ CORETIMETYPE barebones_clock() {
 	Use lower values to increase resolution, but make sure that overflow does not occur.
 	If there are issues with the return value overflowing, increase this value.
 	*/
-#define CLOCKS_PER_SEC (30000000)
+#define CLOCKS_PER_SEC (120000000)
 #define GETMYTIME(_t) (*_t=barebones_clock())
 #define MYTIMEDIFF(fin,ini) ((fin)-(ini))
 #define TIMER_RES_DIVIDER 1

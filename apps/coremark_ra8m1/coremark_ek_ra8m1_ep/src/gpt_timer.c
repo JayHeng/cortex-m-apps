@@ -31,7 +31,7 @@
  **********************************************************************************************************************/
 
 extern bsp_leds_t g_bsp_leds;
-
+volatile uint32_t s_timerGptHighCounter = 0;
 static volatile bool g_periodic_timer_gpt_flag = false;
 
 /*******************************************************************************************************************//**
@@ -44,6 +44,7 @@ void periodic_timer_gpt_callback(timer_callback_args_t *p_args)
     if(TIMER_EVENT_CYCLE_END == p_args->event)
     {
     	g_periodic_timer_gpt_flag = true;
+    	s_timerGptHighCounter++;
     }
 }
 
@@ -106,7 +107,7 @@ fsp_err_t gpt_set_period(void)
     printf("\pclkd_freq_hz = %dHz\r\n", pclkd_freq_hz);
 
 	/* Convert period to PCLK counts so it can be set in hardware. */
-	period_counts = (uint64_t)((gpt_desired_period_ms * (pclkd_freq_hz * CLOCK_TYPE_SPECIFIER))  / TIMER_UNITS_MILLISECONDS);
+	//period_counts = (uint64_t)((gpt_desired_period_ms * (pclkd_freq_hz * CLOCK_TYPE_SPECIFIER))  / TIMER_UNITS_MILLISECONDS);
 
 	/* Validate Period Count based on user input (time period in ms) */
 	if(GPT_MAX_PERIOD_COUNT < period_counts)

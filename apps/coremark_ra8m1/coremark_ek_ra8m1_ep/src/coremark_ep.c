@@ -58,14 +58,16 @@ void coremark_ep_entry(void)
     //coremark_ep_main_process();
 
     /* Perform EP main procedure */
-    static volatile uint32_t counter0, counter1;
-    counter0 = gpt_get_current_counter();
-    printf("\r\ncounter value before run = %d\r\n", counter0);
-    counter0 = gpt_get_current_counter();
-    printf("\r\ncounter value before run = %d\r\n", counter0);
+    //static volatile uint32_t counter0, counter1;
+    //counter0 = gpt_get_current_counter();
+    //printf("counter value before run = %d\r\n", counter0);
+    //counter0 = gpt_get_current_counter();
+    //printf("counter value before run = %d\r\n", counter0);
+    //counter0 = gpt_get_current_counter();
+    //printf("counter value before run = %d\r\n", counter0);
     coremark_main();
-    counter1 = gpt_get_current_counter();
-    printf("\r\ncounter value after run = %d\r\n", counter1);
+    //counter1 = gpt_get_current_counter();
+    //printf("\r\ncounter value after run = %d\r\n", counter1);
     while (true)
     {
     }

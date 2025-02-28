@@ -42,10 +42,10 @@
 #define PERIOD_1S           (1U)
 #define PERIOD_2S           (2U)
 #define PERIOD_3S           (3U)
-#define TIMES_MAX           (3U)
+#define TIMES_MAX_ULPT           (3U)
 
 /* MACRO for select the LED to blink in ULPT periodic mode */
-#define LED_USE             (0U)
+#define LED_USE_ULPT             (0U)
 
 typedef enum e_led_power
 {
@@ -54,9 +54,9 @@ typedef enum e_led_power
 } led_power_t;
 
 /* function declarations */
-fsp_err_t hw_module_init(void);
+fsp_err_t hw_module_ulpt_init(void);
 fsp_err_t ulpt_set_period(void);
 fsp_err_t ulpt_periodic_operation(void);
-void hw_module_deinit(void);
+void hw_module_ulpt_deinit(void);
 
 #endif /* ULPT_EP_H_ */

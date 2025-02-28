@@ -23,14 +23,32 @@
 
 #include "common_utils.h"
 #include "gpt_timer.h"
+#include "ulpt_ep.h"
 
 /*******************************************************************************************************************//**
  * @addtogroup r_gpt_ep
  * @{
  **********************************************************************************************************************/
 
+extern bsp_leds_t g_bsp_leds;
+
 /* Store Timer open state*/
 uint8_t g_timer_open_state = RESET_VALUE;
+
+static volatile bool g_periodic_timer_gpt_flag = false;
+
+/*******************************************************************************************************************//**
+ * @brief This function is callback for periodic timer.
+ * @param[in]  p_args
+ * @retval     None
+ **********************************************************************************************************************/
+void periodic_timer_gpt_callback(timer_callback_args_t *p_args)
+{
+    if(TIMER_EVENT_CYCLE_END == p_args->event)
+    {
+    	g_periodic_timer_gpt_flag = true;
+    }
+}
 
 /*****************************************************************************************************************
  * @brief       Initialize GPT timer.
@@ -54,6 +72,119 @@ fsp_err_t init_gpt_timer(timer_ctrl_t * const p_timer_ctl, timer_cfg_t const * c
     {
         g_timer_open_state = PERIODIC_MODE;
     }
+    return err;
+}
+
+/*******************************************************************************************************************//**
+ * @brief       This function initializes the necessary hardware for the example project.
+ * @param[in]   None
+ * @retval      FSP_SUCCESS Upon successful operation
+ * @retval      Any Other Error code apart from FSP_SUCCESS
+ **********************************************************************************************************************/
+fsp_err_t hw_module_gpt_init(void)
+{
+    fsp_err_t err = FSP_SUCCESS;
+
+    /* Initialize LPM driver */
+    err = R_LPM_Open(&g_lpm_deep_sw_standby_ctrl, &g_lpm_deep_sw_standby_cfg);
+    if (err != FSP_SUCCESS)
+    {
+        return err;
+    }
+
+	/* Check the status of GPT timer in Periodic mode */
+	if(PERIODIC_MODE != g_timer_open_state)
+	{
+		/*Initialize Periodic Timer */
+		err = init_gpt_timer(&g_timer_gpt_periodic_ctrl, &g_timer_gpt_periodic_cfg, PERIODIC_MODE_TIMER);
+		if(FSP_SUCCESS != err)
+		{
+			return err;
+		}
+	}
+
+    return err;
+}
+
+/*******************************************************************************************************************//**
+ * @brief       This function gets the period value from the RTT and sets this period value for the one-shot timer.
+ * @param[in]   None
+ * @retval      FSP_SUCCESS Upon successful operation
+ * @retval      Any Other Error code apart from FSP_SUCCESS
+ **********************************************************************************************************************/
+fsp_err_t gpt_set_period(void)
+{
+    fsp_err_t err = FSP_SUCCESS;
+	uint32_t gpt_desired_period_ms          = 1000;
+	uint64_t period_counts                  = RESET_VALUE;
+	uint32_t pclkd_freq_hz                  = RESET_VALUE;
+
+	/* Get the source clock frequency (in Hz) */
+	pclkd_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKD);
+	pclkd_freq_hz >>= (uint32_t)(g_timer_gpt_periodic_cfg.source_div);
+    printf("\r\npclkd_freq_hz = %dHz\r\n", pclkd_freq_hz);
+
+	/* Convert period to PCLK counts so it can be set in hardware. */
+	period_counts = (uint64_t)((gpt_desired_period_ms * (pclkd_freq_hz * CLOCK_TYPE_SPECIFIER))  / TIMER_UNITS_MILLISECONDS);
+
+	/* Validate Period Count based on user input (time period in ms) */
+	if(GPT_MAX_PERIOD_COUNT < period_counts)
+	{
+		return FSP_ERR_ASSERTION;
+	}
+	else
+	{
+		/* Period Set API set the desired period counts on the on-board LED */
+		err = R_GPT_PeriodSet(&g_timer_gpt_periodic_ctrl, (uint32_t)period_counts);
+		if (FSP_SUCCESS != err)
+		{
+			/*Close Periodic Timer instance */
+			deinit_gpt_timer(&g_timer_gpt_periodic_ctrl);
+			return err;
+		}
+	}
+
+    return err;
+}
+
+/*******************************************************************************************************************//**
+ * @brief       This function demonstrates a periodic timer operation.
+ * @param[in]   None
+ * @retval      FSP_SUCCESS Upon successful operation
+ * @retval      Any Other Error code apart from FSP_SUCCESS
+ **********************************************************************************************************************/
+fsp_err_t gpt_periodic_operation(void)
+{
+    fsp_err_t   err         = FSP_SUCCESS;
+    uint8_t     count_value = RESET_VALUE;
+    led_power_t led_state   = (led_power_t)RESET_VALUE;
+
+    /* Start periodic timer */
+    err = start_gpt_timer(&g_timer_gpt_periodic_ctrl);
+    if (err != FSP_SUCCESS)
+    {
+        return err;
+    }
+
+    /* Wait until GPT timer underflow three times*/
+    while (TIMES_MAX_GPT > count_value)
+    {
+        if (true == g_periodic_timer_gpt_flag)
+        {
+        	g_periodic_timer_gpt_flag = false;
+            count_value ++;
+
+            if (LED_USE_GPT < g_bsp_leds.led_count)
+            {
+                led_state = led_state ^ (led_power_t)BSP_IO_LEVEL_HIGH;
+                R_IOPORT_PinWrite(&g_ioport_ctrl, g_bsp_leds.p_leds[LED_USE_GPT], (bsp_io_level_t)led_state);
+            }
+        }
+    }
+
+    /* Stop GPT in periodic mode */
+    err = R_GPT_Stop(&g_timer_gpt_periodic_ctrl);
+
     return err;
 }
 

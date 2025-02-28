@@ -31,6 +31,11 @@
 #define TIMER_UNITS_MILLISECONDS  (1000U)        /* timer unit in millisecond */
 #define CLOCK_TYPE_SPECIFIER      (1ULL)         /* type specifier */
 
+#define TIMES_MAX_GPT           (3U)
+
+/* MACRO for select the LED to blink in GPT periodic mode */
+#define LED_USE_GPT            (0U)
+
 /* GPT Timer Pin for boards */
 #define TIMER_PIN           (GPT_IO_PIN_GTIOCB)
 
@@ -43,6 +48,9 @@
 #define PERIODIC_MODE	   (1U)                  /* To check status of GPT Timer in Periodic mode */
 
 /* Function declaration */
+fsp_err_t hw_module_gpt_init(void);
+fsp_err_t gpt_set_period(void);
+fsp_err_t gpt_periodic_operation(void);
 fsp_err_t init_gpt_timer(timer_ctrl_t * const p_timer_ctl, timer_cfg_t const * const p_timer_cfg, uint8_t timer_mode);
 fsp_err_t start_gpt_timer (timer_ctrl_t * const p_timer_ctl);
 void deinit_gpt_timer(timer_ctrl_t * const p_timer_ctl);

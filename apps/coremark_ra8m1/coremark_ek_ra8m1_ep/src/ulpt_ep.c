@@ -31,7 +31,7 @@
 
 extern bsp_leds_t g_bsp_leds;
 
-static volatile bool g_periodic_timer_flag = false;
+static volatile bool g_periodic_timer_ulpt_flag = false;
 
 /*******************************************************************************************************************//**
  * @brief This function is callback for periodic timer.
@@ -42,7 +42,7 @@ void periodic_timer_ulpt_callback(timer_callback_args_t *p_args)
 {
     if(TIMER_EVENT_CYCLE_END == p_args->event)
     {
-        g_periodic_timer_flag = true;
+    	g_periodic_timer_ulpt_flag = true;
     }
 }
 
@@ -52,7 +52,7 @@ void periodic_timer_ulpt_callback(timer_callback_args_t *p_args)
  * @retval      FSP_SUCCESS Upon successful operation
  * @retval      Any Other Error code apart from FSP_SUCCESS
  **********************************************************************************************************************/
-fsp_err_t hw_module_init(void)
+fsp_err_t hw_module_ulpt_init(void)
 {
     fsp_err_t err = FSP_SUCCESS;
 
@@ -124,17 +124,17 @@ fsp_err_t ulpt_periodic_operation(void)
     }
 
     /* Wait until ULPT1 timer underflow three times*/
-    while (TIMES_MAX > count_value)
+    while (TIMES_MAX_ULPT > count_value)
     {
-        if (true == g_periodic_timer_flag)
+        if (true == g_periodic_timer_ulpt_flag)
         {
-            g_periodic_timer_flag = false;
+        	g_periodic_timer_ulpt_flag = false;
             count_value ++;
 
-            if (LED_USE < g_bsp_leds.led_count)
+            if (LED_USE_ULPT < g_bsp_leds.led_count)
             {
                 led_state = led_state ^ (led_power_t)BSP_IO_LEVEL_HIGH;
-                R_IOPORT_PinWrite(&g_ioport_ctrl, g_bsp_leds.p_leds[LED_USE], (bsp_io_level_t)led_state);
+                R_IOPORT_PinWrite(&g_ioport_ctrl, g_bsp_leds.p_leds[LED_USE_ULPT], (bsp_io_level_t)led_state);
             }
         }
     }
@@ -150,7 +150,7 @@ fsp_err_t ulpt_periodic_operation(void)
  * @param[in]   None
  * @retval      Any Other Error code apart from FSP_SUCCESS
  **********************************************************************************************************************/
-void hw_module_deinit(void)
+void hw_module_ulpt_deinit(void)
 {
     /* Close ULPT1 module */
     if (MODULE_CLOSED != g_timer_ulpt_periodic_ctrl.open)

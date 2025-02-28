@@ -101,6 +101,9 @@ static fsp_err_t coremark_ep_startup(void)
 #endif
     }
 
+    uint32_t cpu_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_CPUCLK);
+    printf("\Cortex-M85 freq_hz = %dHz\r\n", cpu_freq_hz);
+
     /* Initialize necessary hardware modules  */
     //err = hw_module_ulpt_init();
     err = hw_module_gpt_init();

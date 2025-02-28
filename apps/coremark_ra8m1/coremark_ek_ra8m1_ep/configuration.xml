@@ -190,7 +190,7 @@
     <node id="board.clock.pclka.div" option="board.clock.pclka.div.4"/>
     <node id="board.clock.pclkb.div" option="board.clock.pclkb.div.8"/>
     <node id="board.clock.pclkc.div" option="board.clock.pclkc.div.8"/>
-    <node id="board.clock.pclkd.div" option="board.clock.pclkd.div.4"/>
+    <node id="board.clock.pclkd.div" option="board.clock.pclkd.div.16"/>
     <node id="board.clock.pclke.div" option="board.clock.pclke.div.2"/>
     <node id="board.clock.sdclkout.enable" option="board.clock.sdclkout.enable.enabled"/>
     <node id="board.clock.bclk.div" option="board.clock.bclk.div.4"/>

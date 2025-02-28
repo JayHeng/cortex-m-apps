@@ -51,6 +51,7 @@
 fsp_err_t hw_module_gpt_init(void);
 fsp_err_t gpt_set_period(void);
 fsp_err_t gpt_periodic_operation(void);
+uint32_t gpt_get_current_counter(void);
 fsp_err_t init_gpt_timer(timer_ctrl_t * const p_timer_ctl, timer_cfg_t const * const p_timer_cfg, uint8_t timer_mode);
 fsp_err_t start_gpt_timer (timer_ctrl_t * const p_timer_ctl);
 void deinit_gpt_timer(timer_ctrl_t * const p_timer_ctl);

@@ -9,6 +9,9 @@
 */
 #ifndef CORE_PORTME_H
 #define CORE_PORTME_H
+
+#include <stdint.h>
+
 /************************/
 /* Data types and settings */
 /************************/
@@ -23,14 +26,14 @@
 	and implementation of functions thereof.
 */
 #ifndef HAS_TIME_H
-#define HAS_TIME_H 1
+#define HAS_TIME_H 0
 #endif
 /* Configuration : USE_CLOCK
 	Define to 1 if platform has the time.h header file,
 	and implementation of functions thereof.
 */
 #ifndef USE_CLOCK
-#define USE_CLOCK 1
+#define USE_CLOCK 0
 #endif
 /* Configuration : HAS_STDIO
 	Define to 1 if the platform has stdio.h.
@@ -53,15 +56,17 @@
  #ifdef __GNUC__
  #define COMPILER_VERSION "GCC"__VERSION__
  #else
- #define COMPILER_VERSION "Please put compiler version here (e.g. gcc 4.1)"
+ #define COMPILER_VERSION "GCC v13.2.1"
  #endif
 #endif
 #ifndef COMPILER_FLAGS 
- #define COMPILER_FLAGS FLAGS_STR /* "Please put compiler flags here (e.g. -o3)" */
+ #define COMPILER_FLAGS "-Ofast" /* "Please put compiler flags here (e.g. -o3)" */
 #endif
 #ifndef MEM_LOCATION 
  #define MEM_LOCATION "STACK"
 #endif
+
+#define ITERATIONS (1000)
 
 /* Data Types :
 	To avoid compiler issues, define the data types that need ot be used for 8b, 16b and 32b in <core_portme.h>.
@@ -76,7 +81,7 @@ typedef double ee_f32;
 typedef unsigned char ee_u8;
 typedef unsigned int ee_u32;
 typedef ee_u32 ee_ptr_int;
-typedef size_t ee_size_t;
+typedef unsigned int ee_size_t;
 #define NULL ((void *)0)
 /* align_mem :
 	This macro is used to align an offset to point to a 32b value. It is used in the Matrix algorithm to initialize the input memory blocks.
@@ -86,8 +91,8 @@ typedef size_t ee_size_t;
 /* Configuration : CORE_TICKS
 	Define type of return from the timing functions.
  */
-#define CORETIMETYPE ee_u32 
-typedef ee_u32 CORE_TICKS;
+#define CORETIMETYPE uint64_t
+#define CORE_TICKS uint64_t
 
 /* Configuration : SEED_METHOD
 	Defines method to get seed values that cannot be computed at compile time.
@@ -146,7 +151,7 @@ typedef ee_u32 CORE_TICKS;
 	This flag only matters if MULTITHREAD has been defined to a value greater then 1.
 */
 #ifndef MAIN_HAS_NOARGC 
-#define MAIN_HAS_NOARGC 0
+#define MAIN_HAS_NOARGC 1
 #endif
 
 /* Configuration : MAIN_HAS_NORETURN

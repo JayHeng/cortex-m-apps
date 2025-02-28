@@ -33,6 +33,7 @@ This code is based on a file that contains the following:
 
 #include <coremark.h>
 #include <stdarg.h>
+#include "uart_terminal.h"
 
 #define ZEROPAD  	(1<<0)	/* Pad with zero */
 #define SIGN    	(1<<1)	/* Unsigned/signed long */
@@ -578,7 +579,12 @@ repeat:
 }
 
 void uart_send_char(char c) {
-#error "You must implement the method uart_send_char to use this file!\n";
+    if (c == '\n')
+    {
+        char tmp = '\r';
+        uart_print((const uint8_t *)&tmp);
+    }
+    uart_print((const uint8_t *)&c);
 /*	Output of a char to a UART usually follows the following model:
 	Wait until UART is ready
 	Write char to UART

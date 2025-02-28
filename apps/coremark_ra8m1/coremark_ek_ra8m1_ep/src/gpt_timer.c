@@ -148,6 +148,27 @@ fsp_err_t gpt_set_period(void)
 }
 
 /*******************************************************************************************************************//**
+ * @brief       This function gets the period value from the RTT and sets this period value for the one-shot timer.
+ * @param[in]   None
+ * @retval      FSP_SUCCESS Upon successful operation
+ * @retval      Any Other Error code apart from FSP_SUCCESS
+ **********************************************************************************************************************/
+uint32_t gpt_get_current_counter(void)
+{
+    fsp_err_t       err                             = FSP_SUCCESS;
+    timer_status_t    timer_status;
+
+    /* Get the clock frequency of the periodic timer */
+    err = R_GPT_StatusGet(&g_timer_ulpt_periodic_ctrl, &timer_status);
+    if (err != FSP_SUCCESS)
+    {
+        return 0;
+    }
+
+    return timer_status.counter;
+}
+
+/*******************************************************************************************************************//**
  * @brief       This function demonstrates a periodic timer operation.
  * @param[in]   None
  * @retval      FSP_SUCCESS Upon successful operation

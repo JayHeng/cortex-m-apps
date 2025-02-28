@@ -39,6 +39,8 @@ static void coremark_ep_main_process(void);
 static bool standby_sram_write(uint32_t offset_addr, uint8_t * p_write_buf, uint32_t len);
 #endif
 
+extern int coremark_main(void);
+
 /**********************************************************************************************************************
 * Function implementations
 **********************************************************************************************************************/
@@ -56,7 +58,7 @@ void coremark_ep_entry(void)
     /* Perform EP main procedure */
     while (true)
     {
-        coremark_ep_main_process();
+    	coremark_main();
     }
 }
 

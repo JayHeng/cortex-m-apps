@@ -40,7 +40,7 @@
 #define RESET_VALUE     (0x00)
 
 #define EP_VERSION      "1.0"
-#define MODULE_NAME     "sw_coremark"
+#define MODULE_NAME     "coremark"
 #define BANNER_VER      "\r\n********************************************************************************"\
 		                "\r\n*   Renesas FSP Example Project for "MODULE_NAME" Module                               *"\
 						"\r\n*   Example Project Version %s                                                *"\

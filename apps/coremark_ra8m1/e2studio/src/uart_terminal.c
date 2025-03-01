@@ -30,12 +30,9 @@ static volatile uart_event_t g_uart_event = RESET_VALUE;
 
 volatile bool uart_send_complete_flag = false;
 
-#if defined(__GNUC__) || defined(__ICCARM__)
+#if defined(__GNUC__)
 
-    #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-    #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 
 PUTCHAR_PROTOTYPE
 {
@@ -58,6 +55,15 @@ int _write(int fd,char *pBuffer,int size)
     }
     return size;
 }
+#elif defined(__ICCARM__)
+size_t __write(int handle, const unsigned char *buf, size_t size)
+{
+    /* Send data. */ 
+    (void)uart_write((uint8_t *)buf, size);
+
+    return size;
+}
+#endif // __ICCARM__
 
 /*******************************************************************************************************************//**
  *  @brief      SCI UART callback function
@@ -132,12 +138,18 @@ void uart_deinit(void)
  **********************************************************************************************************************/
 fsp_err_t uart_print(uint8_t * p_buf)
 {
-    fsp_err_t   err     = FSP_SUCCESS;
     uint32_t    len     = RESET_VALUE;
-    uint32_t    timeout = RESET_VALUE;
 
     /* Calculate length of message received */
     len = (uint32_t)(strlen((char *)p_buf));
+
+    return uart_write(p_buf, len);
+}
+
+fsp_err_t uart_write(uint8_t * p_buf, uint32_t len)
+{
+    fsp_err_t   err     = FSP_SUCCESS;
+    uint32_t    timeout = RESET_VALUE;
 
     /* Set timeout value according to message length */
     timeout = len;
@@ -217,18 +229,6 @@ fsp_err_t uart_ep_info_print (void)
 
     /* Print EP version and FSP version to terminal on Host PC via SCI UART */
     err = uart_print(uart_buffer);
-    if (FSP_SUCCESS != err)
-    {
-        return err;
-    }
-
-    /* Print EP version and FSP version to terminal on Host PC via SCI UART */
-    err = uart_print((uint8_t *)BANNER_INFO);
-    if (FSP_SUCCESS != err)
-    {
-        return err;
-    }
-
     return err;
 }
 

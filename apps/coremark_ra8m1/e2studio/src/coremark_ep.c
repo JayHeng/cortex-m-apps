@@ -55,8 +55,6 @@ void coremark_ep_entry(void)
         return;
     }
 
-    //coremark_ep_main_process();
-
     /* Perform EP main procedure */
     static volatile uint32_t counter0, counter1;
     counter0 = gpt_get_current_counter();
@@ -65,7 +63,9 @@ void coremark_ep_entry(void)
     printf("counter value before run = %d\r\n", counter0);
     counter0 = gpt_get_current_counter();
     printf("counter value before run = %d\r\n", counter0);
+    printf("----------------------------------\r\n");
     coremark_main();
+    printf("----------------------------------\r\n");
     counter1 = gpt_get_current_counter();
     printf("\r\ncounter value after run = %d\r\n", counter1);
     while (true)
@@ -97,12 +97,12 @@ static fsp_err_t coremark_ep_startup(void)
         }
 
         /* Print stored successful message */
-        TERMINAL_PRINT("Stored fixed data into standby SRAM\r\n");
+        TERMINAL_PRINT("\r\nStored fixed data into standby SRAM\r\n");
 #endif
     }
 
     uint32_t cpu_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_CPUCLK);
-    printf("\Cortex-M85 freq_hz = %dHz\r\n", cpu_freq_hz);
+    printf("Cortex-M85 freq_hz = %d\r\n", cpu_freq_hz);
 
     /* Initialize necessary hardware modules  */
     //err = hw_module_ulpt_init();

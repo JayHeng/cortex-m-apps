@@ -53,14 +53,20 @@
 	Initialize these strings per platform
 */
 #ifndef COMPILER_VERSION 
- #ifdef __GNUC__
+#if defined(__GNUC__)
  #define COMPILER_VERSION "GCC"__VERSION__
- #else
+#elif defined(__ICCARM__)
+ #define COMPILER_VERSION "IAR v9.60.2"
+#else
  #define COMPILER_VERSION "GCC v13.2.1"
- #endif
+#endif
 #endif
 #ifndef COMPILER_FLAGS 
- #define COMPILER_FLAGS "-Ofast" /* "Please put compiler flags here (e.g. -o3)" */
+#if defined(__GNUC__)
+ #define COMPILER_FLAGS "-Ofast"
+#elif defined(__ICCARM__)
+ #define COMPILER_FLAGS "-High-Speed-No Size Constraints"
+#endif
 #endif
 #ifndef MEM_LOCATION 
  #define MEM_LOCATION "STACK"

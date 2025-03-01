@@ -30,7 +30,8 @@ static volatile uart_event_t g_uart_event = RESET_VALUE;
 
 volatile bool uart_send_complete_flag = false;
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__ICCARM__)
+
     #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
     #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
@@ -43,7 +44,7 @@ PUTCHAR_PROTOTYPE
 #else
 	fsp_err_t err = R_SCI_B_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
 #endif
-	if(FSP_SUCCESS != err) __BKPT();
+	if(FSP_SUCCESS != err) __BKPT(0);
 	while(uart_send_complete_flag == false){}
 	uart_send_complete_flag = false;
 	return ch;
@@ -186,7 +187,7 @@ void uart_putchar(char ch)
 #else
 	fsp_err_t err = R_SCI_B_UART_Write(&g_uart_ctrl, (uint8_t *)&ch, 1);
 #endif
-	if(FSP_SUCCESS != err) __BKPT();
+	if(FSP_SUCCESS != err) __BKPT(0);
 	while(uart_send_complete_flag == false){}
 	uart_send_complete_flag = false;
 }

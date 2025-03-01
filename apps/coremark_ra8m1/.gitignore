@@ -4,8 +4,11 @@
 /*/Release/
 /*/ra_gen/
 /*/.settings/
+/*/.cache/
 
 /*/settings/
+/*/Flash/
+/*/TCM/
 
 /*/*.jlink
 /*/*.launch

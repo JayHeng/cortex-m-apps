@@ -309,7 +309,7 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
@@ -854,7 +854,7 @@
                 </option>
                 <option>
                     <name>IlinkUseExtraOptions</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>IlinkExtraOptions</name>
@@ -1116,20 +1116,7 @@
         <settings>
             <name>BUILDACTION</name>
             <archiveVersion>2</archiveVersion>
-            <data>
-                <buildActions>
-                    <buildAction>
-                        <cmdline>cmd /c ""$RASC_EXE_PATH$" -nosplash --launcher.suppressErrors --gensmartbundle --compiler IAR --devicefamily ra "$PROJ_DIR$\configuration.xml" "$TARGET_PATH$" 2&gt; "%TEMP%\rasc_stderr.out"" &amp;&amp; echo &gt; "$BUILD_FILES_DIR$/.postbuild"</cmdline>
-                        <workingDirectory>$PROJ_DIR$</workingDirectory>
-                        <buildSequence>postLink</buildSequence>
-                        <outputs>
-                            <file>
-                                <name>$BUILD_FILES_DIR$/.postbuild</name>
-                            </file>
-                        </outputs>
-                    </buildAction>
-                </buildActions>
-            </data>
+            <data />
         </settings>
     </configuration>
     <configuration>

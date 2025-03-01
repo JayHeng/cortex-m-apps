@@ -1940,7 +1940,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/script/fsp_tcm.icf</state>
+                    <state>$PROJ_DIR$/script/R7FA8M1AH_ram.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>

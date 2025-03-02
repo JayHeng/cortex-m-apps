@@ -95,8 +95,8 @@ void coremark_ep_entry(void)
     }
 
     /* Perform EP main procedure */
-    bsp_itcm_test();
-    bsp_dtcm_test();
+    //bsp_itcm_test();
+    //bsp_dtcm_test();
     coremark_timer_track();
     coremark_main();
     while (true)

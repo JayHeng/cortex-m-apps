@@ -1,6 +1,6 @@
 
             /* generated memory regions file - do not edit */
-                            define symbol RAM_START = 0x22000000;
+                define symbol RAM_START = 0x22000000;
                 define symbol RAM_LENGTH   = 0xE0000;
                 define symbol FLASH_START = 0x02000000;
                 define symbol FLASH_LENGTH   = 0x1F8000;

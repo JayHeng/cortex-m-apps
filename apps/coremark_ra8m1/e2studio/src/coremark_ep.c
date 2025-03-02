@@ -67,7 +67,7 @@ void coremark_ep_entry(void)
     coremark_main();
     printf("----------------------------------\r\n");
     counter1 = gpt_get_current_counter();
-    printf("\r\ncounter value after run = %d\r\n", counter1);
+    printf("counter value after run = %d\r\n", counter1);
     while (true)
     {
     }

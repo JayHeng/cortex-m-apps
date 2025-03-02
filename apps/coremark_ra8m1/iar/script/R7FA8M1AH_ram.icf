@@ -25,6 +25,8 @@
 ** ###################################################################
 */
 
+include "memory_regions.icf";
+
 define symbol m_interrupts_start       = 0x00000000;
 define symbol m_interrupts_end         = 0x000003FF;
 
@@ -65,10 +67,10 @@ define block NCACHE_VAR    { section NonCacheable , section NonCacheable.init };
 define block QACCESS_CODE  { section CodeQuickAccess };
 define block QACCESS_DATA  { section DataQuickAccess };
 
-initialize by copy { readwrite, section .textrw, section CodeQuickAccess, section DataQuickAccess };
-do not initialize  { section .noinit };
+initialize manually { readwrite, section .textrw, section CodeQuickAccess, section DataQuickAccess };
+do not initialize  { zeroinit };
 
-place at address mem: m_interrupts_start    { readonly section .intvec };
+place at address mem: m_interrupts_start    { ro section .fixed_vectors* };
 
 place in TEXT_region                        { readonly };
 place in DATA_region                        { block RW };
@@ -78,3 +80,62 @@ place in DATA_region                        { block NCACHE_VAR };
 place in TEXT_region                        { block QACCESS_CODE };
 place in DATA_region                        { block QACCESS_DATA };
 place in CSTACK_region                      { block CSTACK };
+
+/************************ OPTION Memory **************************************/
+/*
+if(OPTION_SETTING_LENGTH > 0)
+{
+  if (!isdefinedsymbol(PROJECT_NONSECURE))
+  {
+    place at address OPTION_SETTING_START { ro section .option_setting_ofs0 };
+    place at address OPTION_SETTING_START+0x04 { ro section .option_setting_ofs2 };
+    place at address OPTION_SETTING_START+0x10 { ro section .option_setting_dualsel };
+    place at address OPTION_SETTING_START+0x34 { ro section .option_setting_sas };
+    place at address OPTION_SETTING_S_START+0x00 { ro section .option_setting_ofs1_sec };
+    place at address OPTION_SETTING_S_START+0x04 { ro section .option_setting_ofs3_sec };
+    place at address OPTION_SETTING_S_START+0x10 { ro section .option_setting_banksel_sec };
+    place at address OPTION_SETTING_S_START+0x40 { ro section .option_setting_bps_sec0 };
+    place at address OPTION_SETTING_S_START+0x44 { ro section .option_setting_bps_sec1 };
+    place at address OPTION_SETTING_S_START+0x48 { ro section .option_setting_bps_sec2 };
+    place at address OPTION_SETTING_S_START+0x4C { ro section .option_setting_bps_sec3 };
+    place at address OPTION_SETTING_S_START+0x60 { ro section .option_setting_pbps_sec0 };
+    place at address OPTION_SETTING_S_START+0x64 { ro section .option_setting_pbps_sec1 };
+    place at address OPTION_SETTING_S_START+0x68 { ro section .option_setting_pbps_sec2 };
+    place at address OPTION_SETTING_S_START+0x6C { ro section .option_setting_pbps_sec3 };
+    place at address OPTION_SETTING_S_START+0x80 { ro section .option_setting_ofs1_sel };
+    place at address OPTION_SETTING_S_START+0x84 { ro section .option_setting_ofs3_sel };
+    place at address OPTION_SETTING_S_START+0x90 { ro section .option_setting_banksel_sel };
+    place at address OPTION_SETTING_S_START+0xC0 { ro section .option_setting_bps_sel0 };
+    place at address OPTION_SETTING_S_START+0xC4 { ro section .option_setting_bps_sel1 };
+    place at address OPTION_SETTING_S_START+0xC8 { ro section .option_setting_bps_sel2 };
+    place at address OPTION_SETTING_S_START+0xCC { ro section .option_setting_bps_sel3 };
+  }
+  else
+  {
+    place at address OPTION_SETTING_START+0 { ro section .option_setting_ofs1 };
+    place at address OPTION_SETTING_START+4 { ro section .option_setting_ofs3 };
+    place at address OPTION_SETTING_START+0x10 { ro section .option_setting_banksel };
+    place at address OPTION_SETTING_START+0x40 { ro section .option_setting_bps0 };
+    place at address OPTION_SETTING_START+0x44 { ro section .option_setting_bps1 };
+    place at address OPTION_SETTING_START+0x48 { ro section .option_setting_bps2 };
+    place at address OPTION_SETTING_START+0x4C { ro section .option_setting_bps3 };
+    place at address OPTION_SETTING_START+0x60 { ro section .option_setting_pbps0 };
+    place at address OPTION_SETTING_START+0x64 { ro section .option_setting_pbps1 };
+    place at address OPTION_SETTING_START+0x68 { ro section .option_setting_pbps2 };
+    place at address OPTION_SETTING_START+0x6C { ro section .option_setting_pbps3 };
+  }
+}
+if (OPTION_SETTING_DATA_FLASH_S_LENGTH > 0)
+{
+  if (!isdefinedsymbol(PROJECT_NONSECURE))
+  {
+    place at address OPTION_SETTING_DATA_FLASH_S_START { ro section .option_setting_data_flash_fsblctrl0 };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x04 { ro section .option_setting_data_flash_fsblctrl1 };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x08 { ro section .option_setting_data_flash_fsblctrl2 };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x0C { ro section .option_setting_data_flash_sacc0 };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x10 { ro section .option_setting_data_flash_sacc1 };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x14 { ro section .option_setting_data_flash_samr };
+    place at address OPTION_SETTING_DATA_FLASH_S_START+0x2E0 { ro section .option_setting_data_flash_hoemrtpk };
+  }
+}
+*/

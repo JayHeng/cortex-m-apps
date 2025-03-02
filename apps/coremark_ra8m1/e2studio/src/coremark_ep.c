@@ -44,6 +44,45 @@ extern int coremark_main(void);
 /**********************************************************************************************************************
 * Function implementations
 **********************************************************************************************************************/
+
+//BSP_PLACE_IN_SECTION(".itcm_data")uint32_t itcm_var = 0;
+void bsp_itcm_test(void)
+{
+    //itcm_var = 0x5aa5;
+    //printf("itcm_var addr = 0x%x\r\n", &itcm_var);
+    *(uint32_t *)0x00000000 = 0xFFFFFFFF;
+    uint32_t itcm_0_val = *(uint32_t *)0x00000000;
+    printf("@0x00000000 = %d\r\n", itcm_0_val);
+    *(uint32_t *)0x0000FFFC = 0xFFFFFFFF;
+    uint32_t itcm_n_val = *(uint32_t *)0x0000FFFC;
+    printf("@0x0000FFFC = %d\r\n", itcm_n_val);
+}
+
+//BSP_PLACE_IN_SECTION(".dtcm_data")uint32_t dtcm_var = 0;
+void bsp_dtcm_test(void)
+{
+    //dtcm_var = 0x5aa5;
+    //printf("dtcm_var addr = 0x%x\r\n", &dtcm_var);
+    *(uint32_t *)0x20000000 = 0xFFFFFFFF;
+    uint32_t dtcm_0_val = *(uint32_t *)0x20000000;
+    printf("@0x20000000 = %d\r\n", dtcm_0_val);
+    *(uint32_t *)0x2000FFFC = 0xFFFFFFFF;
+    uint32_t dtcm_n_val = *(uint32_t *)0x2000FFFC;
+    printf("@0x2000FFFC = %d\r\n", dtcm_n_val);
+}
+
+void coremark_timer_track(void)
+{
+    static volatile uint32_t counter0, counter1;
+    counter0 = gpt_get_current_counter();
+    printf("counter value before run = %d\r\n", counter0);
+    counter0 = gpt_get_current_counter();
+    printf("counter value before run = %d\r\n", counter0);
+    counter0 = gpt_get_current_counter();
+    printf("counter value before run = %d\r\n", counter0);
+    printf("----------------------------------\r\n");
+}
+
 void coremark_ep_entry(void)
 {
     fsp_err_t err = FSP_SUCCESS;
@@ -56,18 +95,10 @@ void coremark_ep_entry(void)
     }
 
     /* Perform EP main procedure */
-    static volatile uint32_t counter0, counter1;
-    counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
-    counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
-    counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
-    printf("----------------------------------\r\n");
+    bsp_itcm_test();
+    bsp_dtcm_test();
+    coremark_timer_track();
     coremark_main();
-    printf("----------------------------------\r\n");
-    counter1 = gpt_get_current_counter();
-    printf("counter value after run = %d\r\n", counter1);
     while (true)
     {
     }

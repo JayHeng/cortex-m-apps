@@ -1,64 +1,30 @@
 include "memory_regions.icf";
 
-
 define symbol FLASH_ORIGIN = FLASH_START;
 define symbol LIMITED_FLASH_LENGTH = FLASH_LENGTH;
 
 define symbol FLASH_END             = FLASH_ORIGIN + LIMITED_FLASH_LENGTH - 1;
 define symbol RAM_END               = RAM_START + RAM_LENGTH - 1;
 
-/*-Memory Regions-*/
-define symbol VECT_START      = FLASH_ORIGIN;
-define symbol VECT_END        = FLASH_ORIGIN + 0x3FF;
-define symbol ROMREG_START    = FLASH_ORIGIN + 0x400;
-define symbol ROMREG_END      = FLASH_ORIGIN + 0x4FF;
-define symbol FLASH_PRV_START = FLASH_ORIGIN + 0x500;
-
 /* Stack and heap sizes are defined in bsp_cfg.h */
 
 initialize manually { readwrite };
 do not initialize   { zeroinit };
-initialize manually { section .code_in_ram };
 /* Main thread local storage */
 initialize manually { section __DLIB_PERTHREAD };
 
-define block RAM_INIT_CODE   { section .code_in_ram_init };
-define block RAM_CODE        { section .code_in_ram };
-
-keep                                       { section .vector*};
-
-define block USB_DEV_DESC_BLK with fixed order, alignment = 1
-                                           { ro data section .usb_device_desc_fs,
-                                             ro data section .usb_config_desc_fs,
-                                             ro data section .usb_interface_desc_fs,
-                                             ro data section .usb_device_desc_hs,
-                                             ro data section .usb_config_desc_hs,
-                                             ro data section .usb_interface_desc_hs,
-                                             ro data section .usb_dev_descriptor_start_fs,
-                                             ro data section .usb_descriptor_end_fs };
-keep                                       { section .usb_*};
+keep { section .vector*};
 
 /************************ FLASH Memory **************************************/
-/* MCUs with the OPTION_SETTING region do not use the ROM registers at 0x400. */
-
 define region FLASH_region      = mem:[from FLASH_ORIGIN to FLASH_END];
 place at start of FLASH_region  { ro section .fixed_vectors* };
 place in FLASH_region           { ro section .application_vectors* };
 place in FLASH_region   { ro,
                           ro section .rodata,
-                          block RAM_INIT_CODE,
-                          block USB_DEV_DESC_BLK,
                           last section END_OF_ROM };
 
 /************************ RAM Memory **************************************/
 define region RAM_region        = mem:[from RAM_START to RAM_END];
-
-
-/* If DTC is used, put the DTC vector table at the start of SRAM.
-This avoids memory holes due to 1K alignment required by it. */
-define block START_OF_RAM with fixed order { rw section .fsp_dtc_vector_table,
-                                             block RAM_CODE };
-place at start of RAM_region { block START_OF_RAM };
 place in RAM_region     { rw,
                           rw section .noinit,
                           rw section .bss,
@@ -71,60 +37,4 @@ define block NOCACHE with alignment = 32, end alignment = 32, fixed order {
 place in RAM_region     { block NOCACHE };
 place in RAM_region     { last section FREE_MEM };
 
-/************************ OPTION Memory **************************************/
-if(OPTION_SETTING_LENGTH > 0)
-{
-  if (!isdefinedsymbol(PROJECT_NONSECURE))
-  {
-    place at address OPTION_SETTING_START { ro section .option_setting_ofs0 };
-    place at address OPTION_SETTING_START+0x04 { ro section .option_setting_ofs2 };
-    place at address OPTION_SETTING_START+0x10 { ro section .option_setting_dualsel };
-    place at address OPTION_SETTING_START+0x34 { ro section .option_setting_sas };
-    place at address OPTION_SETTING_S_START+0x00 { ro section .option_setting_ofs1_sec };
-    place at address OPTION_SETTING_S_START+0x04 { ro section .option_setting_ofs3_sec };
-    place at address OPTION_SETTING_S_START+0x10 { ro section .option_setting_banksel_sec };
-    place at address OPTION_SETTING_S_START+0x40 { ro section .option_setting_bps_sec0 };
-    place at address OPTION_SETTING_S_START+0x44 { ro section .option_setting_bps_sec1 };
-    place at address OPTION_SETTING_S_START+0x48 { ro section .option_setting_bps_sec2 };
-    place at address OPTION_SETTING_S_START+0x4C { ro section .option_setting_bps_sec3 };
-    place at address OPTION_SETTING_S_START+0x60 { ro section .option_setting_pbps_sec0 };
-    place at address OPTION_SETTING_S_START+0x64 { ro section .option_setting_pbps_sec1 };
-    place at address OPTION_SETTING_S_START+0x68 { ro section .option_setting_pbps_sec2 };
-    place at address OPTION_SETTING_S_START+0x6C { ro section .option_setting_pbps_sec3 };
-    place at address OPTION_SETTING_S_START+0x80 { ro section .option_setting_ofs1_sel };
-    place at address OPTION_SETTING_S_START+0x84 { ro section .option_setting_ofs3_sel };
-    place at address OPTION_SETTING_S_START+0x90 { ro section .option_setting_banksel_sel };
-    place at address OPTION_SETTING_S_START+0xC0 { ro section .option_setting_bps_sel0 };
-    place at address OPTION_SETTING_S_START+0xC4 { ro section .option_setting_bps_sel1 };
-    place at address OPTION_SETTING_S_START+0xC8 { ro section .option_setting_bps_sel2 };
-    place at address OPTION_SETTING_S_START+0xCC { ro section .option_setting_bps_sel3 };
-  }
-  else
-  {
-    place at address OPTION_SETTING_START+0 { ro section .option_setting_ofs1 };
-    place at address OPTION_SETTING_START+4 { ro section .option_setting_ofs3 };
-    place at address OPTION_SETTING_START+0x10 { ro section .option_setting_banksel };
-    place at address OPTION_SETTING_START+0x40 { ro section .option_setting_bps0 };
-    place at address OPTION_SETTING_START+0x44 { ro section .option_setting_bps1 };
-    place at address OPTION_SETTING_START+0x48 { ro section .option_setting_bps2 };
-    place at address OPTION_SETTING_START+0x4C { ro section .option_setting_bps3 };
-    place at address OPTION_SETTING_START+0x60 { ro section .option_setting_pbps0 };
-    place at address OPTION_SETTING_START+0x64 { ro section .option_setting_pbps1 };
-    place at address OPTION_SETTING_START+0x68 { ro section .option_setting_pbps2 };
-    place at address OPTION_SETTING_START+0x6C { ro section .option_setting_pbps3 };
-  }
-}
-if (OPTION_SETTING_DATA_FLASH_S_LENGTH > 0)
-{
-  if (!isdefinedsymbol(PROJECT_NONSECURE))
-  {
-    place at address OPTION_SETTING_DATA_FLASH_S_START { ro section .option_setting_data_flash_fsblctrl0 };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x04 { ro section .option_setting_data_flash_fsblctrl1 };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x08 { ro section .option_setting_data_flash_fsblctrl2 };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x0C { ro section .option_setting_data_flash_sacc0 };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x10 { ro section .option_setting_data_flash_sacc1 };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x14 { ro section .option_setting_data_flash_samr };
-    place at address OPTION_SETTING_DATA_FLASH_S_START+0x2E0 { ro section .option_setting_data_flash_hoemrtpk };
-  }
-}
 

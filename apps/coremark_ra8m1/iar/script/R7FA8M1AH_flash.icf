@@ -25,14 +25,14 @@
 ** ###################################################################
 */
 
-define symbol m_interrupts_start       = 0x00000000;
-define symbol m_interrupts_end         = 0x000003FF;
+define symbol m_interrupts_start       = 0x02000000;
+define symbol m_interrupts_end         = 0x020003FF;
 
-define symbol m_text_start             = 0x00000400;
-define symbol m_text_end               = 0x0000FFFF;
+define symbol m_text_start             = 0x02000400;
+define symbol m_text_end               = 0x0200FFFF;
 
-define symbol m_data_start             = 0x20000000;
-define symbol m_data_end               = 0x2000FFFF;
+define symbol m_data_start             = 0x22000000;
+define symbol m_data_end               = 0x2200FFFF;
 
 /* Sizes */
 if (isdefinedsymbol(__stack_size__)) {
@@ -78,3 +78,4 @@ place in DATA_region                        { block NCACHE_VAR };
 place in TEXT_region                        { block QACCESS_CODE };
 place in DATA_region                        { block QACCESS_DATA };
 place in CSTACK_region                      { block CSTACK };
+

@@ -1,10 +1,10 @@
 include "memory_regions.icf";
 
-define symbol FLASH_ORIGIN = FLASH_START;
-define symbol LIMITED_FLASH_LENGTH = FLASH_LENGTH;
-
-define symbol FLASH_END             = FLASH_ORIGIN + LIMITED_FLASH_LENGTH - 1;
-define symbol RAM_END               = RAM_START + RAM_LENGTH - 1;
+define symbol APP_ROM_START  = FLASH_START;
+define symbol APP_ROM_LENGTH = FLASH_LENGTH;
+define symbol APP_ROM_END    = APP_ROM_START + APP_ROM_LENGTH - 1;
+define symbol APP_RAM_START  = RAM_START;
+define symbol APP_RAM_END    = RAM_START + RAM_LENGTH - 1;
 
 /* Stack and heap sizes are defined in bsp_cfg.h */
 
@@ -13,10 +13,8 @@ do not initialize   { zeroinit };
 /* Main thread local storage */
 initialize manually { section __DLIB_PERTHREAD };
 
-keep { section .vector*};
-
 /************************ FLASH Memory **************************************/
-define region FLASH_region      = mem:[from FLASH_ORIGIN to FLASH_END];
+define region FLASH_region      = mem:[from APP_ROM_START to APP_ROM_END];
 place at start of FLASH_region  { ro section .fixed_vectors* };
 place in FLASH_region           { ro section .application_vectors* };
 place in FLASH_region   { ro,
@@ -24,17 +22,11 @@ place in FLASH_region   { ro,
                           last section END_OF_ROM };
 
 /************************ RAM Memory **************************************/
-define region RAM_region        = mem:[from RAM_START to RAM_END];
+define region RAM_region        = mem:[from APP_RAM_START to APP_RAM_END];
 place in RAM_region     { rw,
                           rw section .noinit,
                           rw section .bss,
                           rw section .data,
                           rw section HEAP,
                           rw section .stack };
-define block NOCACHE with alignment = 32, end alignment = 32, fixed order {
-    rw section .nocache
-};
-place in RAM_region     { block NOCACHE };
-place in RAM_region     { last section FREE_MEM };
-
 

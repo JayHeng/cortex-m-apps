@@ -2240,45 +2240,6 @@
     <group>
         <name>Flex Software</name>
         <group>
-            <name>ra_cfg</name>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\board_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_device_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_device_pn_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_family_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_pin_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_gpt_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_icu_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_ioport_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_lpm_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_sci_b_uart_cfg.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_ulpt_cfg.h</name>
-            </file>
-        </group>
-        <group>
             <name>ra</name>
             <group>
                 <name>arm</name>
@@ -2591,6 +2552,45 @@
             </group>
         </group>
         <group>
+            <name>ra_cfg</name>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\board_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_device_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_device_pn_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_mcu_family_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\bsp\bsp_pin_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_gpt_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_icu_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_ioport_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_lpm_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_sci_b_uart_cfg.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\e2studio\ra_cfg\fsp_cfg\r_ulpt_cfg.h</name>
+            </file>
+        </group>
+        <group>
             <name>ra_gen</name>
             <file>
                 <name>$PROJ_DIR$\..\e2studio\ra_gen\bsp_clock_cfg.h</name>
@@ -2684,8 +2684,4 @@
             </file>
         </group>
     </group>
-    <file>
-        <name>$PROJ_DIR$\buildinfo.ipcf</name>
-        <tag>IAR.ControlFile</tag>
-    </file>
 </project>

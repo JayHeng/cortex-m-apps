@@ -72,7 +72,9 @@
  #define MEM_LOCATION "STACK"
 #endif
 
+#ifndef ITERATIONS 
 #define ITERATIONS (10000)
+#endif
 
 /* Data Types :
 	To avoid compiler issues, define the data types that need ot be used for 8b, 16b and 32b in <core_portme.h>.

@@ -1351,6 +1351,7 @@
                     <name>CCDefines</name>
                     <state>_RENESAS_RA_</state>
                     <state>_RA_CORE=CM85</state>
+                    <state>ITERATIONS=30000</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -1940,7 +1941,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/script/R7FA8M1AH_ram.icf</state>
+                    <state>$PROJ_DIR$/script/fsp_tcm.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>

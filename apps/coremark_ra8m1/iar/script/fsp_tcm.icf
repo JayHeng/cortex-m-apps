@@ -1,0 +1,32 @@
+include "memory_regions.icf";
+
+define symbol APP_ROM_START  = ITCM_START;
+define symbol APP_ROM_LENGTH = ITCM_LENGTH;
+define symbol APP_ROM_END    = APP_ROM_START + APP_ROM_LENGTH - 1;
+define symbol APP_RAM_START  = DTCM_START;
+define symbol APP_RAM_END    = DTCM_START + DTCM_LENGTH - 1;
+
+/* Stack and heap sizes are defined in bsp_cfg.h */
+
+initialize manually { readwrite };
+do not initialize   { zeroinit };
+/* Main thread local storage */
+initialize manually { section __DLIB_PERTHREAD };
+
+/************************ FLASH Memory **************************************/
+define region FLASH_region      = mem:[from APP_ROM_START to APP_ROM_END];
+place at start of FLASH_region  { ro section .fixed_vectors* };
+place in FLASH_region           { ro section .application_vectors* };
+place in FLASH_region   { ro,
+                          ro section .rodata,
+                          last section END_OF_ROM };
+
+/************************ RAM Memory **************************************/
+define region RAM_region        = mem:[from APP_RAM_START to APP_RAM_END];
+place in RAM_region     { rw,
+                          rw section .noinit,
+                          rw section .bss,
+                          rw section .data,
+                          rw section HEAP,
+                          rw section .stack };
+

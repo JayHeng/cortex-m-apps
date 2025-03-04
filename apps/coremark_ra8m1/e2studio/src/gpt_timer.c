@@ -101,11 +101,6 @@ fsp_err_t gpt_set_period(void)
 	uint64_t period_counts                  = GPT_MAX_PERIOD_COUNT;
 	uint32_t pclkd_freq_hz                  = RESET_VALUE;
 
-	/* Get the source clock frequency (in Hz) */
-	pclkd_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKD);
-	pclkd_freq_hz >>= (uint32_t)(g_timer_gpt_periodic_cfg.source_div);
-    printf("\PCLKD freq_hz = %d\r\n", pclkd_freq_hz);
-
 	/* Convert period to PCLK counts so it can be set in hardware. */
 	//period_counts = (uint64_t)((gpt_desired_period_ms * (pclkd_freq_hz * CLOCK_TYPE_SPECIFIER))  / TIMER_UNITS_MILLISECONDS);
 

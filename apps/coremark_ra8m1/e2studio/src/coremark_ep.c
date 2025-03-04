@@ -41,6 +41,8 @@ static bool standby_sram_write(uint32_t offset_addr, uint8_t * p_write_buf, uint
 
 extern int coremark_main(void);
 
+uint32_t s_timerClockSourceInHz = 0;
+
 /**********************************************************************************************************************
 * Function implementations
 **********************************************************************************************************************/
@@ -48,38 +50,42 @@ extern int coremark_main(void);
 //BSP_PLACE_IN_SECTION(".itcm_data")uint32_t itcm_var = 0;
 void bsp_itcm_test(void)
 {
-    //itcm_var = 0x5aa5;
-    //printf("itcm_var addr = 0x%x\r\n", &itcm_var);
-    *(uint32_t *)0x00000000 = 0xFFFFFFFF;
-    uint32_t itcm_0_val = *(uint32_t *)0x00000000;
-    printf("@0x00000000 = %d\r\n", itcm_0_val);
-    *(uint32_t *)0x0000FFFC = 0xFFFFFFFF;
-    uint32_t itcm_n_val = *(uint32_t *)0x0000FFFC;
-    printf("@0x0000FFFC = %d\r\n", itcm_n_val);
+    volatile uint64_t counter_start, counter_end;
+    counter_start = gpt_get_current_counter();
+    for(uint32_t i=0; i<0x3000; i++)
+    {
+        memcpy((void *)0xC000, (void *)0x8000, 8*1024);
+    }
+    counter_end = gpt_get_current_counter();
+    printf("counter value before ITCM test = %llu\r\n", counter_start);
+    printf("counter value before ITCM test = %llu\r\n", counter_end);
+    printf("ITCM memcpy cost time (us) = %llu\r\n", (counter_end-counter_start)/(s_timerClockSourceInHz/1000000));
 }
 
 //BSP_PLACE_IN_SECTION(".dtcm_data")uint32_t dtcm_var = 0;
 void bsp_dtcm_test(void)
 {
-    //dtcm_var = 0x5aa5;
-    //printf("dtcm_var addr = 0x%x\r\n", &dtcm_var);
-    *(uint32_t *)0x20000000 = 0xFFFFFFFF;
-    uint32_t dtcm_0_val = *(uint32_t *)0x20000000;
-    printf("@0x20000000 = %d\r\n", dtcm_0_val);
-    *(uint32_t *)0x2000FFFC = 0xFFFFFFFF;
-    uint32_t dtcm_n_val = *(uint32_t *)0x2000FFFC;
-    printf("@0x2000FFFC = %d\r\n", dtcm_n_val);
+    volatile uint64_t counter_start, counter_end;
+    counter_start = gpt_get_current_counter();
+    for(uint32_t i=0; i<0x3000; i++)
+    {
+        memcpy((void *)0x2000C000, (void *)0x20008000, 8*1024);
+    }
+    counter_end = gpt_get_current_counter();
+    printf("counter value before DTCM test = %llu\r\n", counter_start);
+    printf("counter value before DTCM test = %llu\r\n", counter_end);
+    printf("DTCM memcpy cost time (us) = %llu\r\n", (counter_end-counter_start)/(s_timerClockSourceInHz/1000000));
 }
 
 void coremark_timer_track(void)
 {
-    static volatile uint32_t counter0, counter1;
+    static volatile uint64_t counter0, counter1;
     counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
+    printf("counter value before run = %llu\r\n", counter0);
     counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
+    printf("counter value before run = %llu\r\n", counter0);
     counter0 = gpt_get_current_counter();
-    printf("counter value before run = %d\r\n", counter0);
+    printf("counter value before run = %llu\r\n", counter0);
     printf("----------------------------------\r\n");
 }
 
@@ -95,9 +101,9 @@ void coremark_ep_entry(void)
     }
 
     /* Perform EP main procedure */
+    coremark_timer_track();
     //bsp_itcm_test();
     //bsp_dtcm_test();
-    coremark_timer_track();
     coremark_main();
     while (true)
     {
@@ -134,6 +140,10 @@ static fsp_err_t coremark_ep_startup(void)
 
     uint32_t cpu_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_CPUCLK);
     printf("Cortex-M85 freq_hz = %d\r\n", cpu_freq_hz);
+    /* Get the source clock frequency (in Hz) */
+    s_timerClockSourceInHz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKD);
+    s_timerClockSourceInHz >>= (uint32_t)(g_timer_gpt_periodic_cfg.source_div);
+    printf("\PCLKD freq_hz = %d\r\n", s_timerClockSourceInHz);
 
     /* Initialize necessary hardware modules  */
     //err = hw_module_ulpt_init();

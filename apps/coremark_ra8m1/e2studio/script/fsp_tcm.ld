@@ -4,15 +4,6 @@
 
 INCLUDE memory_regions.ld
 
-/* Uncomment and set XIP_SECONDARY_SLOT_IMAGE to 1 below for the secondary XIP application image.*/
-/*
- XIP_SECONDARY_SLOT_IMAGE = 1;
-*/
-
-QSPI_FLASH_PRV_LENGTH = DEFINED(QSPI_FLASH_SIZE) ? ABSOLUTE(QSPI_FLASH_SIZE) : ABSOLUTE(QSPI_FLASH_LENGTH);
-OSPI_DEVICE_0_PRV_LENGTH = DEFINED(OSPI_DEVICE_0_SIZE) ? ABSOLUTE(OSPI_DEVICE_0_SIZE) : ABSOLUTE(OSPI_DEVICE_0_LENGTH);
-OSPI_DEVICE_1_PRV_LENGTH = DEFINED(OSPI_DEVICE_1_SIZE) ? ABSOLUTE(OSPI_DEVICE_1_SIZE) : ABSOLUTE(OSPI_DEVICE_1_LENGTH);
-
 /* If a flat (secure) project has DEFINED RAM_NS_BUFFER_LENGTH, then emit IDAU symbols to allocate non-secure RAM. */
 __RESERVE_NS_RAM = !DEFINED(PROJECT_NONSECURE) && DEFINED(RAM_NS_BUFFER_LENGTH) && (OPTION_SETTING_S_LENGTH != 0);
 
@@ -32,49 +23,13 @@ OPTION_SETTING_DATA_FLASH_S_LENGTH = DEFINED(OPTION_SETTING_DATA_FLASH_S_LENGTH)
 /* This definition is used to avoid moving the counter in OPTION_SETTING regions for projects that should not configure option settings.
  * Bootloader images do not configure option settings because they are owned by the bootloader.
  * FSP_BOOTABLE_IMAGE is only defined in bootloader images. */
-__bl_FSP_BOOTABLE_IMAGE = 1;
-__bln_FSP_BOOTABLE_IMAGE = 1;
+
 PROJECT_SECURE_OR_FLAT = (!DEFINED(PROJECT_NONSECURE) || DEFINED(PROJECT_SECURE)) && OPTION_SETTING_LENGTH && !DEFINED(FSP_BOOTABLE_IMAGE);
 USE_OPTION_SETTING_NS = DEFINED(PROJECT_NONSECURE) && !DEFINED(FSP_BOOTABLE_IMAGE);
 USE_OPTION_SETTING_DATA_FLASH = PROJECT_SECURE_OR_FLAT && (OPTION_SETTING_DATA_FLASH_S_LENGTH != 0);
 
-__bl_FLASH_IMAGE_START = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                         FLASH_APPLICATION_IMAGE_NUMBER == 1 ? FLASH_START + FLASH_BOOTLOADER_LENGTH + FLASH_BOOTLOADER_HEADER_LENGTH :
-                         (DEFINED(BOOTLOADER_SECONDARY_USE_QSPI) || DEFINED(BOOTLOADER_SECONDARY_USE_OSPI_B)) ? FLASH_START + FLASH_BOOTLOADER_LENGTH + FLASH_BOOTLOADER_SCRATCH_LENGTH + FLASH_BOOTLOADER_HEADER_LENGTH :
-                         FLASH_START + FLASH_BOOTLOADER_LENGTH + FLASH_BOOTLOADER_SCRATCH_LENGTH + FLASH_APPLICATION_S_LENGTH + FLASH_BOOTLOADER_HEADER_LENGTH;
-__bl_FLASH_IMAGE_LENGTH = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                          FLASH_APPLICATION_S_LENGTH - FLASH_BOOTLOADER_HEADER_LENGTH;
-__bl_FLASH_IMAGE_END    = __bl_FLASH_IMAGE_START + __bl_FLASH_IMAGE_LENGTH;
-__bl_XIP_SECONDARY_FLASH_IMAGE_START = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                         FLASH_BOOTLOADER_LENGTH + FLASH_APPLICATION_S_LENGTH + FLASH_BOOTLOADER_HEADER_LENGTH;
-__bl_XIP_SECONDARY_FLASH_IMAGE_END = __bl_XIP_SECONDARY_FLASH_IMAGE_START + __bl_FLASH_IMAGE_LENGTH;
-__bl_FLASH_NS_START = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                        FLASH_APPLICATION_NS_LENGTH == 0 ? __bl_FLASH_IMAGE_END :
-                        __bl_FLASH_IMAGE_START - FLASH_BOOTLOADER_HEADER_LENGTH + FLASH_APPLICATION_S_LENGTH;
-__bl_FLASH_NSC_START = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                        FLASH_APPLICATION_NS_LENGTH == 0 ? __bl_FLASH_IMAGE_END :
-                        __bl_FLASH_IMAGE_END - FLASH_APPLICATION_NSC_LENGTH;
-__bl_RAM_NS_START    = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                       FLASH_APPLICATION_NS_LENGTH == 0 ? RAM_START + RAM_LENGTH :
-                       RAM_START + RAM_LENGTH - RAM_APPLICATION_NS_LENGTH;
-__bl_RAM_NSC_START   = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                       FLASH_APPLICATION_NS_LENGTH == 0 ? RAM_START + RAM_LENGTH :
-                       __bl_RAM_NS_START - RAM_APPLICATION_NSC_LENGTH;
-__bl_FLASH_NS_IMAGE_START = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                            FLASH_APPLICATION_NS_LENGTH == 0 ? __bl_FLASH_IMAGE_END :
-                            __bl_FLASH_NS_START + FLASH_BOOTLOADER_HEADER_LENGTH_2;
-__bln_FLASH_IMAGE_START = __bl_FLASH_NS_IMAGE_START | (!DEFINED (NS_OFFSET_START) ? 0 : NS_OFFSET_START);
-__bln_FLASH_IMAGE_LENGTH = !DEFINED(FLASH_BOOTLOADER_LENGTH) ? 0 :
-                           FLASH_APPLICATION_NS_LENGTH == 0 ? __bl_FLASH_IMAGE_END :
-                           FLASH_APPLICATION_NS_LENGTH - FLASH_BOOTLOADER_HEADER_LENGTH_2;
-
-XIP_SECONDARY_SLOT_IMAGE = DEFINED(XIP_SECONDARY_SLOT_IMAGE) ? XIP_SECONDARY_SLOT_IMAGE : 0;
-FLASH_ORIGIN = !DEFINED(FLASH_IMAGE_START) ? FLASH_START :
-                XIP_SECONDARY_SLOT_IMAGE == 1 ? XIP_SECONDARY_FLASH_IMAGE_START :
-                FLASH_IMAGE_START;
-LIMITED_FLASH_LENGTH = DEFINED(FLASH_IMAGE_LENGTH) ? FLASH_IMAGE_LENGTH :
-                       DEFINED(FLASH_BOOTLOADER_LENGTH) ? FLASH_BOOTLOADER_LENGTH :
-                       FLASH_LENGTH;
+FLASH_ORIGIN = FLASH_START;
+LIMITED_FLASH_LENGTH = FLASH_LENGTH;
 OPTION_SETTING_SAS_SIZE = 0x34;
 OPTION_SETTING_SAS_LENGTH = !DEFINED(OPTION_SETTING_LENGTH) ? 0 :
                             OPTION_SETTING_LENGTH == 0 ? 0 :
@@ -88,12 +43,7 @@ MEMORY
   FLASH (rx)                      : ORIGIN = FLASH_ORIGIN, LENGTH = LIMITED_FLASH_LENGTH
   RAM (rwx)                       : ORIGIN = RAM_START, LENGTH = RAM_LENGTH
   DATA_FLASH (rx)                 : ORIGIN = DATA_FLASH_START, LENGTH = DATA_FLASH_LENGTH
-  QSPI_FLASH (rx)                 : ORIGIN = QSPI_FLASH_START, LENGTH = QSPI_FLASH_PRV_LENGTH
-  OSPI_DEVICE_0 (rx)              : ORIGIN = OSPI_DEVICE_0_START, LENGTH = OSPI_DEVICE_0_PRV_LENGTH
-  OSPI_DEVICE_1 (rx)              : ORIGIN = OSPI_DEVICE_1_START, LENGTH = OSPI_DEVICE_1_PRV_LENGTH
-  OSPI_DEVICE_0_RAM (rwx)         : ORIGIN = OSPI_DEVICE_0_START, LENGTH = OSPI_DEVICE_0_PRV_LENGTH
-  OSPI_DEVICE_1_RAM (rwx)         : ORIGIN = OSPI_DEVICE_1_START, LENGTH = OSPI_DEVICE_1_PRV_LENGTH
-  SDRAM (rwx)                     : ORIGIN = SDRAM_START, LENGTH = SDRAM_LENGTH
+
   OPTION_SETTING (r)              : ORIGIN = OPTION_SETTING_START, LENGTH = OPTION_SETTING_LENGTH
   OPTION_SETTING_OFS (r)          : ORIGIN = OPTION_SETTING_START, LENGTH = 0x18
   OPTION_SETTING_SAS (r)          : ORIGIN = OPTION_SETTING_START + OPTION_SETTING_SAS_SIZE, LENGTH = OPTION_SETTING_SAS_LENGTH
@@ -134,24 +84,6 @@ GROUP(libgcc.a libc.a libm.a)
  *   __stack
  *   __Vectors_End
  *   __Vectors_Size
- *   __qspi_flash_start__
- *   __qspi_flash_end__
- *   __qspi_flash_code_size__
- *   __qspi_region_max_size__
- *   __qspi_region_start_address__
- *   __qspi_region_end_address__
- *   __ospi_device_0_start__
- *   __ospi_device_0_end__
- *   __ospi_device_0_code_size__
- *   __ospi_device_0_region_max_size__
- *   __ospi_device_0_region_start_address__
- *   __ospi_device_0_region_end_address__
- *   __ospi_device_1_start__
- *   __ospi_device_1_end__
- *   __ospi_device_1_code_size__
- *   __ospi_device_1_region_max_size__
- *   __ospi_device_1_region_start_address__
- *   __ospi_device_1_region_end_address__
  */
 ENTRY(Reset_Handler)
 
@@ -449,115 +381,6 @@ SECTIONS
     __tz_FLASH_N = DEFINED(FLASH_NS_START) ? ABSOLUTE(FLASH_NS_START) : __RESERVE_NS_RAM ? ABSOLUTE(FLASH_START + FLASH_LENGTH) : FLASH_LENGTH < 32768 ? FLASH_LENGTH : ALIGN(32768);
     FLASH_NS_IMAGE_START = DEFINED(FLASH_NS_IMAGE_START) ? FLASH_NS_IMAGE_START : __tz_FLASH_N;
 
-    /* Note: There are no secure/non-secure boundaries for QSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_QSPI_FLASH_S = ORIGIN(QSPI_FLASH);
-
-    /* QSPI_FLASH section to be downloaded via debugger */
-    .qspi_flash :
-    {
-        __qspi_flash_start__ = .;
-        KEEP(*(.qspi_flash*))
-        KEEP(*(.code_in_qspi*))
-        __qspi_flash_end__ = .;
-    } > QSPI_FLASH
-    __qspi_flash_code_size__ = __qspi_flash_end__ - __qspi_flash_start__;
-
-    /* QSPI_FLASH non-retentive section, creates a copy in internal flash that can be copied to QSPI */
-    __qspi_flash_code_addr__ = sgstubs_pre_location;
-    .qspi_non_retentive : AT(__qspi_flash_code_addr__)
-    {
-        __qspi_non_retentive_start__ = .;
-        KEEP(*(.qspi_non_retentive*))
-        __qspi_non_retentive_end__ = .;
-    } > QSPI_FLASH
-    __qspi_non_retentive_size__ = __qspi_non_retentive_end__ - __qspi_non_retentive_start__;
-
-    __qspi_region_max_size__ = 0x4000000;   /* Must be the same as defined in MEMORY above */
-    __qspi_region_start_address__ = __qspi_flash_start__;
-    __qspi_region_end_address__ = __qspi_flash_start__ + __qspi_region_max_size__;
-
-    /* Note: There are no secure/non-secure boundaries for QSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_QSPI_FLASH_N = __qspi_non_retentive_end__;
-
-    /* Support for OctaRAM */
-    .OSPI_DEVICE_0_NO_LOAD (NOLOAD):
-    {
-        . = ALIGN(4);
-        __ospi_device_0_start__ = .;
-        *(.ospi_device_0_no_load*)
-        . = ALIGN(4);
-        __ospi_device_0_end__ = .;
-    } > OSPI_DEVICE_0_RAM
-
-    .OSPI_DEVICE_1_NO_LOAD (NOLOAD):
-    {
-        . = ALIGN(4);
-        __ospi_device_1_start__ = .;
-        *(.ospi_device_1_no_load*)
-        . = ALIGN(4);
-        __ospi_device_1_end__ = .;
-    } > OSPI_DEVICE_1_RAM
-
-    /* Note: There are no secure/non-secure boundaries for QSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_OSPI_DEVICE_0_S = ORIGIN(OSPI_DEVICE_0);
-
-    /* OSPI_DEVICE_0 section to be downloaded via debugger */
-    .OSPI_DEVICE_0 :
-    {
-        __ospi_device_0_start__ = .;
-        KEEP(*(.ospi_device_0*))
-        KEEP(*(.code_in_ospi_device_0*))
-        __ospi_device_0_end__ = .;
-    } > OSPI_DEVICE_0
-    __ospi_device_0_code_size__ = __ospi_device_0_end__ - __ospi_device_0_start__;
-
-    /* OSPI_DEVICE_0 non-retentive section, creates a copy in internal flash that can be copied to OSPI */
-     __ospi_device_0_code_addr__ = sgstubs_pre_location + (SIZEOF(.qspi_non_retentive));
-    .ospi_device_0_non_retentive : AT(__ospi_device_0_code_addr__)
-    {
-        __ospi_device_0_non_retentive_start__ = .;
-        KEEP(*(.ospi_device_0_non_retentive*))
-        __ospi_device_0_non_retentive_end__ = .;
-    } > OSPI_DEVICE_0
-    __ospi_device_0_non_retentive_size__ = __ospi_device_0_non_retentive_end__ - __ospi_device_0_non_retentive_start__;
-
-    __ospi_device_0_region_max_size__ = 0x8000000;   /* Must be the same as defined in MEMORY above */
-    __ospi_device_0_region_start_address__ = __ospi_device_0_start__;
-    __ospi_device_0_region_end_address__ = __ospi_device_0_start__ + __ospi_device_0_region_max_size__;
-
-    /* Note: There are no secure/non-secure boundaries for OSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_OSPI_DEVICE_0_N = __ospi_device_0_non_retentive_end__;
-
-    /* Note: There are no secure/non-secure boundaries for OSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_OSPI_DEVICE_1_S = ORIGIN(OSPI_DEVICE_1);
-
-    /* OSPI_DEVICE_1 section to be downloaded via debugger */
-    .OSPI_DEVICE_1 :
-    {
-        __ospi_device_1_start__ = .;
-        KEEP(*(.ospi_device_1*))
-        KEEP(*(.code_in_ospi_device_1*))
-        __ospi_device_1_end__ = .;
-    } > OSPI_DEVICE_1
-    __ospi_device_1_code_size__ = __ospi_device_1_end__ - __ospi_device_1_start__;
-
-    /* OSPI_DEVICE_1 non-retentive section, creates a copy in internal flash that can be copied to OSPI */
-    __ospi_device_1_code_addr__ = sgstubs_pre_location + (SIZEOF(.qspi_non_retentive) + SIZEOF(.ospi_device_0_non_retentive));
-    .ospi_device_1_non_retentive : AT(__ospi_device_1_code_addr__)
-    {
-        __ospi_device_1_non_retentive_start__ = .;
-        KEEP(*(.ospi_device_1_non_retentive*))
-        __ospi_device_1_non_retentive_end__ = .;
-    } > OSPI_DEVICE_1
-    __ospi_device_1_non_retentive_size__ = __ospi_device_1_non_retentive_end__ - __ospi_device_1_non_retentive_start__;
-
-    __ospi_device_1_region_max_size__ = 0x10000000;   /* Must be the same as defined in MEMORY above */
-    __ospi_device_1_region_start_address__ = __ospi_device_1_start__;
-    __ospi_device_1_region_end_address__ = __ospi_device_1_start__ + __ospi_device_1_region_max_size__;
-
-    /* Note: There are no secure/non-secure boundaries for OSPI.  These symbols are provided for the RA configuration tool. */
-    __tz_OSPI_DEVICE_1_N = __ospi_device_1_non_retentive_end__;
-
     .noinit (NOLOAD):
     {
         . = ALIGN(4);
@@ -652,34 +475,6 @@ SECTIONS
 
         __tz_DATA_FLASH_N = DEFINED(DATA_FLASH_NS_START) ? ABSOLUTE(DATA_FLASH_NS_START) : __RESERVE_NS_RAM ? ABSOLUTE(DATA_FLASH_START + DATA_FLASH_LENGTH) : ALIGN(1024);
     } > DATA_FLASH
-
-    /* Note: There are no secure/non-secure boundaries for SDRAM.  These symbols are provided for the RA configuration tool. */
-    __tz_SDRAM_S = ORIGIN(SDRAM);
-
-    /* SDRAM */
-    .sdram (NOLOAD):
-    {
-        __SDRAM_Start = .;
-        KEEP(*(.sdram*))
-        KEEP(*(.frame*))
-        __SDRAM_End = .;
-    } > SDRAM
-
-    . = .;
-    __nocache_sdram_pre_location = .;
-    .nocache_sdram ALIGN(32) (NOLOAD):
-    {
-        __nocache_sdram_start = .;
-
-        KEEP(*(.nocache_sdram))
-
-        . = ALIGN(32);
-        __nocache_sdram_end = .;
-    } > SDRAM
-    . = (SIZEOF(.nocache_sdram) > 0) ? __nocache_sdram_end : __nocache_sdram_pre_location;
-
-    /* Note: There are no secure/non-secure boundaries for SDRAM.  These symbols are provided for the RA configuration tool. */
-    __tz_SDRAM_N = __SDRAM_End;
 
     /* Note: There are no secure/non-secure boundaries for ID_CODE.  These symbols are provided for the RA configuration tool. */
     __tz_ID_CODE_S = ORIGIN(ID_CODE);

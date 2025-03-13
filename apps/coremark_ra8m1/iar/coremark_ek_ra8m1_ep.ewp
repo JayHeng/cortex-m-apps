@@ -822,7 +822,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$/script/fsp_flash.icf</state>
+                    <state>$PROJ_DIR$/script/fsp.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>

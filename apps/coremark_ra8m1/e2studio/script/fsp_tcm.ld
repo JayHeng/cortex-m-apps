@@ -7,11 +7,16 @@ INCLUDE memory_regions.ld
 /* If a flat (secure) project has DEFINED RAM_NS_BUFFER_LENGTH, then emit IDAU symbols to allocate non-secure RAM. */
 __RESERVE_NS_RAM = !DEFINED(PROJECT_NONSECURE) && DEFINED(RAM_NS_BUFFER_LENGTH) && (OPTION_SETTING_S_LENGTH != 0);
 
+APP_ROM_START  = FLASH_START;
+APP_ROM_LENGTH = FLASH_LENGTH;
+APP_RAM_START  = RAM_START;
+APP_RAM_LENGTH = RAM_LENGTH;
+
 /* Define memory regions. */
 MEMORY
 {
-  FLASH (rx)                      : ORIGIN = FLASH_START, LENGTH = FLASH_LENGTH
-  RAM (rwx)                       : ORIGIN = RAM_START, LENGTH = RAM_LENGTH
+  FLASH (rx)                      : ORIGIN = APP_ROM_START, LENGTH = APP_ROM_LENGTH
+  RAM (rwx)                       : ORIGIN = APP_RAM_START, LENGTH = APP_RAM_LENGTH
 }
 
 /* Library configurations */
@@ -23,7 +28,7 @@ SECTIONS
 {
     .text :
     {
-        __tz_FLASH_S = ABSOLUTE(FLASH_START);
+        __tz_FLASH_S = ABSOLUTE(APP_ROM_START);
         __ROM_Start = .;
 
         /* Even though the vector table is not 256 entries (1KB) long, we still allocate that much
@@ -147,14 +152,14 @@ SECTIONS
     SGSTUBS_LOC = (DEFINED(PROJECT_SECURE) && DEFINED(FLASH_NSC_START)) ? ABSOLUTE(FLASH_NSC_START) : ALIGN(1024);
     .gnu.sgstubs SGSTUBS_LOC : ALIGN(1024)
     {
-        __FLASH_NSC_START = DEFINED(FLASH_NSC_START) ? ABSOLUTE(FLASH_NSC_START) : __RESERVE_NS_RAM ? ABSOLUTE(FLASH_START + FLASH_LENGTH) : ALIGN(1024);
+        __FLASH_NSC_START = DEFINED(FLASH_NSC_START) ? ABSOLUTE(FLASH_NSC_START) : __RESERVE_NS_RAM ? ABSOLUTE(APP_ROM_START + APP_ROM_LENGTH) : ALIGN(1024);
         _start_sg = .;
         *(.gnu.sgstubs*)
         . = ALIGN(32);
         _end_sg = .;
     } > FLASH
 
-    __tz_FLASH_N = DEFINED(FLASH_NS_START) ? ABSOLUTE(FLASH_NS_START) : __RESERVE_NS_RAM ? ABSOLUTE(FLASH_START + FLASH_LENGTH) : FLASH_LENGTH < 32768 ? FLASH_LENGTH : ALIGN(32768);
+    __tz_FLASH_N = DEFINED(FLASH_NS_START) ? ABSOLUTE(FLASH_NS_START) : __RESERVE_NS_RAM ? ABSOLUTE(APP_ROM_START + APP_ROM_LENGTH) : APP_ROM_LENGTH < 32768 ? APP_ROM_LENGTH : ALIGN(32768);
     FLASH_NS_IMAGE_START = DEFINED(FLASH_NS_IMAGE_START) ? FLASH_NS_IMAGE_START : __tz_FLASH_N;
 
     .noinit (NOLOAD):

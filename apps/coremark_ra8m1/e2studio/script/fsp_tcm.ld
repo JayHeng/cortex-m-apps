@@ -17,24 +17,8 @@ RAM_NS_BUFFER_LENGTH = DEFINED(RAM_NS_BUFFER_LENGTH) ? RAM_NS_BUFFER_LENGTH : 0;
 RAM_NS_BUFFER_START = RAM_START + RAM_LENGTH - RAM_NS_BUFFER_LENGTH;
 RAM_NS_BUFFER_BLOCK_START = RAM_START + RAM_LENGTH - RAM_NS_BUFFER_BLOCK_LENGTH;
 
-OPTION_SETTING_START_NS = DEFINED(PROJECT_NONSECURE) ? OPTION_SETTING_START : OPTION_SETTING_START + 0x80;
-OPTION_SETTING_DATA_FLASH_S_START = DEFINED(OPTION_SETTING_DATA_FLASH_S_START) ? OPTION_SETTING_DATA_FLASH_S_START : 0;
-OPTION_SETTING_DATA_FLASH_S_LENGTH = DEFINED(OPTION_SETTING_DATA_FLASH_S_LENGTH) ? OPTION_SETTING_DATA_FLASH_S_LENGTH : 0;
-
-/* This definition is used to avoid moving the counter in OPTION_SETTING regions for projects that should not configure option settings.
- * Bootloader images do not configure option settings because they are owned by the bootloader.
- * FSP_BOOTABLE_IMAGE is only defined in bootloader images. */
-
-PROJECT_SECURE_OR_FLAT = (!DEFINED(PROJECT_NONSECURE) || DEFINED(PROJECT_SECURE)) && OPTION_SETTING_LENGTH && !DEFINED(FSP_BOOTABLE_IMAGE);
-USE_OPTION_SETTING_NS = DEFINED(PROJECT_NONSECURE) && !DEFINED(FSP_BOOTABLE_IMAGE);
-USE_OPTION_SETTING_DATA_FLASH = PROJECT_SECURE_OR_FLAT && (OPTION_SETTING_DATA_FLASH_S_LENGTH != 0);
-
 FLASH_ORIGIN = FLASH_START;
 LIMITED_FLASH_LENGTH = FLASH_LENGTH;
-OPTION_SETTING_SAS_SIZE = 0x34;
-OPTION_SETTING_SAS_LENGTH = !DEFINED(OPTION_SETTING_LENGTH) ? 0 :
-                            OPTION_SETTING_LENGTH == 0 ? 0 :
-                            OPTION_SETTING_LENGTH - OPTION_SETTING_SAS_SIZE;
 
 /* Define memory regions. */
 MEMORY
@@ -43,12 +27,6 @@ MEMORY
   DTCM (rwx)                      : ORIGIN = DTCM_START, LENGTH = DTCM_LENGTH
   FLASH (rx)                      : ORIGIN = FLASH_ORIGIN, LENGTH = LIMITED_FLASH_LENGTH
   RAM (rwx)                       : ORIGIN = RAM_START, LENGTH = RAM_LENGTH
-
-  OPTION_SETTING (r)              : ORIGIN = OPTION_SETTING_START, LENGTH = OPTION_SETTING_LENGTH
-  OPTION_SETTING_OFS (r)          : ORIGIN = OPTION_SETTING_START, LENGTH = 0x18
-  OPTION_SETTING_SAS (r)          : ORIGIN = OPTION_SETTING_START + OPTION_SETTING_SAS_SIZE, LENGTH = OPTION_SETTING_SAS_LENGTH
-  OPTION_SETTING_S (r)            : ORIGIN = OPTION_SETTING_S_START, LENGTH = OPTION_SETTING_S_LENGTH
-  OPTION_SETTING_DATA_FLASH_S (r) : ORIGIN = OPTION_SETTING_DATA_FLASH_S_START, LENGTH = OPTION_SETTING_DATA_FLASH_S_LENGTH
 }
 
 /* Library configurations */
@@ -462,126 +440,4 @@ SECTIONS
 
         KEEP(*(.ns_buffer*))
     } > RAM
-
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_S = ORIGIN(OPTION_SETTING_OFS);
-
-    .option_setting_ofs :
-    {
-        __OPTION_SETTING_OFS_Start = .;
-        KEEP(*(.option_setting_ofs0))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_OFS_Start + 0x04 : __OPTION_SETTING_OFS_Start;
-        KEEP(*(.option_setting_ofs2))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_OFS_Start + 0x10 : __OPTION_SETTING_OFS_Start;
-        KEEP(*(.option_setting_dualsel))
-        __OPTION_SETTING_OFS_End = .;
-    } > OPTION_SETTING_OFS = 0xFF
-
-    .option_setting_sas :
-    {
-        __OPTION_SETTING_SAS_Start = .;
-        KEEP(*(.option_setting_sas))
-        __OPTION_SETTING_SAS_End = .;
-    } > OPTION_SETTING_SAS = 0xFF
-
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_N = ABSOLUTE(OPTION_SETTING_START_NS);
-
-    .option_setting_ns :
-    {
-        __OPTION_SETTING_NS_Start = .;
-        KEEP(*(.option_setting_ofs1))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x04 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_ofs3))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x10 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_banksel))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x40 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_bps0))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x44 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_bps1))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x48 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_bps2))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x4C : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_bps3))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x60 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_pbps0))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x64 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_pbps1))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x68 : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_pbps2))
-        . = USE_OPTION_SETTING_NS ? __OPTION_SETTING_NS_Start + 0x6C : __OPTION_SETTING_NS_Start;
-        KEEP(*(.option_setting_pbps3))
-        __OPTION_SETTING_NS_End = .;
-    } > OPTION_SETTING = 0xFF
-
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_S_S = ORIGIN(OPTION_SETTING_S);
-
-    .option_setting_s :
-    {
-        __OPTION_SETTING_S_Start = .;
-        KEEP(*(.option_setting_ofs1_sec))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x04 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_ofs3_sec))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x10 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_banksel_sec))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x40 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sec0))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x44 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sec1))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x48 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sec2))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x4C : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sec3))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x60 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_pbps_sec0))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x64 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_pbps_sec1))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x68 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_pbps_sec2))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x6C : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_pbps_sec3))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x80 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_ofs1_sel))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x84 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_ofs3_sel))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0x90 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_banksel_sel))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0xC0 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sel0))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0xC4 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sel1))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0xC8 : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sel2))
-        . = PROJECT_SECURE_OR_FLAT ? __OPTION_SETTING_S_Start + 0xCC : __OPTION_SETTING_S_Start;
-        KEEP(*(.option_setting_bps_sel3))
-        __OPTION_SETTING_S_End = .;
-    } > OPTION_SETTING_S = 0xFF
-
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_S_N = __OPTION_SETTING_S_End;
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_DATA_FLASH_S_S = ORIGIN(OPTION_SETTING_DATA_FLASH_S);
-
-    .option_setting_data_flash_s :
-    {
-        __OPTION_SETTING_DATA_FLASH_S_Start = .;
-        KEEP(*(.option_setting_data_flash_fsblctrl0))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x04 : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_fsblctrl1))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x08 : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_fsblctrl2))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x0C : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_sacc0))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x10 : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_sacc1))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x14 : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_samr))
-        . = USE_OPTION_SETTING_DATA_FLASH ? __OPTION_SETTING_DATA_FLASH_S_Start + 0x2E0 : __OPTION_SETTING_DATA_FLASH_S_Start;
-        KEEP(*(.option_setting_data_flash_hoemrtpk))
-        __OPTION_SETTING_DATA_FLASH_S_End = .;
-    } > OPTION_SETTING_DATA_FLASH_S = 0xFF
-
-    /* Symbol required for RA Configuration tool. */
-    __tz_OPTION_SETTING_DATA_FLASH_S_N = __OPTION_SETTING_DATA_FLASH_S_End;
 }

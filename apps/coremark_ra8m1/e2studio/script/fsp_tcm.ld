@@ -11,6 +11,7 @@ ITCM_START = DEFINED(ITCM_START)? ITCM_START : 0;
 ITCM_LENGTH = DEFINED(ITCM_LENGTH)? ITCM_LENGTH : 0;
 DTCM_START = DEFINED(DTCM_START)? DTCM_START : 0;
 DTCM_LENGTH = DEFINED(DTCM_LENGTH)? DTCM_LENGTH : 0;
+
 RAM_NS_BUFFER_BLOCK_LENGTH = DEFINED(RAM_NS_BUFFER_LENGTH) ? ALIGN(RAM_NS_BUFFER_LENGTH, 8192) : 0;
 RAM_NS_BUFFER_LENGTH = DEFINED(RAM_NS_BUFFER_LENGTH) ? RAM_NS_BUFFER_LENGTH : 0;
 RAM_NS_BUFFER_START = RAM_START + RAM_LENGTH - RAM_NS_BUFFER_LENGTH;
@@ -42,14 +43,12 @@ MEMORY
   DTCM (rwx)                      : ORIGIN = DTCM_START, LENGTH = DTCM_LENGTH
   FLASH (rx)                      : ORIGIN = FLASH_ORIGIN, LENGTH = LIMITED_FLASH_LENGTH
   RAM (rwx)                       : ORIGIN = RAM_START, LENGTH = RAM_LENGTH
-  DATA_FLASH (rx)                 : ORIGIN = DATA_FLASH_START, LENGTH = DATA_FLASH_LENGTH
 
   OPTION_SETTING (r)              : ORIGIN = OPTION_SETTING_START, LENGTH = OPTION_SETTING_LENGTH
   OPTION_SETTING_OFS (r)          : ORIGIN = OPTION_SETTING_START, LENGTH = 0x18
   OPTION_SETTING_SAS (r)          : ORIGIN = OPTION_SETTING_START + OPTION_SETTING_SAS_SIZE, LENGTH = OPTION_SETTING_SAS_LENGTH
   OPTION_SETTING_S (r)            : ORIGIN = OPTION_SETTING_S_START, LENGTH = OPTION_SETTING_S_LENGTH
   OPTION_SETTING_DATA_FLASH_S (r) : ORIGIN = OPTION_SETTING_DATA_FLASH_S_START, LENGTH = OPTION_SETTING_DATA_FLASH_S_LENGTH
-  ID_CODE (rx)                    : ORIGIN = ID_CODE_START, LENGTH = ID_CODE_LENGTH
 }
 
 /* Library configurations */
@@ -463,33 +462,6 @@ SECTIONS
 
         KEEP(*(.ns_buffer*))
     } > RAM
-
-    /* Data flash. */
-    .data_flash :
-    {
-        . = ORIGIN(DATA_FLASH);
-        __tz_DATA_FLASH_S = .;
-        __Data_Flash_Start = .;
-        KEEP(*(.data_flash*))
-        __Data_Flash_End = .;
-
-        __tz_DATA_FLASH_N = DEFINED(DATA_FLASH_NS_START) ? ABSOLUTE(DATA_FLASH_NS_START) : __RESERVE_NS_RAM ? ABSOLUTE(DATA_FLASH_START + DATA_FLASH_LENGTH) : ALIGN(1024);
-    } > DATA_FLASH
-
-    /* Note: There are no secure/non-secure boundaries for ID_CODE.  These symbols are provided for the RA configuration tool. */
-    __tz_ID_CODE_S = ORIGIN(ID_CODE);
-
-    /* Note: There are no secure/non-secure boundaries for ID_CODE.  These symbols are provided for the RA configuration tool.
-     *       Set this symbol to the same value as __tz_ID_CODE_S so the RA configuration tool does not split the ID_CODE
-     *       memory region between TrustZone projects. */
-    __tz_ID_CODE_N = __tz_ID_CODE_S;
-
-    .id_code :
-    {
-        __ID_Code_Start = .;
-        KEEP(*(.id_code*))
-        __ID_Code_End = .;
-    } > ID_CODE
 
     /* Symbol required for RA Configuration tool. */
     __tz_OPTION_SETTING_S = ORIGIN(OPTION_SETTING_OFS);

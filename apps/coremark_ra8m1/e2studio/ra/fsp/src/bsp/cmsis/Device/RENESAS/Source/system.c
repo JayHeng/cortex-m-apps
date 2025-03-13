@@ -400,10 +400,10 @@ void SystemInit (void)
 
     /* Initialize TCM memory. */
  #if BSP_FEATURE_BSP_HAS_ITCM
-    bsp_init_itcm();
+    //bsp_init_itcm();
  #endif
  #if BSP_FEATURE_BSP_HAS_DTCM
-    bsp_init_dtcm();
+    //bsp_init_dtcm();
  #endif
 
  #if defined(RENESAS_CORTEX_M85)

@@ -2,6 +2,10 @@
 
 /*/Debug/
 /*/Release/
+/*/Flash_Debug/
+/*/Flash_Release/
+/*/TCM_Debug/
+/*/TCM_Release/
 /*/ra_gen/
 /*/.settings/
 /*/.cache/

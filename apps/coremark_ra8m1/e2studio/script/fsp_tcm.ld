@@ -7,61 +7,16 @@ INCLUDE memory_regions.ld
 /* If a flat (secure) project has DEFINED RAM_NS_BUFFER_LENGTH, then emit IDAU symbols to allocate non-secure RAM. */
 __RESERVE_NS_RAM = !DEFINED(PROJECT_NONSECURE) && DEFINED(RAM_NS_BUFFER_LENGTH) && (OPTION_SETTING_S_LENGTH != 0);
 
-ITCM_START = DEFINED(ITCM_START)? ITCM_START : 0;
-ITCM_LENGTH = DEFINED(ITCM_LENGTH)? ITCM_LENGTH : 0;
-DTCM_START = DEFINED(DTCM_START)? DTCM_START : 0;
-DTCM_LENGTH = DEFINED(DTCM_LENGTH)? DTCM_LENGTH : 0;
-
-RAM_NS_BUFFER_BLOCK_LENGTH = DEFINED(RAM_NS_BUFFER_LENGTH) ? ALIGN(RAM_NS_BUFFER_LENGTH, 8192) : 0;
-RAM_NS_BUFFER_LENGTH = DEFINED(RAM_NS_BUFFER_LENGTH) ? RAM_NS_BUFFER_LENGTH : 0;
-RAM_NS_BUFFER_START = RAM_START + RAM_LENGTH - RAM_NS_BUFFER_LENGTH;
-RAM_NS_BUFFER_BLOCK_START = RAM_START + RAM_LENGTH - RAM_NS_BUFFER_BLOCK_LENGTH;
-
-FLASH_ORIGIN = FLASH_START;
-LIMITED_FLASH_LENGTH = FLASH_LENGTH;
-
 /* Define memory regions. */
 MEMORY
 {
-  ITCM (rx)                       : ORIGIN = ITCM_START, LENGTH = ITCM_LENGTH
-  DTCM (rwx)                      : ORIGIN = DTCM_START, LENGTH = DTCM_LENGTH
-  FLASH (rx)                      : ORIGIN = FLASH_ORIGIN, LENGTH = LIMITED_FLASH_LENGTH
+  FLASH (rx)                      : ORIGIN = FLASH_START, LENGTH = FLASH_LENGTH
   RAM (rwx)                       : ORIGIN = RAM_START, LENGTH = RAM_LENGTH
 }
 
 /* Library configurations */
 GROUP(libgcc.a libc.a libm.a)
 
-/* Linker script to place sections and symbol values. Should be used together
- * with other linker script that defines memory regions FLASH and RAM.
- * It references following symbols, which must be DEFINED in code:
- *   Reset_Handler : Entry of reset handler
- *
- * It defines following symbols, which code can use without definition:
- *   __exidx_start
- *   __exidx_end
- *   __copy_table_start__
- *   __copy_table_end__
- *   __zero_table_start__
- *   __zero_table_end__
- *   __etext
- *   __data_start__
- *   __preinit_array_start
- *   __preinit_array_end
- *   __init_array_start
- *   __init_array_end
- *   __fini_array_start
- *   __fini_array_end
- *   __data_end__
- *   __bss_start__
- *   __bss_end__
- *   __HeapLimit
- *   __StackLimit
- *   __StackTop
- *   __stack
- *   __Vectors_End
- *   __Vectors_Size
- */
 ENTRY(Reset_Handler)
 
 SECTIONS
@@ -78,103 +33,18 @@ SECTIONS
         KEEP(*(.application_vectors*))
         __Vectors_End = .;
 
-        /* Some devices have a gap of code flash between the vector table and ROM Registers.
-         * The flash gap section allows applications to place code and data in this section. */
-        *(.flash_gap*)
-
-        /* ROM Registers start at address 0x00000400 for devices that do not have the OPTION_SETTING region. */
-        . = OPTION_SETTING_LENGTH > 0 ? . : __ROM_Start + 0x400;
-        KEEP(*(.rom_registers*))
-
-        /* Allocate flash write-boundary-aligned
-         * space for sce9 wrapped public keys for mcuboot if the module is used.
-         */
-        KEEP(*(.mcuboot_sce9_key*))
-
         *(.text*)
 
         KEEP(*(.version))
         KEEP(*(.init))
         KEEP(*(.fini))
 
-        /* .ctors */
-        *crtbegin.o(.ctors)
-        *crtbegin?.o(.ctors)
-        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
-        *(SORT(.ctors.*))
-        *(.ctors)
-
-        /* .dtors */
-        *crtbegin.o(.dtors)
-        *crtbegin?.o(.dtors)
-        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
-        *(SORT(.dtors.*))
-        *(.dtors)
-
         *(.rodata*)
-        __usb_dev_descriptor_start_fs = .;
-        KEEP(*(.usb_device_desc_fs*))
-        __usb_cfg_descriptor_start_fs = .;
-        KEEP(*(.usb_config_desc_fs*))
-        __usb_interface_descriptor_start_fs = .;
-        KEEP(*(.usb_interface_desc_fs*))
-        __usb_descriptor_end_fs = .;
-        __usb_dev_descriptor_start_hs = .;
-        KEEP(*(.usb_device_desc_hs*))
-        __usb_cfg_descriptor_start_hs = .;
-        KEEP(*(.usb_config_desc_hs*))
-        __usb_interface_descriptor_start_hs = .;
-        KEEP(*(.usb_interface_desc_hs*))
-        __usb_descriptor_end_hs = .;
-
-        KEEP(*(.eh_frame*))
 
         __ROM_End = .;
     } > FLASH = 0xFF
 
     __Vectors_Size = __Vectors_End - __Vectors;
-
-    . = .;
-    __itcm_data_pre_location = .;
-
-    /* Initialized ITCM data. */
-    /* Aligned to FCACHE2 for RA8. */
-    .itcm_data : ALIGN(16)
-    {
-        /* Start of ITCM Secure Trustzone region. */
-        __tz_ITCM_S = ABSOLUTE(ITCM_START);
-
-        /* All ITCM data start */
-        __itcm_data_start = .;
-
-        KEEP(*(.itcm_data*))
-
-        /* Pad to eight byte alignment in case of ECC initialization. Fill zero. */
-        . = ALIGN(8);
-
-        /* All ITCM data end */
-        __itcm_data_end = .;
-
-        /*
-         * Start of the ITCM Non-Secure Trustzone region.
-         * ITCM_NS_START can be used to set a fixed address for non-secure ITCM in secure projects or flat projects.
-         */
-        __tz_ITCM_N = DEFINED(ITCM_NS_START) ? ABSOLUTE(ITCM_NS_START) : ALIGN(__itcm_data_end, 8192);
-    } > ITCM AT > FLASH = 0x00
-
-    /* Addresses exported for ITCM initialization. */
-    __itcm_data_init_start = LOADADDR(.itcm_data);
-    __itcm_data_init_end = LOADADDR(.itcm_data) + SIZEOF(.itcm_data);
-
-    ASSERT(ORIGIN(ITCM) % 8 == 0, "ITCM memory region origin must be aligned to 8 bytes.")
-    ASSERT(LENGTH(ITCM) % 8 == 0, "ITCM memory region length must be a multiple of 8 bytes.")
-    ASSERT(LOADADDR(.itcm_data) % 16 == 0, ".itcm_data section must be aligned to 16 bytes.")
-    ASSERT(SIZEOF(.itcm_data) % 8 == 0, ".itcm_data section size must be a multiple of 8 bytes.")
-
-    /* Restore location counter. */
-    /* If ITCM is not present, this will be the address stored in '.' before ALIGN was attempted. */
-    /* If ITCM is present, this will be the absolute address that follows the ITCM ROM location. */
-    . = (SIZEOF(.itcm_data) > 0) ? __itcm_data_init_end : __itcm_data_pre_location;
 
     __exidx_start = .;
     /DISCARD/ :
@@ -222,14 +92,6 @@ SECTIONS
 
     __tz_RAM_S = ORIGIN(RAM);
 
-    /* If DTC is used, put the DTC vector table at the start of SRAM.
-       This avoids memory holes due to 1K alignment required by it. */
-    .fsp_dtc_vector_table (NOLOAD) :
-    {
-        . = ORIGIN(RAM);
-        *(.fsp_dtc_vector_table)
-    } > RAM
-
     /* Initialized data section. */
     .data :
     {
@@ -275,69 +137,6 @@ SECTIONS
         __data_end__ = .;
 
     } > RAM AT > FLASH
-
-    . = .;
-    __dtcm_data_pre_location = LOADADDR(.data) + SIZEOF(.data);
-
-    /* Initialized DTCM data. */
-    /* Aligned to FCACHE2 for RA8. */
-    .dtcm_data : ALIGN(16)
-    {
-        /* Start of DTCM Secure Trustzone region. */
-        __tz_DTCM_S = ABSOLUTE(DTCM_START);
-
-        /* Initialized DTCM data start */
-        __dtcm_data_start = .;
-
-        KEEP(*(.dtcm_data*))
-
-        /* Pad to eight byte alignment in case of ECC initialization. Fill zero. */
-        . = ALIGN(8);
-
-        /* Initialized DTCM data end */
-        __dtcm_data_end = .;
-    } > DTCM AT > FLASH = 0x00
-
-    . = __dtcm_data_end;
-    /* Uninitialized DTCM data. */
-    /* ALIGN appears on the left side of the colon because it is being used to assign the VMA directly, as opposed to a right side appearance which would control the LMA. */
-    .dtcm_bss ALIGN(8) (NOLOAD) :
-    {
-        /* Uninitialized DTCM data start */
-        __dtcm_bss_start = .;
-
-        KEEP(*(.dtcm_bss*))
-
-        /* Pad to eight byte alignment in case of ECC initialization. No fill because of NOLOAD. */
-        . = ALIGN(8);
-
-        /* Uninitialized DTCM data end */
-        __dtcm_bss_end = .;
-
-        /*
-         * Start of the DTCM Non-Secure Trustzone region.
-         * DTCM_NS_START can be used to set a fixed address for non-secure DTCM in secure projects or flat projects.
-         */
-        __tz_DTCM_N = DEFINED(DTCM_NS_START) ? ABSOLUTE(DTCM_NS_START) : ALIGN(__dtcm_bss_end, 8192);
-    } > DTCM
-
-    /* Addresses exported for DTCM initialization. */
-    __dtcm_data_init_start = LOADADDR(.dtcm_data);
-    __dtcm_data_init_end = LOADADDR(.dtcm_data) + SIZEOF(.dtcm_data);
-
-    ASSERT(ORIGIN(DTCM) % 8 == 0, "DTCM memory region origin must be aligned to 8 bytes.")
-    ASSERT(LENGTH(DTCM) % 8 == 0, "DTCM memory region length must be a multiple of 8 bytes.")
-    ASSERT(LOADADDR(.dtcm_bss) == ADDR(.dtcm_bss), ".dtcm_bss has (VMA != LMA) but should be NOLOAD (VMA == LMA).")
-    ASSERT(LOADADDR(.dtcm_data) % 16 == 0, ".dtcm_data section must be aligned to 16 bytes.")
-    ASSERT(SIZEOF(.dtcm_data) % 8 == 0, ".dtcm_data section size must be a multiple of 8 bytes.")
-    ASSERT(LOADADDR(.dtcm_bss) % 8 == 0, ".dtcm_bss section must be aligned to 8 bytes.")
-    ASSERT(SIZEOF(.dtcm_bss) % 8 == 0, ".dtcm_bss section size must be a multiple of 8 bytes.")
-    ASSERT(__dtcm_bss_start == __dtcm_data_end, ".dtcm_bss section is not adjacent to .dtcm_data section.")
-
-    /* Restore location counter. */
-    /* If DTCM is not present, this will be the address stored in '.' before ALIGN was attempted. */
-    /* If DTCM is present, this will be the absolute address that follows the DTCM ROM location. */
-    . = (SIZEOF(.dtcm_data) > 0) ? __dtcm_data_init_end : __dtcm_data_pre_location;
 
     /* TrustZone Secure Gateway Stubs Section */
 
@@ -419,25 +218,4 @@ SECTIONS
     /* This symbol represents the end of user allocated RAM. The RAM after this symbol can be used
        at run time for things such as ThreadX memory pool allocations. */
     __RAM_segment_used_end__ = ALIGN(__StackTopAll , 4);
-
-    /* RAM_NSC_START can be used to set a fixed address for non-secure callable RAM in secure projects.
-     * If it is not specified, the address for NSC RAM is the end of RAM aligned to a 1K boundary.
-     * In flat projects that require non-secure RAM, this variable is set to the start of non-secure RAM. */
-    __RAM_NSC_START = DEFINED(RAM_NSC_START) ? ABSOLUTE(RAM_NSC_START - RAM_NS_BUFFER_BLOCK_LENGTH) : __RESERVE_NS_RAM ? ABSOLUTE(RAM_NS_BUFFER_BLOCK_START) : ALIGN(__RAM_segment_used_end__, 1024);
-
-    /* RAM_NS_START can be used to set a fixed address for non-secure RAM in secure projects or flat projects.
-     * RAM_NS_BUFFER_BLOCK_LENGTH is used to allocate non-secure buffers in a flat project. If it is not
-     * specified, the address for NSC RAM is the end of RAM aligned to an 8K boundary.
-     * In flat projects that require non-secure RAM, this variable is set to the start of non-secure RAM. */
-    __tz_RAM_N = DEFINED(FLASH_BOOTLOADER_LENGTH) ? (RAM_START + RAM_LENGTH - RAM_APPLICATION_NS_LENGTH) : DEFINED(RAM_NS_START) ? ABSOLUTE(RAM_NS_START - RAM_NS_BUFFER_BLOCK_LENGTH) : __RESERVE_NS_RAM ? ABSOLUTE(RAM_NS_BUFFER_BLOCK_START) : ALIGN(__RAM_NSC_START, 8192);
-
-    /* Non-secure buffers must be in non-secure RAM. This is primarily used for the EDMAC in flat projects.
-     * The EDMAC is a non-secure bus master and can only access non-secure RAM. */
-    .ns_buffer (NOLOAD):
-    {
-        /* Allocate RAM on a 32-byte boundary to help with placement of Ethernet buffers. */
-        . = __RESERVE_NS_RAM ? ABSOLUTE(RAM_NS_BUFFER_START & 0xFFFFFFE0) : .;
-
-        KEEP(*(.ns_buffer*))
-    } > RAM
 }

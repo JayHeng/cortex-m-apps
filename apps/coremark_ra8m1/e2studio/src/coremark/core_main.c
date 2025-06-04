@@ -44,13 +44,23 @@ void *iterate(void *pres) {
 	res->crclist=0;
 	res->crcmatrix=0;
 	res->crcstate=0;
-
-	for (i=0; i<iterations; i++) {
+        CORE_TICKS total_time;
+	for (i=0; i<iterations+3; i++) {
+                if (i <= 3)
+                {
+                    start_time();
+                }
 		crc=core_bench_list(res,1);
 		res->crc=crcu16(crc,res->crc);
 		crc=core_bench_list(res,-1);
 		res->crc=crcu16(crc,res->crc);
 		if (i==0) res->crclist=res->crc;
+                if (i <= 2)
+                {
+                    stop_time();
+                    total_time=get_time();
+                    ee_printf("round %d - CoreMark 1.0 : %f\n", i+1, default_num_contexts/time_in_secs(total_time));
+                }
 	}
 	return NULL;
 }

@@ -26,6 +26,7 @@
 
 #include "common_utils.h"
 #include "uart_terminal.h"
+#include "core_portme.h"
 
 /**********************************************************************************************************************
 * Macro definitions

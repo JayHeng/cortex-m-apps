@@ -137,6 +137,10 @@ static fsp_err_t coremark_ep_startup(void)
         TERMINAL_PRINT("\r\nStored fixed data into standby SRAM\r\n");
 #endif
     }
+    
+    // SCB->CCR[BP], SCB->CCR[LOB] have been set in SystemInit()
+    uint32_t scb_ccr = SCB->CCR;
+    ee_printf("Cortex-M85 SCB->CCR = 0x%x\r\n", scb_ccr);
 
     uint32_t cpu_freq_hz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_CPUCLK);
     ee_printf("Cortex-M85 freq_hz = %d\r\n", cpu_freq_hz);
@@ -144,7 +148,7 @@ static fsp_err_t coremark_ep_startup(void)
     /* Get the source clock frequency (in Hz) */
     s_timerClockSourceInHz = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKD);
     s_timerClockSourceInHz >>= (uint32_t)(g_timer_gpt_periodic_cfg.source_div);
-    ee_printf("\PCLKD freq_hz = %d\r\n", s_timerClockSourceInHz);
+    ee_printf("PCLKD freq_hz = %d\r\n", s_timerClockSourceInHz);
 
     /* Initialize necessary hardware modules  */
     //err = hw_module_ulpt_init();

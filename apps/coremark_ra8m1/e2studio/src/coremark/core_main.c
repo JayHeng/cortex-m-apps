@@ -183,13 +183,13 @@ MAIN_RETURN_TYPE coremark_main(int argc, char *argv[]) {
 	/* call inits */
 	for (i=0 ; i<MULTITHREAD; i++) {
 		if (results[i].execs & ID_LIST) {
-			results[i].list=core_list_init(results[0].size,results[i].memblock[1],results[i].seed1);
+			results[i].list=core_list_init(results[0].size,(list_head*)(results[i].memblock[1]),results[i].seed1);
 		}
 		if (results[i].execs & ID_MATRIX) {
 			core_init_matrix(results[0].size, results[i].memblock[2], (ee_s32)results[i].seed1 | (((ee_s32)results[i].seed2) << 16), &(results[i].mat) );
 		}
 		if (results[i].execs & ID_STATE) {
-			core_init_state(results[0].size,results[i].seed1,results[i].memblock[3]);
+			core_init_state(results[0].size,results[i].seed1,(ee_u8 *)(results[i].memblock[3]));
 		}
 	}
 	
